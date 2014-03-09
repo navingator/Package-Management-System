@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 
 public class JSONFileIO {
-	// TODO Rewrite with new database in mind
+	// TODO Rewrite with new database
 	public static void writeDatabaseJSONFile(Person person, String fileName) throws IOException {
 		
 		// initialize gson object
