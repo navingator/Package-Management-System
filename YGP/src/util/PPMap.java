@@ -70,7 +70,6 @@ public class PPMap {
 		System.out.println(getPackages(navin).toString());
 		//System.out.println(getPerson(p1).getNetID());		// should throw exception
 		//System.out.println(getPackages(chris).toString());// should throw exception
-		
 	}
 	
 }
