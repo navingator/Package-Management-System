@@ -26,6 +26,8 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
 
+import controller.Controller;
+
 public class MainFrame extends JFrame {
 
 	private JPanel contentPane;
@@ -171,6 +173,7 @@ public class MainFrame extends JFrame {
 		JButton btnConfirm = new JButton("Confirm");
 		btnConfirm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 			}
 		});
 		panelCheckIn.add(btnConfirm, "3, 6, center, default");

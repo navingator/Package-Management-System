@@ -10,6 +10,7 @@ public class Person {
 	private String lastName;
 	private String firstName;
 	private String emailAddress;
+	private String netID;
 	
 	public Person(String lastName, String firstName, String emailAddress) {
 		this.lastName = lastName;
@@ -23,6 +24,7 @@ public class Person {
 	 * 	lastName
 	 * 	firstName
 	 * 	emailAddress
+	 * 	netID
 	 */
 	public String getFullName() {
 		return firstName + ' ' + lastName;
@@ -36,7 +38,9 @@ public class Person {
 	public String getEmailAddress(){
 		return emailAddress;
 	}
-	
+	public String getNetID() {
+		return netID;
+	}
 
 	/*
 	 * Setters:
@@ -44,7 +48,7 @@ public class Person {
 	 *  firstName
 	 *  emailAddress
 	 */
-	
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}

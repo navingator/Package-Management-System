@@ -14,9 +14,13 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import util.PPMap;
 import util.Package;
 import util.Person;
+
+/*
+ * Class that handles sending notification and reminder emails to students through
+ * SMTP to the Gmail mail server.
+ */
 
 public class Emailer {
 	
@@ -88,10 +92,8 @@ public class Emailer {
 	 * Sends a reminder email to the recipient reminding them of each package that
 	 * is returned by recipient.getPackageList()
 	 */
-	public static void sendPackageReminder(Person recipient) 
+	public static void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
 			throws UnsupportedEncodingException, MessagingException {
-		
-		ArrayList<Package> packages = PPMap.getPackages(recipient);
 		
 		String subject = "[Test][Package Reminder] You have " + packages.size() + " package";
 		if (packages.size() != 1) {
@@ -129,9 +131,10 @@ public class Emailer {
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));
 		Package p3 = new Package(309435,"",new Date(now.getTime()-200000000));
 		
-		//navin.addPackage(p1);
-		PPMap.addEntry(navin, p2);
-		PPMap.addEntry(navin, p3);
+		ArrayList<Package> navinPkgs = new ArrayList<Package>();
+		navinPkgs.add(p2);
+		navinPkgs.add(p3);
+		
 		try {
 			Emailer.connect(senderEmail, password);
 			Emailer.sendPackageNotification(navin);
@@ -139,7 +142,7 @@ public class Emailer {
 			//Emailer.sendPackageReminder(navin, new Package[]{p2});
 			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2});
 			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2,p3});
-			Emailer.sendPackageReminder(navin);
+			Emailer.sendPackageReminder(navin,navinPkgs);
 			//Emailer.sendPackageReminder(navin, new Package[]{});
 			Emailer.closeConnection();
 		} catch (NoSuchProviderException e) {

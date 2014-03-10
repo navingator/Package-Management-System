@@ -1,27 +1,46 @@
-package util;
+package model;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
 
+import util.Package;
+import util.Person;
+
+/*
+ * Class containing a map that handles the storage of the person and package relationships 
+ * for use by the database only.
+ */
+
 public class PPMap {
 
-	private static HashMap<Person, ArrayList<Package>> person2Package = new HashMap<Person, ArrayList<Package>>();
-	private static HashMap<Package, Person> package2Person = new HashMap<Package, Person>();
+	private HashMap<Person, ArrayList<Package>> person2Package;
+	private HashMap<Package, Person> package2Person;
 	
-	public static void generateMapsFromDatabase(String fileName) {
+	public PPMap(String folderName) {
+		this.person2Package = new HashMap<Person, ArrayList<Package>>();
+		this.package2Person = new HashMap<Package, Person>();
+		
+		generateMapsFromFolder(folderName);
+	}
+	
+	/*
+	 * Generates both maps from indicated folder
+	 * All people and package objects initially created here
+	 */
+	private void generateMapsFromFolder(String folderName) {
 		//TODO: do it after we have JSON reader/writer
 	}
 	
-	public static Person getPerson(Package pkg) {
+	public Person getPerson(Package pkg) {
 		return package2Person.get(pkg);
 	}
 	
-	public static ArrayList<Package> getPackages(Person person) {
+	public ArrayList<Package> getPackages(Person person) {
 		return person2Package.get(person);
 	}
 	
-	public static void addEntry(Person person, Package pkg) {
+	public void addEntry(Person person, Package pkg) {
 		package2Person.put(pkg, person);
 		
 		// retrieve list of packages
@@ -37,21 +56,16 @@ public class PPMap {
 		person2Package.put(person, pkgList);
 	}
 	
-	public static void deleteEntry(Person person, Package pkg) {
+	public void deleteEntry(Person person, Package pkg) {
 		package2Person.remove(pkg);
 		
 		// retrieve list of packages
 		ArrayList<Package> pkgList = person2Package.get(person);
-		if (pkgList.size() == 1) {
-			//TODO: reconsider this, especially if we do not store people elsewhere
-			person2Package.remove(person); // remove person if only package
-		} else {
-			pkgList.remove(pkg); // remove the package from the list
-			person2Package.put(person, pkgList); // associate with new list
-		}
+		pkgList.remove(pkg); // remove the package from the list
+		person2Package.put(person, pkgList); // associate with new list
 	}
 	
-	public static void main(String[] args) {
+	public void main(String[] args) {
 		Date now = new Date();
 		Package p1 = new Package(123,"",now);
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));
