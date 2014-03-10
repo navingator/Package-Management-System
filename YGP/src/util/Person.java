@@ -12,10 +12,11 @@ public class Person {
 	private String emailAddress;
 	private String netID;
 	
-	public Person(String lastName, String firstName, String emailAddress) {
+	public Person(String lastName, String firstName, String emailAddress, String netID) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
+		this.netID = netID;
 	}
 	
 	/*

@@ -71,8 +71,8 @@ public class PPMap {
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));
 		Package p3 = new Package(309435,"",new Date(now.getTime()-200000000));
 		
-		Person navin = new Person("Pathak", "Navin", "np8@rice.edu");
-		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
+		Person navin = new Person("Pathak", "Navin", "np8@rice.edu","np8");
+		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu","cwh1");
 		
 		addEntry(navin,p1);
 		addEntry(navin,p2);

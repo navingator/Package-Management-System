@@ -1,4 +1,4 @@
-package model;
+package util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -13,9 +13,6 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import util.Package;
-import util.Person;
 
 /*
  * Class that handles sending notification and reminder emails to students through
@@ -121,7 +118,7 @@ public class Emailer {
 		String senderEmail = "JonesCollegeMailRoom@gmail.com";
 		String password = "jonesmailroomisbadass";
 		
-		Person navin = new Person("Pathak", "Navin", "np8@rice.edu");
+		Person navin = new Person("Pathak", "Navin", "np8@rice.edu","np8");
 		//Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
 		//Person michelle = new Person("Bennack", "Michelle", "mrb4@rice.edu");
 		//Person ambi = new Person("Bobmanuel","Ambila","ajb6@rice.edu");

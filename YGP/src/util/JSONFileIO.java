@@ -63,12 +63,12 @@ public class JSONFileIO {
 		Package p3 = new Package(309435,"",new Date(now.getTime()-200000000));
 		
 		ArrayList<Package> packages = new ArrayList<Package>();
-		//packages.add(p1);
-		//packages.add(p2);
-		//packages.add(p3);
+		packages.add(p1);
+		packages.add(p2);
+		packages.add(p3);
 		
-		Person navin = new Person("Pathak", "Navin", "np8@rice.edu");
-		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
+		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
+		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "np8");
 		
 		try {
 			// test writing to JSON file
