@@ -3,9 +3,11 @@ package controller;
 import java.awt.EventQueue;
 import java.util.Date;
 
-import model.Database;
+import model.IModelToViewAdapter;
+import model.database.Database;
 import util.Package;
 import util.Person;
+import view.IViewToModelAdapter;
 import view.MainFrame;
 
 /**
@@ -19,7 +21,7 @@ public class Controller implements IViewToModelAdapter, IModelToViewAdapter{
 	
 	public static void main(String[] args) {
 		
-		// initialize database
+		// initialize model.database
 		ActiveDB = new Database("$HOME$/Documents/Package Management Utility/Data/Active Packages");
 
 		EventQueue.invokeLater(new Runnable() {

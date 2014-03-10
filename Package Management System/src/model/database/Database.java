@@ -1,15 +1,14 @@
-package model;
+package model.database;
 
 import util.Package;
 import util.Person;
 import util.Pair;
-import model.PPMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 /*
- * Class that handles operations to and from the database
+ * Class that handles operations to and from the model.database
  */
 
 public class Database {

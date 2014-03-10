@@ -1,4 +1,4 @@
-package model;
+package model.database;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import util.Person;
 
 /*
  * Class containing a map that handles the storage of the person and package relationships 
- * for use by the database only.
+ * for use by the model.database only.
  */
 
 public class PPMap {

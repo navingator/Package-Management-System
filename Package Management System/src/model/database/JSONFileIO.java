@@ -1,4 +1,4 @@
-package util;
+package model.database;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -13,13 +13,12 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.lang.reflect.Type;
 
-import model.PPMap;
 import util.Package;
 import util.Pair;
 import util.Person;
 
 public class JSONFileIO {
-	// TODO Rewrite with new database
+	// TODO Rewrite with new model.database
 	public static void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String fileName) 
 			throws IOException {
 		
@@ -46,7 +45,7 @@ public class JSONFileIO {
 		FileInputStream infile = new FileInputStream(fileName);
 		DataInputStream inStream = new DataInputStream(infile);
 		
-		// read database file
+		// read model.database file
 		String json = inStream.readUTF();
 		
 		inStream.close();
