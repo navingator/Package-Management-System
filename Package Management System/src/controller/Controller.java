@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import model.IModelToViewAdaptor;
+import model.PackageManager;
 import model.database.Database;
 import util.Package;
 import util.Pair;
@@ -17,11 +18,12 @@ import view.MainFrame;
  * instantiating them both as well as their communications and adaptors.
  */
 
+//TODO Find all of the system.out.println and replace with logger
+
 public class Controller{
 	
 	private MainFrame viewFrame;
-	//TODO implement model
-	private Database ActiveDB;
+	private PackageManager modelPM;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -40,75 +42,75 @@ public class Controller{
 		// Initialize view
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
 			public Pair<Person,Package> getPackageInfo(long packageID) {
-				//TODO
+				modelPM.getPackageFromID(packageID);
 				return null;
 			}
 			
 			public void checkOutPackage(Package pkg) {
-				//TODO
+				modelPM.checkOutPackage(pkg);
 			}
 			
 			public ArrayList<Person> getPersonList() {
-				//TODO
+				modelPM.getAllPeople();
 				return null;
 			}
 			
 			public Package checkInPackage(Person person, String comment) {
-				//TODO
+				modelPM.checkInPackage(person, comment);
 				return null;
 			}
 			
 			public void printLabel(Package pkg) {
-				//TODO
+				modelPM.printLabel(pkg);
 			}
 			
 			public void sendPackageNotification(Person person) {
-				//TODO
-			}
-			
-			public void authenticate(String password) {
-				//TODO
+				modelPM.sendPackageNotification(person);
 			}
 			
 			public ArrayList<Pair<Person,Package>> getActivePackages() {
-				return ActiveDB.getActiveEntries();
+				return modelPM.getActiveEntries();
 			}
 			
 			public ArrayList<Pair<Person,Package>> getPackagesByPerson(Person person) {
-				return ActiveDB.getEntriesByPerson(person);
+				return modelPM.getEntriesByPerson(person);
 			}
 			
 			public ArrayList<Pair<Person,Package>> getPackagesByDate(Date date, String predicate) {
-				return ActiveDB.getEntriesByDate(date, predicate);
+				return modelPM.getEntriesByDate(date, predicate);
+			}
+			
+			public void authenticate(String password) {
+				modelPM.checkAdminPassword(password);
 			}
 			
 			public void changeEmail(String newEmail, String newPassword) {
-				//TODO
+				modelPM.changeEmail(newEmail, newPassword);
 			}
 			
 			public void importPersonList(String fileName) {
-				//TODO
+				modelPM.importPersonList(fileName);
 			}
 			
 			public void savePersonList(ArrayList<Person> personList) {
-				//TODO
+				modelPM.exportPersonList(personList);
 			}
 		});
 		
+		// TODO ask chris how anonymous classes can work without an instantiated modelPM object
 		// Initialize model
+		modelPM = new PackageManager(new IModelToViewAdaptor() {
+			//TODO write IModelToViewAdaptor
+		});
 	}
 	
 	public void start() {
+		//TODO Start logger
 		viewFrame.start();
-		//TODO Start model
+		modelPM.start();
 	}
 	
 	//TODO Send this to another file
-	public Package checkInPackage(Person person, String comment) {
-		Date now = new Date();
-		//TODO Actually make the packageID work
-		Package pkg = new Package(0, comment, now);
-		return ActiveDB.checkInPackage(person, pkg);
-	}
+
 
 }

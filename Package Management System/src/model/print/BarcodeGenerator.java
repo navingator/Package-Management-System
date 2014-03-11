@@ -1,4 +1,4 @@
-package model.barcode;
+package model.print;
 
 /*
  * Copyright 2010 Jeremias Maerki

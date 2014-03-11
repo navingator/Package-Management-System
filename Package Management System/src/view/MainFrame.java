@@ -36,6 +36,11 @@ import controller.Controller;
 
 public class MainFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3659030814987459253L;
+
 	private IViewToModelAdaptor modelAdaptor;
 	
 	private JPanel contentPane;

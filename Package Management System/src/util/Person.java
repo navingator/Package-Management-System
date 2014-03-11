@@ -1,7 +1,5 @@
 package util;
 
-import java.util.ArrayList;
-
 /*
  * Package class contains variables necessary to define a package
  */

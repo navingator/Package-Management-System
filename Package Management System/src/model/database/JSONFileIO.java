@@ -1,24 +1,23 @@
 package model.database;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Date;
 
 import util.Package;
 import util.Pair;
 import util.Person;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class JSONFileIO {
-	// TODO Rewrite with new model.database
 	public static void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String fileName) 
 			throws IOException {
 		
@@ -60,23 +59,23 @@ public class JSONFileIO {
 		Package p1 = new Package(123,"",now);
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));
 		Package p3 = new Package(309435,"",new Date(now.getTime()-200000000));
-		
+
 		ArrayList<Package> packages = new ArrayList<Package>();
 		packages.add(p1);
 		packages.add(p2);
 		packages.add(p3);
-		
+
 		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
 		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "np8");
-		
+
 		try {
 			// test writing to JSON file
-			String fileName = "testFiles/test.txt";
+			String fileName = "testFiles/" + navin.getNetID() +".txt";
 			writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName);
-			
+
 			// test reading from JSON file
-			Pair<Person,ArrayList<Package>> testPair = readDatabaseJSONFile(fileName);  
-			
+			Pair<Person,ArrayList<Package>> testPair = readDatabaseJSONFile(fileName);
+
 			System.out.println(testPair.first.getEmailAddress());
 			System.out.println(testPair.second.toString());
 		} catch (FileNotFoundException e) {
@@ -85,5 +84,4 @@ public class JSONFileIO {
 			e.printStackTrace();
 		}
 	}
-	
 }

@@ -1,5 +1,6 @@
 package model.database;
 
+import util.FileIO;
 import util.Package;
 import util.Person;
 import util.Pair;
@@ -10,20 +11,29 @@ import java.util.Date;
 import java.util.Map;
 
 /*
- * Class that handles operations to and from the model.database
+ * Class that handles operations to and from the data files and DatabaseMaps
  */
 
 public class Database {
 	
-	private DatabaseMaps peoplePersonMap;
-	private Map<String,Person> personIDMap;
-	private Map<String,Package> packageIDMap;
-	private String dataFolderName;
+	private DatabaseMaps dbMap;
+	private String dataDirName;
+	private String activeDirName;
+	private String archiveDirName;
 	
-	public Database(String dataFolderName) {
-		this.dataFolderName = dataFolderName;
-		this.peoplePersonMap = new DatabaseMaps(dataFolderName);
+	public Database(String rootDirName) {
+		this.dataDirName = rootDirName + "/data";
+		this.activeDirName = dataDirName + "/active";
+		this.archiveDirName = dataDirName + "/archive";
 	}
+	
+	public void start() {
+		// check if rootFolder and subfolders exist
+		System.out.println("Creating data directories: " + dataDirName + ", " + archiveDirName);
+		FileIO.makeDirs(new String[] {dataDirName, activeDirName, archiveDirName});
+		this.dbMap = new DatabaseMaps(activeDirName);
+	}
+	
 	
 	//TODO check in package
 	public Package checkInPackage(Person person, Package pkg) {
@@ -38,8 +48,6 @@ public class Database {
 		// remove package from packageID:Package map
 	}
 	
-	
-
 	/* return sorted entries for all active entries */
 	//TODO get active entries
 	public ArrayList<Pair<Person, Package>> getActiveEntries() {
@@ -55,6 +63,8 @@ public class Database {
 		return null;
 	}
 
+	
+	// make the directory structure required by the database
 	
 	/* 
 	 * return entries sorted by:
@@ -94,6 +104,10 @@ public class Database {
 		// move person file to the archive 
 		
 		// remove person from DatabaseMaps, netID:Person map, and packageID:Package map
+	}
+
+	public ArrayList<Person> getAllPeople() {
+		return dbMap.getAllPeople();
 	}
 	
 }

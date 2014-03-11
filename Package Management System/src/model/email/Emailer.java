@@ -1,4 +1,4 @@
-package util;
+package model.email;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -14,6 +14,9 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import util.Package;
+import util.Person;
+
 /*
  * Class that handles sending notification and reminder emails to students through
  * SMTP to the Gmail mail server.
@@ -21,15 +24,15 @@ import javax.mail.internet.MimeMessage;
 
 public class Emailer {
 	
-	private static Session session;
-	private static Transport transport;
-	private static String senderEmail;
+	private Session session;
+	private Transport transport;
+	private String senderEmail;
 	
 	private static final String senderAlias = "Jones Mail Room";
 	
 	
 	// connect to the mail server
-	public static void connect(String userEmail, String password) 
+	public void connect(String userEmail, String password) 
 			throws NoSuchProviderException, MessagingException {
 
 		senderEmail = userEmail;
@@ -50,7 +53,7 @@ public class Emailer {
 	}
 	
 	// send an email through the mail server
-	private static void sendEmail(String recipientEmail, String recipientAlias, String subject,
+	private void sendEmail(String recipientEmail, String recipientAlias, String subject,
 			String body) throws UnsupportedEncodingException, MessagingException {
 		
         MimeMessage message = new MimeMessage(session);
@@ -65,7 +68,7 @@ public class Emailer {
 	}
 
 	// close the connection to the mail server
-	public static void closeConnection() throws MessagingException {
+	public void closeConnection() throws MessagingException {
         transport.close();
 	}
 
@@ -73,7 +76,7 @@ public class Emailer {
 	 * Sends a notification email to the recipient informing them that they 
 	 * have a new package 
 	 */
-	public static void sendPackageNotification(Person recipient) 
+	public void sendPackageNotification(Person recipient) 
 			throws UnsupportedEncodingException, MessagingException {
 		
 		String subject = "[Test][Package Notification] New Package for " + recipient.getFullName();
@@ -89,7 +92,7 @@ public class Emailer {
 	 * Sends a reminder email to the recipient reminding them of each package that
 	 * is returned by recipient.getPackageList()
 	 */
-	public static void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
+	public void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
 			throws UnsupportedEncodingException, MessagingException {
 		
 		String subject = "[Test][Package Reminder] You have " + packages.size() + " package";
@@ -112,8 +115,8 @@ public class Emailer {
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 	}
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public void main(String[] args) {
+		Emailer emailer = new Emailer();
 		
 		String senderEmail = "JonesCollegeMailRoom@gmail.com";
 		String password = "jonesmailroomisbadass";
@@ -133,15 +136,15 @@ public class Emailer {
 		navinPkgs.add(p3);
 		
 		try {
-			Emailer.connect(senderEmail, password);
-			Emailer.sendPackageNotification(navin);
+			emailer.connect(senderEmail, password);
+			emailer.sendPackageNotification(navin);
 			//Emailer.sendPackageReminder(navin, new Package[]{p1});
 			//Emailer.sendPackageReminder(navin, new Package[]{p2});
 			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2});
 			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2,p3});
-			Emailer.sendPackageReminder(navin,navinPkgs);
+			emailer.sendPackageReminder(navin,navinPkgs);
 			//Emailer.sendPackageReminder(navin, new Package[]{});
-			Emailer.closeConnection();
+			emailer.closeConnection();
 		} catch (NoSuchProviderException e) {
 			e.printStackTrace();
 		} catch (MessagingException e) {
@@ -149,6 +152,11 @@ public class Emailer {
 		} catch(UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} 
+	}
+
+	public void start() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
