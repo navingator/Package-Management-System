@@ -107,7 +107,7 @@ public class Database {
 	}
 
 	public ArrayList<Person> getAllPeople() {
-		return dbMap.getAllPeople();
+		return dbMap.getAllPersons();
 	}
 	
 }
