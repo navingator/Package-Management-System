@@ -7,21 +7,27 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
+
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
+
 import java.awt.Font;
+
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
@@ -30,6 +36,8 @@ import controller.Controller;
 
 public class MainFrame extends JFrame {
 
+	private IViewToModelAdaptor modelAdaptor;
+	
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTable tableActivePackages;
@@ -39,25 +47,13 @@ public class MainFrame extends JFrame {
 	private JPasswordField passwordNew;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainFrame frame = new MainFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
-	public MainFrame() {
+	public MainFrame(IViewToModelAdaptor adpt) {
+		
+		// set model adaptor
+		this.modelAdaptor = adpt;
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 720, 446);
 		
@@ -278,5 +274,11 @@ public class MainFrame extends JFrame {
 		tableStudentInfo = new JTable();
 		tableStudentInfo.setCellSelectionEnabled(true);
 		panelStudInfoTable.add(tableStudentInfo, "1, 1, fill, fill");
+	}
+	/*
+	 * Start the frame
+	 */
+	public void start() {
+		setVisible(true);
 	}
 }

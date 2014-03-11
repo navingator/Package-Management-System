@@ -5,6 +5,6 @@ package model;
  * to the view (MainFrame)
  */
 
-public interface IModelToViewAdapter {
+public interface IModelToViewAdaptor {
 
 }

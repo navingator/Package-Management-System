@@ -12,12 +12,12 @@ import util.Person;
  * for use by the model.database only.
  */
 
-public class PPMap {
+public class DatabaseMaps {
 
 	private HashMap<Person, ArrayList<Package>> person2Package;
 	private HashMap<Package, Person> package2Person;
 	
-	public PPMap(String folderName) {
+	public DatabaseMaps(String folderName) {
 		this.person2Package = new HashMap<Person, ArrayList<Package>>();
 		this.package2Person = new HashMap<Package, Person>();
 		
