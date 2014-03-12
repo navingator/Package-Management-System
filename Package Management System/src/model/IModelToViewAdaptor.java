@@ -6,5 +6,7 @@ package model;
  */
 
 public interface IModelToViewAdaptor {
+
+	void displayMessage(String string);
 	//TODO
 }

@@ -6,9 +6,9 @@ import java.util.Date;
  */
 
 public class Package {
-	private long packageID;
+	private final long packageID;
 	private String comment;
-	private Date checkInDate;
+	private final Date checkInDate;
 	private Date checkOutDate;
 	
 	

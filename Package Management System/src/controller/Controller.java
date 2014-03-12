@@ -101,6 +101,9 @@ public class Controller{
 		// Initialize model
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
 			//TODO write IModelToViewAdaptor
+			public void displayMessage(String message) {
+				
+			}
 		});
 	}
 	

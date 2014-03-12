@@ -1,5 +1,6 @@
 package model;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -35,6 +36,11 @@ public class PackageManager {
 		db = new Database(rootDirName);
 		mailer = new Emailer();
 		printer = new LabelPrinter();
+		
+		//TODO viewAdaptor
+//		db = new Database(rootDirName,viewAdaptor);
+//		mailer = new Emailer(viewAdaptor);
+//		printer = new LabelPrinter(viewAdaptor);
 	}
 	
 	public void start() {
@@ -49,10 +55,14 @@ public class PackageManager {
 	}
 	
 	public Package checkInPackage(Person person, String comment) {
+		// create a packageID
 		Date now = new Date();
-		//TODO Actually make the packageID work
-		Package pkg = new Package(0, comment, now);
-		return db.checkInPackage(person, pkg);
+		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSS");
+		long pkgID = Long.valueOf(ft.format(now)).longValue();
+		
+		Package pkg = new Package(pkgID, comment, now);
+		db.checkInPackage(person, pkg);
+		return pkg;
 	}
 
 	public void checkOutPackage(Package pkg) {

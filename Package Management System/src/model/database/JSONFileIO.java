@@ -15,6 +15,7 @@ import util.Pair;
 import util.Person;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class JSONFileIO {
@@ -22,7 +23,7 @@ public class JSONFileIO {
 			throws IOException {
 		
 		// initialize gson object
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		// open file
 		FileOutputStream outfile = new FileOutputStream(fileName);
@@ -66,19 +67,25 @@ public class JSONFileIO {
 		packages.add(p3);
 
 		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
-		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "np8");
+		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "cwh1");
 
 		JSONFileIO json = new JSONFileIO();
 		try {
 			// test writing to JSON file
-			String fileName = "testFiles/" + navin.getNetID() +".txt";
-			json.writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName);
+			String fileName1 = "testFiles/" + navin.getNetID() + ".txt";
+			String fileName2 = "testFiles/" + chris.getNetID() + ".txt";
+			json.writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName1);
+			json.writeDatabaseJSONFile(
+					new Pair<Person,ArrayList<Package>>(chris,new ArrayList<Package>()),fileName2);
 
 			// test reading from JSON file
-			Pair<Person,ArrayList<Package>> testPair = json.readDatabaseJSONFile(fileName);
-
-			System.out.println(testPair.first.getEmailAddress());
-			System.out.println(testPair.second.toString());
+			Pair<Person,ArrayList<Package>> testPair1 = json.readDatabaseJSONFile(fileName1);
+			Pair<Person,ArrayList<Package>> testPair2 = json.readDatabaseJSONFile(fileName2);
+			
+			System.out.println(testPair1.first.getEmailAddress());
+			System.out.println(testPair1.second.toString());
+			System.out.println(testPair2.first.getEmailAddress());
+			System.out.println(testPair2.second.toString());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

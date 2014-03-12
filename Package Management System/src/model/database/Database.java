@@ -13,11 +13,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import model.IModelToViewAdaptor;
+
 /*
  * Class that handles operations to and from the data files and DatabaseMaps
  */
 
 public class Database {
+	
+	IModelToViewAdaptor viewAdaptor;
 	
 	private DatabaseMaps dbMaps;
 	private JSONFileIO jsonIO;
@@ -25,8 +29,11 @@ public class Database {
 	private String packageDirName;
 	private String currentDirName;
 	private String archiveDirName;
-	
+
+	//TODO instantiate viewAdaptor
 	public Database(String rootDirName) {
+		
+//		this.viewAdaptor = viewAdaptor;
 		
 		this.packageDirName = rootDirName + "/packages";
 		this.currentDirName = packageDirName + "/current";
@@ -52,20 +59,32 @@ public class Database {
 	}
 	
 	/* Checks in a package into the DatabaseMaps and write a new file for the person */
-	public Package checkInPackage(Person person, Package pkg) {
+	public void checkInPackage(Person person, Package pkg) {
 		// modify current DatabaseMaps
 		dbMaps.addPackage(person, pkg);
 		// write new person file
 		writePersonFile(person,currentDirName);
-		return null;
 	}
 	
 	/* Sets a check out date for the package and removes the package */
 	public void checkOutPackage(Package pkg) {
+		
 		// modify package checkOut date
-		pkg.setCheckOutDate(new Date());
-		// remove package from packageID:Package map
-		dbMaps.deletePackage(pkg);
+		long pkgID = pkg.getPackageID();
+		if(pkg.getCheckOutDate() == null) {
+			pkg.setCheckOutDate(new Date());
+		} else {
+			System.out.println("Package ID: " + pkg.getPackageID() + " was already checked out.");
+			//TODO uncomment when ready
+//			viewAdaptor.displayMessage("This package was previously checked out on " + 
+//					pkg.getCheckOutDate().toString());
+		}
+		
+		//add new package to DatabaseMaps
+		Person owner = dbMaps.getPerson(dbMaps.getPackage(pkgID));
+		dbMaps.addPackage(owner, pkg);
+		//write to file
+		writePersonFile(owner,currentDirName);
 	}
 	
 	/* Return a list of all persons in the current directory */
@@ -85,7 +104,7 @@ public class Database {
 		
 		// iterate through all packages, adding those without a check out date
 		for (Package pkg: pkgList) {
-			if(pkg.getCheckOutDate() != null) {
+			if(pkg.getCheckOutDate() == null) {
 				results.add(new Pair<Person,Package> (dbMaps.getPerson(pkg),pkg));
 			}
 		}
@@ -128,6 +147,8 @@ public class Database {
 	 * 
 	 * If the person is not in the archive, a new person will be added to the databaseMap
 	 * and a new file will be written for them.
+	 * 
+	 * If the person's netID is in the database, their information will be updated.
 	 */
 	public void addPerson(Person person) {
 		//Check if person is in the archive
@@ -139,6 +160,7 @@ public class Database {
 		if(archiveNetIDs.contains(person.getNetID())) {
 			String archiveFile = archiveDirName + '/' + person.getNetID();
 			addPersonPackagesFromFile(archiveFile);
+			person = readPersonFile(archiveFile).first;
 			FileIO.deleteFile(archiveFile);
 		} else {
 			//If not in the archive, add new person to DatabaseMaps
@@ -220,7 +242,7 @@ public class Database {
 	private void readCurrentDatabase() {
 		ArrayList<String> currentFileNames = FileIO.getFileNamesFromDirectory(currentDirName);
 		for (String fileName: currentFileNames) {
-			addPersonPackagesFromFile(fileName);
+			addPersonPackagesFromFile(currentDirName+'/'+fileName);
 		}
 	}
 	
@@ -233,12 +255,77 @@ public class Database {
 		ArrayList<Package> packages = dbPair.second;
 		
 		dbMaps.addPerson(person);
+		//TODO check empty
 		for (Package pkg: packages) {
 			dbMaps.addPackage(person, pkg);
 		}
 	}
 		 
-	public static void Main(String arg0) {
+	public static void main(String[] args) {
+		Database db = new Database("C:\\Users\\Navin\\Documents\\Package Management System");
+		db.start();
+		
+		System.out.println("Start:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " + db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		
+		Date now = new Date();
+		
+		Package p1 = new Package(123+now.getTime(),"",now);
+		Package p2 = new Package(234+now.getTime(),"It's huge. Get it out now.",new Date(now.getTime()-100000000));
+		Package p3 = new Package(309435+now.getTime(),"",new Date(now.getTime()-200000000));
+		Package p4 = new Package(1+now.getTime(),"",new Date(now.getTime()-300000000));
+		Package p5 = new Package(2+now.getTime(),"",new Date(now.getTime()-400000000));
+
+		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
+		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "cwh1");
+		Person christopher = new Person("Henderson", "Christopher", "cwh1@rice.edu", "cwh1");
+		Person ambi = new Person("Bobmanuel", "Ambi", "ajb6@rice.edu", "ajb6");
+		
+		db.addPerson(navin);
+		db.addPerson(chris);
+
+		System.out.println("Added Persons:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		
+		db.checkInPackage(navin,p1);
+		System.out.println("Checked In1:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		db.checkInPackage(ambi,p2);
+		db.checkInPackage(chris,p3);
+		System.out.println("Checked In3:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		db.checkInPackage(chris,p4);
+		db.checkInPackage(navin,p5);
+		
+		System.out.println("Checked In5:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		
+		db.checkOutPackage(p5);
+		db.checkOutPackage(p4);
+		db.checkOutPackage(p2);
+		db.checkOutPackage(p5);
+		db.checkOutPackage(p1);
+
+		System.out.println("Checked Out:");
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
+		
+		db.deletePerson(navin);
+		
+		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
+		System.out.println("current active entries = " +db.getActiveEntries().toString());
+		System.out.println("current packages = " + db.getAllCurrentPackages().toString());
 		
 	}
 	

@@ -8,7 +8,7 @@ public class Person {
 	private String lastName;
 	private String firstName;
 	private String emailAddress;
-	private String netID;
+	private final String netID;
 	
 	public Person(String lastName, String firstName, String emailAddress, String netID) {
 		this.lastName = lastName;
