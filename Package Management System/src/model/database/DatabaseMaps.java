@@ -13,30 +13,17 @@ import util.Person;
  */
 
 public class DatabaseMaps {
-
-	//TODO make private after testing
-	public HashMap<Person, ArrayList<Package>> person2Package;
-	public HashMap<Package, Person> package2Person;
-	public HashMap<String,Person> personIDMap;
-	public HashMap<Long,Package> packageIDMap;
 	
-	public DatabaseMaps(String folderName) {
+	private HashMap<Person, ArrayList<Package>> person2Package;
+	private HashMap<Package, Person> package2Person;
+	private HashMap<String,Person> personIDMap;
+	private HashMap<Long,Package> packageIDMap;
+	
+	public DatabaseMaps() {
 		this.person2Package = new HashMap<Person, ArrayList<Package>>();
 		this.package2Person = new HashMap<Package, Person>();
-		
-		//TODO Finish implementing these 2 maps - generateMapsFromFolder
 		this.personIDMap = new HashMap<String,Person>();
 		this.packageIDMap = new HashMap<Long,Package>();
-		
-		generateMapsFromFolder(folderName);
-	}
-	
-	/*
-	 * Generates both maps from indicated folder
-	 * All people and package objects initially created here
-	 */
-	private void generateMapsFromFolder(String folderName) {
-		//TODO: do it after we have JSON reader/writer. Shove it in the database?
 	}
 	
 	/*
@@ -164,7 +151,7 @@ public class DatabaseMaps {
 	
 	//TODO test new implementation
 	public static void main(String[] args) {
-		DatabaseMaps dbMap = new DatabaseMaps("C:/Users/Navin/Documents/Package Management System/Data/active");
+		DatabaseMaps dbMap = new DatabaseMaps();
 		Date now = new Date();
 		Package p1 = new Package(123,"",now);
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));

@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class JSONFileIO {
-	public static void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String fileName) 
+	public void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String fileName) 
 			throws IOException {
 		
 		// initialize gson object
@@ -35,7 +35,7 @@ public class JSONFileIO {
 		
 	}
 	
-	public static Pair<Person,ArrayList<Package>> readDatabaseJSONFile(String fileName) throws IOException {
+	public Pair<Person,ArrayList<Package>> readDatabaseJSONFile(String fileName) throws IOException {
 		
 		// initialize gson object
 		Gson gson = new Gson();
@@ -68,13 +68,14 @@ public class JSONFileIO {
 		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
 		Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu", "np8");
 
+		JSONFileIO json = new JSONFileIO();
 		try {
 			// test writing to JSON file
 			String fileName = "testFiles/" + navin.getNetID() +".txt";
-			writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName);
+			json.writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName);
 
 			// test reading from JSON file
-			Pair<Person,ArrayList<Package>> testPair = readDatabaseJSONFile(fileName);
+			Pair<Person,ArrayList<Package>> testPair = json.readDatabaseJSONFile(fileName);
 
 			System.out.println(testPair.first.getEmailAddress());
 			System.out.println(testPair.second.toString());

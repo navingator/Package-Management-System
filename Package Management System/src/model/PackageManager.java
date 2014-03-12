@@ -57,7 +57,6 @@ public class PackageManager {
 
 	public void checkOutPackage(Package pkg) {
 		db.checkOutPackage(pkg);
-		
 	}
 
 	public void printLabel(Package pkg) {
@@ -73,7 +72,7 @@ public class PackageManager {
 	}
 
 	public ArrayList<Person> getAllPeople() {
-		return db.getAllPeople();
+		return db.getAllCurrentPersons();
 	}
 	
 	public ArrayList<Pair<Person, Package>> getActiveEntries() {
