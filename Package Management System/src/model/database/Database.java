@@ -99,14 +99,14 @@ public class Database {
 	}
 
 	/*
-	 * Returns a list of filtered and sorted packages, according to the filter and sort string
+	 * Returns a list of filtered and sorted packages, according to the options string
 	 * TODO make the filters work
 	 * Available filter strings:
 	 * 
 	 * Available sort strings:
 	 */
 	
-	public ArrayList<Pair<Person,Package>> getEntries(String filter) {
+	public ArrayList<Pair<Person,Package>> getEntries(String options) {
 		ArrayList<Pair<Person,Package>> result = dbMaps.getAllEntries();
 		
 		//TODO Filters & Sorting

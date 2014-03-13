@@ -113,8 +113,8 @@ public class PackageManager {
 	}
 	
 
-	public ArrayList<Pair<Person, Package>> getPackages(String filter) {
-		return db.getEntries(filter);
+	public ArrayList<Pair<Person, Package>> getPackages(String options) {
+		return db.getEntries(options);
 	}
 
 	public void importPersonCSV(String fileName) {
