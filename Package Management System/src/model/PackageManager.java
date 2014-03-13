@@ -54,35 +54,35 @@ public class PackageManager {
 		
 	}
 	
-	public Package checkInPackage(Person person, String comment) {
+	public Package checkInPackage(String personID, String comment) {
 		// create a packageID
 		Date now = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSS");
 		long pkgID = Long.valueOf(ft.format(now)).longValue();
 		
 		Package pkg = new Package(pkgID, comment, now);
-		db.checkInPackage(person, pkg);
+		db.checkInPackage(personID, pkg);
 		return pkg;
 	}
 
-	public void checkOutPackage(Package pkg) {
-		db.checkOutPackage(pkg);
+	public void checkOutPackage(long pkgID) {
+		db.checkOutPackage(pkgID);
 	}
 
-	public void printLabel(Package pkg) {
+	public void printLabel(long pkgID) {
 		// TODO Auto-generated method stub
 		// TODO generate barcode and print label
 		
 	}
 
-	public void sendPackageNotification(Person person) {
+	public void sendPackageNotification(String personID) {
 		// TODO Auto-generated method stub
-		//emailer.sendPackageNotification(person)
 		
 	}
 
-	public ArrayList<Person> getAllPeople() {
-		return db.getAllCurrentPersons();
+	public ArrayList<Person> getPersonList(String searchString) {
+		// TODO
+		return null;
 	}
 	
 	public ArrayList<Pair<Person, Package>> getActiveEntries() {

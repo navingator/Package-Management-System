@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import util.Package;
+import util.Pair;
 import util.Person;
 
 /*
@@ -14,142 +15,198 @@ import util.Person;
 
 public class DatabaseMaps {
 	
-	private HashMap<Person, ArrayList<Package>> person2Package;
-	private HashMap<Package, Person> package2Person;
+	private HashMap<String, ArrayList<Long>> personID2PackageIDs;
+	private HashMap<Long, String> packageID2PersonID;
 	private HashMap<String,Person> personIDMap;
 	private HashMap<Long,Package> packageIDMap;
 	
 	public DatabaseMaps() {
-		this.person2Package = new HashMap<Person, ArrayList<Package>>();
-		this.package2Person = new HashMap<Package, Person>();
+		this.personID2PackageIDs = new HashMap<String, ArrayList<Long>>();
+		this.packageID2PersonID = new HashMap<Long, String>();
 		this.personIDMap = new HashMap<String,Person>();
 		this.packageIDMap = new HashMap<Long,Package>();
 	}
 	
 	/*
 	 * Add a package to the maps
-	 * Will reassign a package if the package already exists
+	 * Will throw InDatabaseError if the package already exists
 	 */
-	public void addPackage(Person person, Package pkg) {
+	public void addPackage(String personID, Package pkg) {
 		
-		// If package is already in database, remove it
-		if(packageIDMap.containsKey(pkg.getPackageID())) {
-			deletePackage(pkg); // remove package
+		long pkgID = pkg.getPackageID();
+		// If package is already in database, TODO throw DatabaseException
+		if(packageIDMap.containsKey(pkgID)) {
+			System.out.println("Package (ID: " + pkgID + ") to be added is already in the database.");
+			return;
+			//throw new DatabaseException("Package (ID: " + pkgID + ") to be added is already in the database.");
+		} 
+
+		// add to personID2PackageID
+		// retrieve list of packageIDs
+		ArrayList<Long> pkgIDList = personID2PackageIDs.get(personID);
+		// add new package ID to list of person's packageIDs
+		pkgIDList.add(pkgID);
+		
+		// add package to other maps
+		packageID2PersonID.put(pkgID, personID);
+		packageIDMap.put(pkgID, pkg);
+	}
+	
+	/*
+	 * Edit a package in the maps
+	 */
+	public void editPackage(Package newPackage) {
+		long pkgID = newPackage.getPackageID();
+		
+		//If package is not in database, TODO throw DatabaseException
+		if (!packageIDMap.containsKey(pkgID)) {
+			System.out.println("Package (ID: " + pkgID + ") to be edited not found in database.");
+			return;
+			//throw new DatabaseException("Package (ID: " + pkgID + ") to be edited not found in database.")
 		}
-		
-		// retrieve list of packages after removal, if any
-		ArrayList<Package> pkgList = person2Package.get(person);
-		// If person is not in database, add person.
-		if (pkgList == null) {
-			addPerson(person);
-			pkgList = new ArrayList<Package>();
-		}
-		
-		// add new package to list of person's packages
-		pkgList.add(pkg);
-		
-		// associate person with new list and write maps
-		person2Package.put(person, pkgList);
-		package2Person.put(pkg, person);
-		packageIDMap.put(pkg.getPackageID(), pkg);
+
+		//edit the packageIDMap only
+		packageIDMap.put(pkgID, newPackage);
 	}
 	
 	/*
 	 * Delete a package from the maps
+	 * If the package is not in the system, throws DatabaseException
 	 */
-	public void deletePackage(Package pkg) {
-		Person person = package2Person.get(pkg);
-		if(person != null) {	
-			// retrieve list of packages
-			ArrayList<Package> pkgList = person2Package.get(person);
-			pkgList.remove(pkg); // remove the package from the list (passed by reference)
+	public void deletePackage(long pkgID) {
+		String personID = packageID2PersonID.get(pkgID);
+		
+		// If the package is not in the database, TODO throw DatabaseException
+		if(personID == null) {
+			System.out.println("Package (ID: " + pkgID + ") to be deleted not found in database.");
+			return;
+			//throw new DatabaseException("Package (ID: " + pkgID + ") to be deleted not found in database.");
+		} 
 
-			package2Person.remove(pkg);
-			packageIDMap.remove(pkg.getPackageID());	
-		}
+		// remove from personID2PackageIDs map
+		ArrayList<Long> pkgIDList = personID2PackageIDs.get(personID);
+		pkgIDList.remove(pkgID); // remove the package from the list (passed by reference)
+
+		// remove from other maps
+		packageID2PersonID.remove(pkgID);
+		packageIDMap.remove(pkgID);	
 	}
 	
 	/*
 	 * Add a person to the maps
-	 * Will edit a person if their netID already exists
-	 * This will retain all of their packages when their information is edited
+	 * If their personID already exists, throws DatabaseException
 	 */
 	public void addPerson(Person person) {
-		// Create container for packages
-		ArrayList<Package> pkgList = new ArrayList<Package>();
-		String netID = person.getNetID();
+		String personID = person.getPersonID();
 		
-		// Check if a person exists and remove the person and the person's packages if so
-		if(personIDMap.containsKey(netID)) {
-			// get the person's packages
-			Person old = getPerson(netID);
-			pkgList = getPackages(old);
-			deletePerson(old);
+		// Check if a person exists and TODO throw DatabaseException if so
+		if(personIDMap.containsKey(personID)) {
+			System.out.println("Person (ID: " + personID + ") to be added is already in database.");
+			return;
+			//throw new DatabaseException("Person (Name: " + person.getFullName() + ") to be added is already in database.");
 		}
-		
-		
-		// set person maps without packages
-		personIDMap.put(netID, person);
-		person2Package.put(person, new ArrayList<Package>());
-		
-		// reassign packages
-		for (Package pkg: pkgList) {
-			addPackage(person,pkg);
-		}
+
+		personIDMap.put(personID, person);
+		personID2PackageIDs.put(personID, new ArrayList<Long>());
 		
 	}
 	
 	/*
-	 * Delete a person and all of person's packages from the maps
+	 * Edit a person in the maps
+	 * This will retain all of their packages when their information is edited
+	 * 
+	 * Note: The new Person object must have the same personID as before
 	 */
-	public void deletePerson(Person person) {
-		if(person2Package.containsKey(person)) {
-			// remove all packages of person
-			ArrayList<Package> pkgList = new ArrayList<Package>(person2Package.get(person));
-			
-			for (Package pkg: pkgList) {
-				deletePackage(pkg);
-			}
-			
-			// remove person from the maps
-			personIDMap.remove(person.getNetID());
-			person2Package.remove(person);
+	
+	public void editPerson(Person newPerson) {
+		String personID = newPerson.getPersonID();
+		
+		//If person is not in database, TODO throw DatabaseException
+		if (!personIDMap.containsKey(personID)) {
+			System.out.println("Person (ID: " + personID + ") to be edited not found in database.");
+			return;
+			//throw new DatabaseException("Person (Name: " + newPerson.getFullName() + ") to be edited not found in database.")
+		} 
+
+		//edit the personIDMap only
+		personIDMap.put(personID, newPerson);
+	}
+	
+	/*
+	 * Delete a person and all of person's packages from the maps
+	 * If the person does not exist, throws DatabaseException
+	 */
+	public void deletePerson(String personID) {
+		
+		Person person = personIDMap.get(personID);
+		
+		// If person not found, TODO throw DatabaseException
+		if(person == null) {
+			System.out.println("Person (ID: " + personID + ") to be deleted delete not found in database.");
+			return;
+			//throw new DatabaseException("Person (Name: " + person.getFullName() + ") to be deleted delete not found in database.")
+		} 
+
+		// remove all packages of person
+		ArrayList<Long> pkgIDList = new ArrayList<Long>(personID2PackageIDs.get(personID));
+		
+		for (long pkgID: pkgIDList) {
+			deletePackage(pkgID);
 		}
+		
+		// remove person from the maps
+		personIDMap.remove(person.getPersonID());
+		personID2PackageIDs.remove(personID);
+
 	}
 	
-	public Person getPerson(Package pkg) {
-		return package2Person.get(pkg);
+	/*
+	 * Getters for the DatabaseMaps class
+	 */
+	
+	public Person getPerson(String personID) {
+		return personIDMap.get(personID);
 	}
 	
-	public Person getPerson(String netID) {
-		return personIDMap.get(netID);
+	public String getOwnerID(long pkgID) {
+		return packageID2PersonID.get(pkgID);
 	}
 	
 	public Package getPackage(long packageID) {
 		return packageIDMap.get(packageID);
 	}
 	
-	public ArrayList<Package> getPackages(Person person) {
-		return person2Package.get(person);
+	public ArrayList<Long> getOwnedPackageIDs(String personID) {
+		return new ArrayList<Long>(personID2PackageIDs.get(personID));
 	}
 	
 	public ArrayList<Person> getAllPersons() {
-		return new ArrayList<Person>(person2Package.keySet());
+		return new ArrayList<Person>(personIDMap.values());
 	}
 	
 	public ArrayList<Package> getAllPackages() {
-		return new ArrayList<Package>(package2Person.keySet());
+		return new ArrayList<Package>(packageIDMap.values());
 	}
 	
-	public ArrayList<String> getAllNetID() {
+	public ArrayList<String> getAllPersonIDs() {
 		return new ArrayList<String>(personIDMap.keySet());
 	}
 	
-	public ArrayList<Long> getAllPackageID() {
+	public ArrayList<Long> getAllPackageIDs() {
 		return new ArrayList<Long>(packageIDMap.keySet());
 	}
 	
-	//TODO test new implementation
+	public ArrayList<Pair<Person,Package>> getAllEntries() {
+		ArrayList<Pair<Person,Package>> result = new ArrayList<Pair<Person,Package>>();
+		ArrayList<Long> pkgIDList = getAllPackageIDs(); 
+		for (long pkgID: pkgIDList) {
+			Package pkg = getPackage(pkgID);
+			Person person = getPerson(getOwnerID(pkgID));
+			result.add(new Pair<Person,Package>(person,pkg));
+		}
+		return result;
+	}
+	
 	public static void main(String[] args) {
 		DatabaseMaps dbMap = new DatabaseMaps();
 		Date now = new Date();
@@ -168,24 +225,36 @@ public class DatabaseMaps {
 		dbMap.addPerson(navin);
 		dbMap.addPerson(ambi);
 		
-		dbMap.addPackage(navin,p1);
-		dbMap.addPackage(navin,p2);
-		dbMap.addPackage(navin,p2);
-		dbMap.addPackage(navin,p3);
+		dbMap.editPerson(christopher);
 		
-		dbMap.addPackage(christopher,p2);
-		dbMap.deletePerson(navin);
+		dbMap.addPackage(navin.getPersonID(),p1);
+		dbMap.addPackage(navin.getPersonID(),p2);
+		dbMap.addPackage(navin.getPersonID(),p2);
+		dbMap.addPackage(navin.getPersonID(),p3);
 		
-		System.out.println(dbMap.person2Package.toString());
-		System.out.println(dbMap.package2Person.toString());
+		p3.setCheckOutDate(now);
+		dbMap.editPackage(p3);
+		
+		dbMap.deletePackage(p2.getPackageID());
+		dbMap.deletePerson(ambi.getPersonID());
+		
+		System.out.println(dbMap.personID2PackageIDs.toString());
+		System.out.println(dbMap.packageID2PersonID.toString());
 		System.out.println(dbMap.personIDMap.toString());
 		System.out.println(dbMap.packageIDMap.toString());
-		System.out.println(dbMap.getPerson(p3).getFullName());
 		System.out.println(dbMap.getPerson("cwh1").getFullName());
-		System.out.println(dbMap.getPackages(chris).toString());
-		System.out.println(dbMap.getPackage(309435).toString());
+		System.out.println(dbMap.getPerson(dbMap.getOwnerID(p3.getPackageID())).getFullName());
+		System.out.println(dbMap.getPackage(309435).getCheckOutDate());
+		System.out.println(dbMap.getOwnedPackageIDs(chris.getPersonID()).toString());
+		System.out.println(dbMap.getAllPersons().toString());
+		System.out.println(dbMap.getAllPackages().toString());
+		System.out.println(dbMap.getAllPersonIDs().toString());
+		System.out.println(dbMap.getAllPackageIDs().toString());
+		System.out.println(dbMap.getAllEntries().get(0).second.toString());
 		//System.out.println(dbMap.getPackage(123).toString());
-		//System.out.println(getPerson(p1).getNetID());		// should throw exception
+		//System.out.println(getPerson(p1).getpersonID());		// should throw exception
 	}
 	
 }
+
+

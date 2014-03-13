@@ -31,6 +31,7 @@ public class Package {
 	 * 	comment
 	 * 	checkOutDate
 	 */
+	
 	public Date getCheckOutDate() {
 		return checkOutDate;
 	}

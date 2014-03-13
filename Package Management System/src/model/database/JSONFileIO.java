@@ -72,8 +72,8 @@ public class JSONFileIO {
 		JSONFileIO json = new JSONFileIO();
 		try {
 			// test writing to JSON file
-			String fileName1 = "testFiles/" + navin.getNetID() + ".txt";
-			String fileName2 = "testFiles/" + chris.getNetID() + ".txt";
+			String fileName1 = "testFiles/" + navin.getPersonID() + ".txt";
+			String fileName2 = "testFiles/" + chris.getPersonID() + ".txt";
 			json.writeDatabaseJSONFile(new Pair<Person,ArrayList<Package>>(navin,packages),fileName1);
 			json.writeDatabaseJSONFile(
 					new Pair<Person,ArrayList<Package>>(chris,new ArrayList<Package>()),fileName2);

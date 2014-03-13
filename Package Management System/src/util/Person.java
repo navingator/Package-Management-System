@@ -8,13 +8,13 @@ public class Person {
 	private String lastName;
 	private String firstName;
 	private String emailAddress;
-	private final String netID;
+	private final String personID;
 	
-	public Person(String lastName, String firstName, String emailAddress, String netID) {
+	public Person(String lastName, String firstName, String emailAddress, String personID) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
-		this.netID = netID;
+		this.personID = personID;
 	}
 	
 	/*
@@ -23,8 +23,9 @@ public class Person {
 	 * 	lastName
 	 * 	firstName
 	 * 	emailAddress
-	 * 	netID
+	 * 	personID
 	 */
+	
 	public String getFullName() {
 		return firstName + ' ' + lastName;
 	}
@@ -37,8 +38,8 @@ public class Person {
 	public String getEmailAddress(){
 		return emailAddress;
 	}
-	public String getNetID() {
-		return netID;
+	public String getPersonID() {
+		return personID;
 	}
 
 	/*
@@ -59,7 +60,5 @@ public class Person {
 	public void setEmailAddress(String email) {
 		this.emailAddress = email;
 	}
-	
 
-	
 }

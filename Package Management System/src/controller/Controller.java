@@ -46,30 +46,29 @@ public class Controller{
 				return null;
 			}
 			
-			public void checkOutPackage(Package pkg) {
-				modelPM.checkOutPackage(pkg);
+			public void checkOutPackage(long pkgID) {
+				modelPM.checkOutPackage(pkgID);
 			}
 			
-			public ArrayList<Person> getPersonList() {
-				modelPM.getAllPeople();
+			public ArrayList<Person> getPersonList(String searchString) {
+				return modelPM.getPersonList(searchString);
+			}
+			
+			public void checkInPackage(String personID, String comment) {
+				modelPM.checkInPackage(personID, comment);
 				return null;
 			}
 			
-			public Package checkInPackage(Person person, String comment) {
-				modelPM.checkInPackage(person, comment);
-				return null;
+			public void printLabel(long pkgID) {
+				modelPM.printLabel(pkgID);
 			}
 			
-			public void printLabel(Package pkg) {
-				modelPM.printLabel(pkg);
+			public void sendPackageNotification(String personID) {
+				modelPM.sendPackageNotification(personID);
 			}
 			
-			public void sendPackageNotification(Person person) {
-				modelPM.sendPackageNotification(person);
-			}
-			
-			public ArrayList<Pair<Person,Package>> getActivePackages() {
-				return modelPM.getActiveEntries();
+			public ArrayList<Pair<Person,Package>> getPackages(String filter) {
+				return modelPM.getPackages();
 			}
 			
 			public ArrayList<Pair<Person,Package>> getPackagesByPerson(Person person) {
