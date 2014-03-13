@@ -13,14 +13,14 @@ import util.Person;
  * for use by the database class only.
  */
 
-public class DatabaseMaps {
+public class DBMaps {
 	
 	private HashMap<String, ArrayList<Long>> personID2PackageIDs;
 	private HashMap<Long, String> packageID2PersonID;
 	private HashMap<String,Person> personIDMap;
 	private HashMap<Long,Package> packageIDMap;
 	
-	public DatabaseMaps() {
+	public DBMaps() {
 		this.personID2PackageIDs = new HashMap<String, ArrayList<Long>>();
 		this.packageID2PersonID = new HashMap<Long, String>();
 		this.personIDMap = new HashMap<String,Person>();
@@ -161,7 +161,7 @@ public class DatabaseMaps {
 	}
 	
 	/*
-	 * Getters for the DatabaseMaps class
+	 * Getters for the DBMaps class
 	 */
 	
 	public Person getPerson(String personID) {
@@ -208,7 +208,7 @@ public class DatabaseMaps {
 	}
 	
 	public static void main(String[] args) {
-		DatabaseMaps dbMap = new DatabaseMaps();
+		DBMaps dbMap = new DBMaps();
 		Date now = new Date();
 		Package p1 = new Package(123,"",now);
 		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));

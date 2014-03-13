@@ -5,27 +5,23 @@ import util.Package;
 import util.Person;
 import util.Pair;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
-
 import model.IModelToViewAdaptor;
 
 /*
- * Class that handles operations to and from the data files and DatabaseMaps
+ * Class that handles operations to and from the data files and DBMaps
  */
 
 public class Database {
 	
 	IModelToViewAdaptor viewAdaptor;
 	
-	private DatabaseMaps dbMaps;
-	private JSONFileIO jsonIO;
+	private DBMaps dbMaps;
+	private DBFileIO dbIO;
 	
 	private String packageDirName;
 	private String currentDirName;
@@ -40,15 +36,15 @@ public class Database {
 		this.currentDirName = packageDirName + "/current";
 		this.archiveDirName = packageDirName + "/archive";
 		
-		this.dbMaps = new DatabaseMaps();
-		this.jsonIO = new JSONFileIO();
+		this.dbMaps = new DBMaps();
+		this.dbIO = new DBFileIO();
 	}
 	
 	/*
 	 * Function whose start is controlled by the controller
 	 * 
 	 * Creates new package directories if they do not exist
-	 * Reads the current database, initializing the DatabaseMaps
+	 * Reads the current database, initializing the DBMaps
 	 */
 	public void start() {
 		// check if rootFolder and subfolders exist, create if they do not.
@@ -59,7 +55,7 @@ public class Database {
 		readCurrentDatabase();
 	}
 	
-	/* Checks in a package into the DatabaseMaps and write a new file for the person */
+	/* Checks in a package into the DBMaps and write a new file for the person */
 	public void checkInPackage(String personID, Package pkg) {
 		// check if package already exists
 		long pkgID = pkg.getPackageID();
@@ -67,7 +63,7 @@ public class Database {
 			System.out.println("Package ID: " + pkgID + " was already checked in.");
 			return;
 		}
-		// modify current DatabaseMaps
+		// modify current DBMaps
 		dbMaps.addPackage(personID, pkg);
 		// write new person file
 		writePersonFile(personID,currentDirName);
@@ -85,7 +81,7 @@ public class Database {
 			return;
 		} 		
 
-		// note that this automatically edits the package in DatabaseMaps
+		// note that this automatically edits the package in DBMaps
 		pkg.setCheckOutDate(new Date());
 		
 		// write to file
@@ -124,12 +120,12 @@ public class Database {
 	}
 	
 	/*
-	 * Adds a person to the databaseMap and writes a file for the person
+	 * Adds a person to the database maps and writes a file for the person
 	 * 
 	 * If the person is already in the archive, their file will be moved and their
 	 * data will be read from the archive file.
 	 * 
-	 * If the person is not in the archive, a new person will be added to the databaseMap
+	 * If the person is not in the archive, a new person will be added to the database maps
 	 * and a new file will be written for them.
 	 * 
 	 */
@@ -145,14 +141,14 @@ public class Database {
 		HashSet<String> archiveFileNames = new HashSet<String>(FileIO.getFileNamesFromDirectory(archiveDirName));
 		HashSet<String> archivePersonIDs = archiveFileNames;
 		
-		//If person file is in archive, add file to DatabaseMaps and delete archive file
+		//If person file is in archive, add file to DBMaps and delete archive file
 		if(archivePersonIDs.contains(personID)) {
 			String archiveFile = archiveDirName + '/' + personID;
 			addPersonPackagesFromFile(archiveFile);
 			FileIO.deleteFile(archiveFile);
 			dbMaps.editPerson(person); //edit the person instead of adding
 		} else {
-			//If not in the archive, add new person to DatabaseMaps
+			//If not in the archive, add new person to DBMaps
 			dbMaps.addPerson(person);
 		}
 		
@@ -162,7 +158,7 @@ public class Database {
 	}
 	
 	/**
-	 * Edits a person in the database, editing the DatabaseMaps and
+	 * Edits a person in the database, editing the DBMaps and
 	 * writing the changes to their file
 	 * @param newPerson		Person object containing new attributes for the person
 	 */
@@ -173,7 +169,7 @@ public class Database {
 			return;
 		}
 		
-		// edit person in databaseMaps and write to file
+		// edit person in database maps and write to file
 		dbMaps.editPerson(newPerson);
 		writePersonFile(personID, currentDirName);
 		
@@ -181,7 +177,7 @@ public class Database {
 	
 	/*
 	 * Moves a person from the current directory to the archive directory and deletes
-	 * their information from the DatabaseMaps
+	 * their information from the DBMaps
 	 */
 	public void deletePerson(String personID) {
 		if(dbMaps.getPerson(personID) == null) {
@@ -192,13 +188,8 @@ public class Database {
 		// move person file to the archive 
 		writePersonFile(personID, archiveDirName);
 		FileIO.deleteFile(currentDirName + '/' + personID);
-		// remove person from DatabaseMaps - must be after reading and writing file
+		// remove person from DBMaps - must be after reading and writing file
 		dbMaps.deletePerson(personID);
-		
-	}
-	
-	public void importPersonsFromCSV(String fileName) {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -207,7 +198,7 @@ public class Database {
 	 * to the directory indicated by baseDirectory
 	 */
 	private void writePersonFile(String personID, String baseDirectory) {
-		// create the person and package pair from the DatabaseMaps object
+		// create the person and package pair from the DBMaps object
 		Person person = dbMaps.getPerson(personID);
 		ArrayList<Long> packageIDs = dbMaps.getOwnedPackageIDs(personID);
 		ArrayList<Package> pkgList = new ArrayList<Package>();
@@ -221,9 +212,12 @@ public class Database {
 		//write Pair object to file
 		String fileName = baseDirectory + '/' + personID;
 		try {
-			jsonIO.writeDatabaseJSONFile(dbPair, fileName);
-		} catch(IOException e) {
-			//TODO actually catch the exception
+			dbIO.writeDatabaseJSONFile(dbPair, fileName);
+		} catch (FileNotFoundException e) {
+			// TODO send to log
+			System.out.println("Failed to find file: " + fileName);	
+		}catch(IOException e) {
+			//TODO send to log
 			System.out.println("Failed to write " + fileName);
 			e.printStackTrace();
 		}
@@ -236,12 +230,15 @@ public class Database {
 	private Pair<Person,ArrayList<Package>> readPersonFile(String fileName) {
 		Pair<Person,ArrayList<Package>> dbPair = null;
 		try {
-			 dbPair = jsonIO.readDatabaseJSONFile(fileName);
+			 dbPair = dbIO.readDatabaseJSONFile(fileName);
+		} catch (FileNotFoundException e) {
+			// TODO send to log
+			System.out.println("Failed to find file: " + fileName);	
 		} catch (IOException e) {
-			// TODO actually catch exception
+			// TODO send to log
 			System.out.println("Failed to read " + fileName);
 			e.printStackTrace();
-		}
+		} 
 		
 		return dbPair;
 		
@@ -249,7 +246,7 @@ public class Database {
 	
 	/*
 	 * Initializes the current database by reading all of the files in the current directory
-	 * and placing all of their attributes into the databaseMaps
+	 * and placing all of their attributes into the database maps
 	 */
 	private void readCurrentDatabase() {
 		ArrayList<String> currentFileNames = FileIO.getFileNamesFromDirectory(currentDirName);
@@ -259,7 +256,7 @@ public class Database {
 	}
 	
 	/*
-	 * Reads and adds all of the person and package information from the fileName to databaseMaps
+	 * Reads and adds all of the person and package information from the fileName to database maps
 	 * Note: *Does not rewrite the file, make sure that calling function will write file*
 	 */
 	private void addPersonPackagesFromFile(String fileName) {
@@ -275,8 +272,51 @@ public class Database {
 		}
 	}
 		 
+	public void importPersonsFromCSV(String fileName) {
+		// Get a list of all people in the database
+		ArrayList<String> currentPersons = dbMaps.getAllPersonIDs();
+		
+		// Remove everyone from the database
+		for(String personID: currentPersons) {
+			deletePerson(personID);
+		}
+		
+		// Get a list of all people in the file
+		ArrayList<Person> csvPersons = new ArrayList<Person>();
+		ArrayList<Pair<String,String>> failedToRead = new ArrayList<Pair<String,String>>();
+		try {
+			csvPersons = dbIO.readDatabaseCSVFile(fileName,failedToRead);
+		} catch (FileNotFoundException e) {
+			// TODO send error message
+			System.out.println("Failed to find file: " + fileName);	
+		} catch (IOException e) {
+			// TODO send error message
+			System.out.println("Failed to read " + fileName);
+			e.printStackTrace();
+		} catch (FileFormatException e) {
+			// TODO send error message
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		if(failedToRead.size() != 0) {
+			String errorMsg = "\nFailed to read the following people: \n"
+					+ "Person - reason\n";
+			for (Pair<String,String> error: failedToRead) {
+				errorMsg = errorMsg + error.first + " - " + error.second + '\n';
+			}
+			// TODO send error message
+			System.out.println(errorMsg);
+		}	
+		
+		// Add all people to the database
+		for(Person person: csvPersons) {
+			addPerson(person);
+		}
+	}
+	
 	public static void main(String[] args) {
-		Database db = new Database("C:\\Users\\Navin\\Documents\\Package Management System");
+		Database db = new Database("testFiles");
 		db.start();
 		
 		System.out.println("Start:");
@@ -285,6 +325,8 @@ public class Database {
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		Date now = new Date();
+		
+		db.importPersonsFromCSV("testFiles/Test Roster.csv");
 		
 		Package p1 = new Package(123+now.getTime(),"",now);
 		Package p2 = new Package(234+now.getTime(),"It's huge.\n Get it out now.",new Date(now.getTime()-100000000));

@@ -61,4 +61,13 @@ public class Person {
 		this.emailAddress = email;
 	}
 
+	/**
+	 * Attempts to generate an email address in the rice domain
+	 * @param netID			Rice netID		
+	 * @return				Rice Email address
+	 */
+	public static String generateEmail(String netID) {
+		return netID + "@rice.edu";
+	}
+
 }
