@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,16 +20,29 @@ import util.Person;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
+/**
+ * Class contains functions for writing database entries to file and 
+ * pulling person objects from a csv file.
+ */
 public class DBFileIO {
-	public void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String fileName) 
+	
+	/**
+	 * Function that will write a pair containing a person object and all associated packages
+	 * to the specified JSON file. 
+	 * 
+	 * @param DBPair			Pair containing a person and ArrayList of all packages associated
+	 * @param filePath			Path to the file to be written
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public void writeDatabaseJSONFile(Pair<Person,ArrayList<Package>> DBPair, String filePath) 
 			throws IOException,FileNotFoundException {
 		
 		// initialize gson object
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		// open file
-		FileOutputStream outfile = new FileOutputStream(fileName);
+		FileOutputStream outfile = new FileOutputStream(filePath);
 		DataOutputStream outStream = new DataOutputStream(outfile);
 		
 		String json = gson.toJson(DBPair); // serialize output
@@ -39,15 +51,23 @@ public class DBFileIO {
 		outfile.close();
 		
 	}
-	
-	public Pair<Person,ArrayList<Package>> readDatabaseJSONFile(String fileName) 
+	/**
+	 * Function that will read a specified JSON file and return the person and packages
+	 * contained within
+	 * 
+	 * @param filePath			Path to the file with the person information
+	 * @return					Returns a pair of person and packages in arrayList object
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public Pair<Person,ArrayList<Package>> readDatabaseJSONFile(String filePath) 
 			throws IOException,FileNotFoundException {
 		
 		// initialize gson object
 		Gson gson = new Gson();
 
 		// open file to read
-		FileInputStream infile = new FileInputStream(fileName);
+		FileInputStream infile = new FileInputStream(filePath);
 		DataInputStream inStream = new DataInputStream(infile);
 		
 		// read model.database file
@@ -72,15 +92,15 @@ public class DBFileIO {
 	 *  	a provided personID only
 	 *  PersonID - Person's unique identifier - MUST BE SPECIFIED
 	 * 
-	 * @param fileName			Name of the CSV file to read from
-	 * @param failed				ArrayList containing a pair with 
-	 * 							name of the persons that failed to be read and reason
+	 * @param filePath			Name of the CSV file to read from
+	 * @param failed			ArrayList containing a pair with name of 
+	 * 							the persons that failed to be read and reason
 	 * @return					List of all of the person objects in the file
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 * @throws FileFormatException 
 	 */
-	public ArrayList<Person> readDatabaseCSVFile(String fileName, ArrayList<Pair<String,String>> failed) 
+	public ArrayList<Person> readDatabaseCSVFile(String filePath, ArrayList<Pair<String,String>> failed) 
 			throws IOException, FileNotFoundException, FileFormatException{
 		
 		ArrayList<Person> personList = new ArrayList<Person>();
@@ -91,7 +111,7 @@ public class DBFileIO {
 		
 		try {
 			 
-			br = new BufferedReader(new FileReader(fileName));
+			br = new BufferedReader(new FileReader(filePath));
 			HashSet<String> personIDSet = new HashSet<String> ();
 			
 			//handle header
@@ -107,7 +127,6 @@ public class DBFileIO {
 						+ "Last Name,First Name,Email Address,ID");
 			}
 			
-			
 			// loop through the file
 			while ((line = br.readLine()) != null) {
 				
@@ -115,7 +134,6 @@ public class DBFileIO {
 				if(line == "") {
 					continue;
 				}
-				
 				
 				// split up the line
 				String[] personElements = line.split(delimiter,4);
@@ -143,6 +161,7 @@ public class DBFileIO {
 				
 				Person person = new Person(lastName,firstName,emailAddress,personID);
 				personList.add(person);
+				personIDSet.add(personID);
 	 
 			}
 	 
@@ -153,7 +172,7 @@ public class DBFileIO {
 		}
 	 
 		// TODO add to logger
-		System.out.println(fileName + " was successfully read");
+		System.out.println(filePath + " was successfully read");
 		return personList;
 	}
 	
