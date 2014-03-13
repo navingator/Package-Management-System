@@ -147,8 +147,7 @@ public class DBFileIO {
 					failed.add(new Pair<String,String>(
 							firstName + ' ' + lastName, "ID not provided"));
 					continue;
-					
-				} else if(personIDSet.contains(personIDSet)) { 
+				} else if(personIDSet.contains(personID)) { 
 					failed.add(new Pair<String,String>(
 							firstName + ' ' + lastName, "Duplicate ID"));
 					continue;
