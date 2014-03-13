@@ -49,10 +49,38 @@ public class PackageManager {
 		printer.start();
 	}
 
-	public void getPackageFromID(long packageID) {
+	//TODO Functions that run on a schedule - mainly send reminders
+	
+	/*
+	 * Emailer functions
+	 */
+	
+	public boolean sendPackageNotification(String personID) {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
+	
+	public boolean checkAdminPassword(String password) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean changeEmail(String newEmail, String newPassword) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	/*
+	 * Printer functions
+	 */
+	public boolean printLabel(long pkgID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	/*
+	 * Database functions
+	 */
 	
 	public Package checkInPackage(String personID, String comment) {
 		// create a packageID
@@ -64,61 +92,45 @@ public class PackageManager {
 		db.checkInPackage(personID, pkg);
 		return pkg;
 	}
-
+	
 	public void checkOutPackage(long pkgID) {
-		db.checkOutPackage(pkgID);
+		db.checkOutPackage(pkgID);		
 	}
-
-	public void printLabel(long pkgID) {
-		// TODO Auto-generated method stub
-		// TODO generate barcode and print label
-		
-	}
-
-	public void sendPackageNotification(String personID) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public ArrayList<Person> getPersonList(String searchString) {
-		// TODO
+	
+	//TODO change to package state instead of checkedOut
+	public Boolean checkedOut(long pkgID) {
+		//TODO
 		return null;
 	}
 	
-	public ArrayList<Pair<Person, Package>> getActiveEntries() {
-		// TODO Auto-generated method stub
+	public Person getOwner(long pkgID) {
+		//TODO
 		return null;
 	}
 
-	public ArrayList<Pair<Person, Package>> getEntriesByPerson(Person person) {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Person> getPersonList(String searchString) {
+		return db.getPersonList(searchString);
+	}
+	
+
+	public ArrayList<Pair<Person, Package>> getPackages(String filter) {
+		return db.getEntries(filter);
 	}
 
-	public ArrayList<Pair<Person, Package>> getEntriesByDate(Date date,
-			String predicate) {
-		// TODO Auto-generated method stub
-		return null;
+	public void importPersonCSV(String fileName) {
+		db.importPersonsFromCSV(fileName);		
 	}
 
-	public void checkAdminPassword(String password) {
-		// TODO Auto-generated method stub
-		
+	public void addPerson(Person person) {
+		db.addPerson(person);
 	}
 
-	public void changeEmail(String newEmail, String newPassword) {
-		// TODO Auto-generated method stub
-		
+	public void editPerson(Person person) {
+		db.editPerson(person);		
 	}
 
-	public void importPersonList(String fileName) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void exportPersonList(ArrayList<Person> personList) {
-		// TODO Auto-generated method stub
-		
+	public void deletePerson(String personID) {
+		db.deletePerson(personID);
 	}
 	
 }

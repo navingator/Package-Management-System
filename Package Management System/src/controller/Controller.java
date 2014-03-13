@@ -18,13 +18,14 @@ import view.MainFrame;
  * instantiating them both as well as their communications and adaptors.
  */
 
-//TODO Find all of the system.out.println and replace with logger
-
 public class Controller{
 	
 	private MainFrame viewFrame;
 	private PackageManager modelPM;
 	
+	/**
+	 * Function which initializes and starts the controller
+	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -38,12 +39,19 @@ public class Controller{
 		});
 	}
 	
+	/**
+	 * Class which acts as the go between for the model and the view
+	 */
 	public Controller() {
-		// Initialize view
+		/* Initializes the view */
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
-			public Pair<Person,Package> getPackageInfo(long packageID) {
-				modelPM.getPackageFromID(packageID);
-				return null;
+
+			public boolean checkedOut(long pkgID) {
+				return modelPM.checkedOut(pkgID);
+			}
+
+			public Person getPackageOwner(long pkgID) {
+				return modelPM.getOwner(pkgID);
 			}
 			
 			public void checkOutPackage(long pkgID) {
@@ -56,48 +64,54 @@ public class Controller{
 			
 			public void checkInPackage(String personID, String comment) {
 				modelPM.checkInPackage(personID, comment);
-				return null;
 			}
 			
-			public void printLabel(long pkgID) {
-				modelPM.printLabel(pkgID);
+			public boolean sendPackageNotification(String personID) {
+				return modelPM.sendPackageNotification(personID);
 			}
 			
-			public void sendPackageNotification(String personID) {
-				modelPM.sendPackageNotification(personID);
+			public boolean printLabel(long pkgID) {
+				return modelPM.printLabel(pkgID);
 			}
 			
 			public ArrayList<Pair<Person,Package>> getPackages(String filter) {
-				return modelPM.getPackages();
+				return modelPM.getPackages(filter);
 			}
 			
-			public ArrayList<Pair<Person,Package>> getPackagesByPerson(Person person) {
-				return modelPM.getEntriesByPerson(person);
+			public boolean authenticate(String password) {
+				return modelPM.checkAdminPassword(password);
 			}
 			
-			public ArrayList<Pair<Person,Package>> getPackagesByDate(Date date, String predicate) {
-				return modelPM.getEntriesByDate(date, predicate);
+			public boolean changeEmail(String newEmail, String newPassword) {
+				return modelPM.changeEmail(newEmail, newPassword);
 			}
 			
-			public void authenticate(String password) {
-				modelPM.checkAdminPassword(password);
+			public void importPersonCSV(String fileName) {
+				modelPM.importPersonCSV(fileName);
+			}
+
+			public void addPerson(String personID, String firstName,
+					String lastName, String emailAddress) {
+				Person person = new Person(lastName,firstName,emailAddress,personID);
+				modelPM.addPerson(person);
+				
+			}
+
+			public void editPerson(String personID, String firstName,
+					String lastName, String emailAddress) {
+				Person person = new Person(lastName,firstName,emailAddress,personID);
+				modelPM.editPerson(person);
+				
+			}
+
+			public void deletePerson(String personID) {
+				modelPM.deletePerson(personID);
 			}
 			
-			public void changeEmail(String newEmail, String newPassword) {
-				modelPM.changeEmail(newEmail, newPassword);
-			}
-			
-			public void importPersonList(String fileName) {
-				modelPM.importPersonList(fileName);
-			}
-			
-			public void savePersonList(ArrayList<Person> personList) {
-				modelPM.exportPersonList(personList);
-			}
 		});
 		
 		// TODO ask chris how anonymous classes can work without an instantiated modelPM object
-		// Initialize model
+		/* Initialize model */
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
 			//TODO write IModelToViewAdaptor
 			public void displayMessage(String message) {

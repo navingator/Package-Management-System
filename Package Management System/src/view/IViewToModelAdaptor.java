@@ -12,7 +12,7 @@ import util.Person;
 
 public interface IViewToModelAdaptor {
 	
-	/**
+	/*
 	 * Pick up functions
 	 */
 	
@@ -20,9 +20,9 @@ public interface IViewToModelAdaptor {
 	 * Returns true if the package is already checked out
 	 * 
 	 * @param pkgID			ID of the package to determine state of
-	 * @return				Boolean containing package state
+	 * @return				Whether or not the package is checked out
 	 */
-	public Boolean checkedOut(long pkgID);
+	public boolean checkedOut(long pkgID);
 	
 	/**
 	 * returns the owner for use in confirmation message
@@ -36,11 +36,10 @@ public interface IViewToModelAdaptor {
 	 * Checks out the package after getting confirmation
 	 * 
 	 * @param pkgID			ID of the package to be checked out
-	 * @return				Success state
 	 */
-	public Boolean checkOutPackage(long pkgID);
+	public void checkOutPackage(long pkgID);
 	
-	/**
+	/*
 	 * Check in functions
 	 */
 	
@@ -54,32 +53,94 @@ public interface IViewToModelAdaptor {
 	
 	/**
 	 * Checks in a package into the database
+	 * 
 	 * @param personID		ID of the package owner
 	 * @param comment		Comment input by the user
-	 * @return				Success state	
 	 */
-	public Boolean checkInPackage(String personID, String comment);
+	public void checkInPackage(String personID, String comment);
 	
 	/**
 	 * Send a package notification email alerting the person
 	 * that a package has been checked in
 	 * 
-	 * @param	
+	 * @param personID		ID of the package owner
+	 * @return				Success of sending email
 	 */
-	public Boolean sendPackageNotification(String personID);
+	public boolean sendPackageNotification(String personID);
 
+	/**
+	 * Print a label for the package. 
+	 * Can also be called by the admin functions.
+	 * 
+	 * @param pkgID			ID of the package 
+	 * @return				Success of printing
+	 */
+	public boolean printLabel(long pkgID);
 	
 	/*
 	 * Admin functions
 	 */
-	public void authenticate(String password);
-	public void changeEmail(String newEmail, String newPassword);
 	
+	/**
+	 * Authenticates the user to gain access to the admin functions
+	 * 
+	 * @param password		User input password
+	 * @return				Success of authentication
+	 */
+	public boolean authenticate(String password);
+	
+	/**
+	 * Changes the email information of the user and attempts to connect to the mail
+	 * server with the new credentials. Returns whether or not this was successful.
+	 * 
+	 * @param newEmail		New email input by user
+	 * @param newPassword	New password input by user
+	 * @return				Success of connecting to mail server with new credentials
+	 */
+	public boolean changeEmail(String newEmail, String newPassword);
+	
+	
+	/**
+	 * Returns all of the packages with the appropriate filters applied
+	 * 
+	 * @param filter		String containing filtering options
+	 * @return				ArrayList of (person, package) pairs after filter is applied
+	 */
 	public ArrayList<Pair<Person,Package>> getPackages(String filter);
-	public void printLabel(long pkgID);
 	
-	public void importPersonList(String fileName);
-	public void addPerson(String personID);
-	public void editPerson(String personID);
+	/**
+	 * Reads a list of people from a csv file and adds the people to the database
+	 * CSV format: LastName,FirstName,EmailAddress,PersonID 
+	 * 
+	 * @param fileName		Location of the csv
+	 * @return				Success of importing the person list
+	 */
+	public void importPersonCSV(String fileName);
+	
+	/**
+	 * Adds a person to the database
+	 *
+	 * @param personID		personID of the person - user input
+	 * @param firstName		First Name of the person - user input
+	 * @param lastName		Last Name of the person - user input
+	 * @param emailAddress	Email Address of the person - user input
+	 */
+	public void addPerson(String personID, String firstName, String lastName, String emailAddress);
+	
+	/**
+	 * Edits a person already in the database
+	 * 
+	 * @param personID		personID of the person - must already exist in the database
+	 * @param firstName		First Name of the person - user input
+	 * @param lastName		Last Name of the person - user input
+	 * @param emailAddress	Email Address of the person - user input
+	 */
+	public void editPerson(String personID, String firstName, String lastName, String emailAddress);
+	
+	/**
+	 * Deletes a person already in the database
+	 * 
+	 * @param personID		personID of the person - must already exist in the database
+	 */
 	public void deletePerson(String personID);
 }

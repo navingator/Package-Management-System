@@ -101,11 +101,10 @@ public class Database {
 	public ArrayList<Package> getAllCurrentPackages() {
 		return dbMaps.getAllPackages();
 	}
-	
 
 	/*
 	 * Returns a list of filtered and sorted packages, according to the filter and sort string
-	 * TODO
+	 * TODO make the filters work
 	 * Available filter strings:
 	 * 
 	 * Available sort strings:
@@ -119,6 +118,10 @@ public class Database {
 		return result;
 	}
 	
+	public ArrayList<Person> getPersonList(String searchString) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	/*
 	 * Adds a person to the databaseMap and writes a file for the person
@@ -158,6 +161,24 @@ public class Database {
 		 
 	}
 	
+	/**
+	 * Edits a person in the database, editing the DatabaseMaps and
+	 * writing the changes to their file
+	 * @param newPerson		Person object containing new attributes for the person
+	 */
+	public void editPerson(Person newPerson) {
+		String personID = newPerson.getPersonID();
+		if(dbMaps.getPerson(personID) == null) {
+			System.out.println("Person (ID: " + personID + ") to be edited by database not found.");
+			return;
+		}
+		
+		// edit person in databaseMaps and write to file
+		dbMaps.editPerson(newPerson);
+		writePersonFile(personID, currentDirName);
+		
+	}
+	
 	/*
 	 * Moves a person from the current directory to the archive directory and deletes
 	 * their information from the DatabaseMaps
@@ -171,8 +192,13 @@ public class Database {
 		// move person file to the archive 
 		writePersonFile(personID, archiveDirName);
 		FileIO.deleteFile(currentDirName + '/' + personID);
-		// remove person from DatabaseMaps
+		// remove person from DatabaseMaps - must be after reading and writing file
 		dbMaps.deletePerson(personID);
+		
+	}
+	
+	public void importPersonsFromCSV(String fileName) {
+		// TODO Auto-generated method stub
 		
 	}
 	
@@ -310,6 +336,7 @@ public class Database {
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		db.deletePerson(navin.getPersonID());
+		db.editPerson(christopher);
 		
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
 		System.out.println("current entries = " +db.getEntries("").toString());
