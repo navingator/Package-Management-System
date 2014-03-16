@@ -21,6 +21,7 @@ public class PackageManager {
 	private LabelPrinter printer;
 	
 	private String rootDirName;
+	private String[] subDirectories;
 	
 	public PackageManager(IModelToViewAdaptor adpt) {
 		
@@ -47,6 +48,11 @@ public class PackageManager {
 		db.start();
 		mailer.start();
 		printer.start();
+	}
+	
+	// TODO
+	private void makeDirectories() {
+		System.out.println();
 	}
 
 	//TODO Functions that run on a schedule - mainly send reminders
