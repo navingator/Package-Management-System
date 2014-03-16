@@ -18,7 +18,6 @@ package model.print;
 
 /* $Id: BarcodeGenerator.java,v 1.1 2010/10/05 08:56:04 jmaerki Exp $ */
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -44,17 +43,15 @@ import org.krysalis.barcode4j.tools.UnitConv;
  */
 public class BarcodeGenerator {
 
-    public BufferedImage getBarcode(String msg, String fullName, OutputStream out, int dpi) throws IOException {
-    	
-    	//
-    	File outputFile = new File("testFiles/barcode.png");
+    public BufferedImage getBarcode(String msg, String fullName, int dpi, FileOutputStream out) 
+    		throws IOException {
 
         //create the barcode bean
         Code128Bean bean = new Code128Bean();
 
         //configure the barcode generator
         bean.setModuleWidth(UnitConv.in2mm(8.0f / dpi)); //makes a dot/module exactly eight pixels
-        bean.setBarHeight(40);
+        bean.setBarHeight(50);
         bean.doQuietZone(false);
 		bean.setFontSize(5);
         //TODO bean.setPattern("____-__-__ __:__:__:__");
@@ -91,9 +88,8 @@ public class BarcodeGenerator {
         height += lineHeight;
 
         //add padding
-        int padding[] = {10,40};
-        width += 2 * padding[0];
-        height += 4 * padding[1];
+        int namePadding = 40;
+        height += namePadding; //pad between name and barcode
 
         //create bitmap
         BufferedImage bitmap = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
@@ -104,24 +100,17 @@ public class BarcodeGenerator {
         g2d.setFont(font);
 
         //add text lines
-        int y = padding[1] + lineHeight;
-        g2d.drawString(line, padding[0], y);
-        
-        //draw a line under the text
-//        y += (int) fontSize/20;
-//        BasicStroke lineStroke = new BasicStroke(fontSize/20);
-//        g2d.setStroke(lineStroke);
-//        g2d.drawLine(padding, y, padding+symbol.getWidth(), y);
+        int y = lineHeight;
+        g2d.drawString(line, 0, y);
         
         //place the barcode symbol
         AffineTransform symbolPlacement = new AffineTransform();
-        symbolPlacement.translate(padding[0], 2*padding[1]+lineHeight);
+        symbolPlacement.translate(0, lineHeight + namePadding);
         g2d.drawRenderedImage(symbol, symbolPlacement);
         g2d.dispose();
 
         //encode bitmap as file
         String mime = "image/png";
-//        OutputStream out = new FileOutputStream(outputFile); TODO
         try {
             final BitmapEncoder encoder = BitmapEncoderRegistry.getInstance(mime);
             encoder.encode(bitmap, out, mime, dpi);
@@ -142,10 +131,10 @@ public class BarcodeGenerator {
     	File outputFile = new File("testFiles/barcode.png");
     	
         try {
-        	OutputStream out = new FileOutputStream(outputFile);
+        	FileOutputStream out = new FileOutputStream(outputFile);
             BarcodeGenerator app = new BarcodeGenerator();
             int dpi = 300;
-            app.getBarcode("--Navin Pathak--","Navin Pathak",out,dpi);
+            app.getBarcode("--Navin Pathak--","Navin Pathak",dpi,out);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

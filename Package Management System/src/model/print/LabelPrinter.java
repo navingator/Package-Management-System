@@ -1,34 +1,15 @@
 package model.print;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.awt.print.Paper;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-import javax.print.attribute.Attribute;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.PrintServiceAttributeSet;
-import javax.print.attribute.Size2DSyntax;
-import javax.print.attribute.standard.MediaPrintableArea;
-import javax.print.attribute.standard.MediaSize;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.print.attribute.standard.OrientationRequested;
-import javax.print.attribute.standard.PrinterIsAcceptingJobs;
-import javax.print.attribute.standard.PrinterResolution;
 
 
 
@@ -38,80 +19,117 @@ public class LabelPrinter {
 
 	private BarcodeGenerator bcgen;
 	private PrintService service;
-	private DocFlavor docFlavor;
-	private PrintRequestAttributeSet attributeSet;
 	
 	public LabelPrinter() {
 		this.bcgen = new BarcodeGenerator();
-		this.docFlavor = DocFlavor.INPUT_STREAM.PNG;
-		this.attributeSet = new HashPrintRequestAttributeSet();
 		
-		// define parameters for 300dpi on Standard Shipping paper
-//		MediaSize ms = new MediaSize(54,101,MediaSize.MM);
-		//attributeSet.add(new MediaSize(54,101,MediaSize.MM));
-		attributeSet.add(new PrinterResolution(300,300,PrinterResolution.DPI));
-		attributeSet.add(OrientationRequested.LANDSCAPE);
-		//attributeSet.add(new MediaPrintableArea(2, 4, 50, 93, MediaPrintableArea.MM)); TODO
 	}
 	
 	// function to print the label
 	public void printLabel(String packageID, String ownerName) {
 		
-		PrintServiceAttributeSet aSet = service.getAttributes();
-		PrinterResolution pr = (PrinterResolution) attributeSet.get(PrinterResolution.class);
-		//MediaPrintableArea mpa = (MediaPrintableArea) attributeSet.get(MediaPrintableArea.class);
+		String tempBarcodeFileName = "testFiles/barcode.png";
+		int dpi = 300;
 		
-		int[] dpi = pr.getResolution(PrinterResolution.DPI);
-		//float[] printableArea = mpa.getPrintableArea(MediaPrintableArea.INCH);
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		try {
-			bcgen.getBarcode(packageID, ownerName, outStream, dpi[0]);//, printableArea);
-			ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-			DocPrintJob pj = service.createPrintJob();
-			Doc doc = new SimpleDoc(inStream, docFlavor, null);
-			pj.print(doc, attributeSet);
+			File tempFile = new File(tempBarcodeFileName);
+			FileOutputStream outStream = new FileOutputStream(tempFile);
+			bcgen.getBarcode(packageID, ownerName, dpi, outStream);//, printableArea);
+			sendToPrinter(tempBarcodeFileName);
+			tempFile.delete();
+			
 		} catch (IOException e) {
 			// TODO Add other stuff
 			System.out.println("Failed to generate barcode.");
-			e.printStackTrace();
-		} catch (PrintException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
 	
-	//TODO
+	private void sendToPrinter(String tempBarcodeFileName) {
+		PrinterJob pj = PrinterJob.getPrinterJob();
+        if (service == null) {
+        	return;
+        }
+    	try {
+			pj.setPrintService(service);
+		} catch (PrinterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        PageFormat pf = pj.defaultPage();
+        Paper paper = pf.getPaper();    
+        double width = mm2Pixels(54);
+        double height = mm2Pixels(101);    
+        paper.setSize(width, height);
+        paper.setImageableArea(
+                        mm2Pixels(2.5), 
+                        mm2Pixels(10), 
+                        width - mm2Pixels(5), 
+                        height - mm2Pixels(20));                
+        System.out.println("Before- " + dump(paper));    
+        pf.setOrientation(PageFormat.LANDSCAPE);
+        pf.setPaper(paper);    
+        System.out.println("After- " + dump(paper));
+        System.out.println("After- " + dump(pf));                
+        dump(pf);    
+        PageFormat validatePage = pj.validatePage(pf);
+        System.out.println("Valid- " + dump(validatePage));                
+
+        pj.setPrintable(new LabelPrintable(tempBarcodeFileName), pf);
+        try {
+            pj.print();
+        } catch (PrinterException ex) {
+            ex.printStackTrace();
+        }  
+	}
+	
+	protected static String dump(PageFormat pf) {    
+        Paper paper = pf.getPaper();            
+        return dump(paper);    
+    }
+	
+	protected static String dump(Paper paper) {            
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(paper.getWidth()).append("x").append(paper.getHeight())
+           .append("/").append(paper.getImageableX()).append("x").
+           append(paper.getImageableY()).append(" - ").append(paper
+       .getImageableWidth()).append("x").append(paper.getImageableHeight());            
+        return sb.toString();            
+    }
+	
+	private double mm2Pixels(double mm) {
+		return in2Pixels(mm*0.0393700787);
+	}
+	
+	private double in2Pixels(double inch) {
+		return inch * 72d;
+	}
+
+
 	private void setDefaultPrinter(PrintService service) {
 		this.service = service;
 	}
 	
 	private void changePrinter() {
-		PrintService[] services = PrintServiceLookup.
-				lookupPrintServices(docFlavor,attributeSet);
+		PrintService[] services = PrinterJob.lookupPrintServices();
 		
 		ArrayList<String> serviceNames = new ArrayList<String>();
 		for (PrintService pservice: services) {
 			System.out.println(pservice);
 			serviceNames.add(pservice.getName());
-			Class[] attCategories = pservice.getSupportedAttributeCategories();
-			for(Class c: attCategories) {
-				System.out.println(c);
-			}
 		}
 		//TODO get printer from view
 		if(services.length != 0) {
-			service = services[0];
+			service = services[2];
 		}
 //		if(serviceNames.size() > 0) {
 //			int sIndex = viewAdaptor.getChoiceFromList(serviceNames);
-//			setPrinter(services[sIndex]);
+//			service = services[sIndex]);
 //		}
 	}
 	
 	public void start() {
-		changePrinter();
-		printLabel("Navin Pathak","--Navin Pathak--");
 		
 	}
 	//TODO
@@ -119,5 +137,7 @@ public class LabelPrinter {
 	public static void main(String[] args) {
 		LabelPrinter lp = new LabelPrinter();
 		lp.start();
+		lp.changePrinter();
+		lp.printLabel("Ambi Bobmanuel","Ambi Bobmanuel");
 	}
 }
