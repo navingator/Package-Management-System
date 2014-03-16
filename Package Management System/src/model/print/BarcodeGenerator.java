@@ -18,6 +18,7 @@ package model.print;
 
 /* $Id: BarcodeGenerator.java,v 1.1 2010/10/05 08:56:04 jmaerki Exp $ */
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -30,68 +31,71 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.krysalis.barcode4j.impl.int2of5.Interleaved2Of5Bean;
-//import org.krysalis.barcode4j.impl.int2of5.SymbolShapeHint;
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.output.bitmap.BitmapEncoder;
 import org.krysalis.barcode4j.output.bitmap.BitmapEncoderRegistry;
 import org.krysalis.barcode4j.tools.UnitConv;
 
 /**
- * This class demonstrates how to create a barcode bitmap that is enhanced by custom elements.
+ * Class that generates the barcode for use in printing
+ * Adapted from the example code from Barcode4j
  *
- * @version $Id: BarcodeGenerator.java,v 1.1 2010/10/05 08:56:04 jmaerki Exp $
  */
 public class BarcodeGenerator {
 
-    private void generate(File outputFile) throws IOException {
-    	//TODO maybe figure out human readable
-        String msg = "2014030723032012";
-        String[] paramArr = new String[] {"Christopher Henderson"};
+    public BufferedImage getBarcode(String msg, String fullName, OutputStream out, int dpi) throws IOException {
+    	
+    	//
+    	File outputFile = new File("testFiles/barcode.png");
 
-        //Create the barcode bean
-        Interleaved2Of5Bean bean = new Interleaved2Of5Bean();
+        //create the barcode bean
+        Code128Bean bean = new Code128Bean();
 
-        final int dpi = 200;
-
-        //Configure the barcode generator
+        //configure the barcode generator
         bean.setModuleWidth(UnitConv.in2mm(8.0f / dpi)); //makes a dot/module exactly eight pixels
+        bean.setBarHeight(40);
         bean.doQuietZone(false);
-        //bean.setShape(SymbolShapeHint.FORCE_RECTANGLE);
+		bean.setFontSize(5);
+        //TODO bean.setPattern("____-__-__ __:__:__:__");
 
         boolean antiAlias = false;
         int orientation = 0;
-        //Set up the canvas provider to create a monochrome bitmap
+        //get up the canvas provider to create a monochrome bitmap
         BitmapCanvasProvider canvas = new BitmapCanvasProvider(
                 dpi, BufferedImage.TYPE_BYTE_BINARY, antiAlias, orientation);
 
-        //Generate the barcode
+        //generate the barcode
         bean.generateBarcode(canvas, msg);
 
-        //Signal end of generation
+        //signal end of generation
         canvas.finish();
 
-        //Get generated bitmap
+        //get generated bitmap
         BufferedImage symbol = canvas.getBufferedImage();
 
-        int fontSize = 32; //pixels
-        int lineHeight = (int)(fontSize * 1.2);
-        Font font = new Font("Arial", Font.PLAIN, fontSize);
+        
+        //make room for text
+        int nameSize = (int) (120.0/300*dpi); //pixels
         int width = symbol.getWidth();
         int height = symbol.getHeight();
-        FontRenderContext frc = new FontRenderContext(new AffineTransform(), antiAlias, true);
-        for (int i = 0; i < paramArr.length; i++) {
-            String line = paramArr[i];
-            Rectangle2D bounds = font.getStringBounds(line, frc);
-            width = (int)Math.ceil(Math.max(width, bounds.getWidth()));
-            height += lineHeight;
+        int lineHeight = (int)(nameSize * 1.2);
+        if (fullName.equals("")) {
+        	lineHeight = 0;
         }
+        Font font = new Font("Times", Font.PLAIN, nameSize);
+        FontRenderContext frc = new FontRenderContext(new AffineTransform(), antiAlias, true);
+        String line = fullName;
+        Rectangle2D bounds = font.getStringBounds(line, frc);
+        width = (int)Math.ceil(Math.max(width, bounds.getWidth()));
+        height += lineHeight;
 
-        //Add padding
-        int padding = 2;
-        width += 2 * padding;
-        height += 3 * padding;
+        //add padding
+        int padding[] = {10,40};
+        width += 2 * padding[0];
+        height += 4 * padding[1];
 
+        //create bitmap
         BufferedImage bitmap = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
         Graphics2D g2d = (Graphics2D)bitmap.getGraphics();
         g2d.setBackground(Color.white);
@@ -99,29 +103,34 @@ public class BarcodeGenerator {
         g2d.clearRect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         g2d.setFont(font);
 
-        //Place the barcode symbol
+        //add text lines
+        int y = padding[1] + lineHeight;
+        g2d.drawString(line, padding[0], y);
+        
+        //draw a line under the text
+//        y += (int) fontSize/20;
+//        BasicStroke lineStroke = new BasicStroke(fontSize/20);
+//        g2d.setStroke(lineStroke);
+//        g2d.drawLine(padding, y, padding+symbol.getWidth(), y);
+        
+        //place the barcode symbol
         AffineTransform symbolPlacement = new AffineTransform();
-        symbolPlacement.translate(padding, padding);
+        symbolPlacement.translate(padding[0], 2*padding[1]+lineHeight);
         g2d.drawRenderedImage(symbol, symbolPlacement);
-
-        //Add text lines (or anything else you might want to add)
-        int y = padding + symbol.getHeight() + padding;
-        for (int i = 0; i < paramArr.length; i++) {
-            String line = paramArr[i];
-            y += lineHeight;
-            g2d.drawString(line, padding, y);
-        }
         g2d.dispose();
 
-        //Encode bitmap as file
+        //encode bitmap as file
         String mime = "image/png";
-        OutputStream out = new FileOutputStream(outputFile);
+//        OutputStream out = new FileOutputStream(outputFile); TODO
         try {
             final BitmapEncoder encoder = BitmapEncoderRegistry.getInstance(mime);
             encoder.encode(bitmap, out, mime, dpi);
         } finally {
             out.close();
         }
+        
+        return bitmap;
+        
     }
 
     /**
@@ -129,10 +138,14 @@ public class BarcodeGenerator {
      * @param args the command-line arguments
      */
     public static void main(String[] args) {
+    	
+    	File outputFile = new File("testFiles/barcode.png");
+    	
         try {
+        	OutputStream out = new FileOutputStream(outputFile);
             BarcodeGenerator app = new BarcodeGenerator();
-            File outputFile = new File("testFiles/out.png");
-            app.generate(outputFile);
+            int dpi = 300;
+            app.getBarcode("--Navin Pathak--","Navin Pathak",out,dpi);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
