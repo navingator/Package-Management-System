@@ -13,7 +13,7 @@ import javax.print.PrintService;
 
 
 
-
+//TODO Edit for properties file
 
 public class LabelPrinter {
 

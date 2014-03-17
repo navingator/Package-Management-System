@@ -10,6 +10,7 @@ import model.database.Database;
 import util.Package;
 import util.Pair;
 import util.Person;
+import util.PropertyHandler;
 import view.IViewToModelAdaptor;
 import view.MainFrame;
 
@@ -121,6 +122,9 @@ public class Controller{
 	}
 	
 	public void start() {
+		//TODO Make root directory
+		//TODO Start PropertyHandler and add root directory
+//		PropertyHandler.getInstance().init(programDirectory);
 		//TODO Start logger
 		viewFrame.start();
 		modelPM.start();
