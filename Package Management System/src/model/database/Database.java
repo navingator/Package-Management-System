@@ -28,11 +28,11 @@ public class Database {
 	private String archiveDirName;
 
 	//TODO instantiate viewAdaptor
-	public Database(String rootDirName) {
+	public Database(String progDirName) {
 		
 //		this.viewAdaptor = viewAdaptor;
 		
-		this.packageDirName = rootDirName + "/packages";
+		this.packageDirName = progDirName + "/packages";
 		this.currentDirName = packageDirName + "/current";
 		this.archiveDirName = packageDirName + "/archive";
 		
@@ -75,6 +75,7 @@ public class Database {
 		Package pkg = dbMaps.getPackage(pkgID);
 		if(pkg.getCheckOutDate() != null) {
 			System.out.println("Package ID: " + pkgID + " was already checked out.");
+			//TODO Sound Clip
 			//TODO uncomment when ready and delete above
 //			viewAdaptor.displayMessage("This package was previously checked out on " + 
 //					pkg.getCheckOutDate().toString());			
@@ -318,7 +319,6 @@ public class Database {
 	public static void main(String[] args) {
 		Database db = new Database("testFiles");
 		db.start();
-		
 		System.out.println("Start:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
 		System.out.println("current active entries = " + db.getEntries("").toString());

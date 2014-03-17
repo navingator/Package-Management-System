@@ -63,9 +63,9 @@ public class LabelPrinter {
         double height = mm2Pixels(101);    
         paper.setSize(width, height);
         paper.setImageableArea(
-                        mm2Pixels(2.5), 
+                        mm2Pixels(0), 
                         mm2Pixels(10), 
-                        width - mm2Pixels(5), 
+                        width - mm2Pixels(7.5), 
                         height - mm2Pixels(20));                
         System.out.println("Before- " + dump(paper));    
         pf.setOrientation(PageFormat.LANDSCAPE);
@@ -121,7 +121,7 @@ public class LabelPrinter {
 		}
 		//TODO get printer from view
 		if(services.length != 0) {
-			service = services[2];
+			service = services[0];
 		}
 //		if(serviceNames.size() > 0) {
 //			int sIndex = viewAdaptor.getChoiceFromList(serviceNames);
@@ -138,6 +138,6 @@ public class LabelPrinter {
 		LabelPrinter lp = new LabelPrinter();
 		lp.start();
 		lp.changePrinter();
-		lp.printLabel("Ambi Bobmanuel","Ambi Bobmanuel");
+		lp.printLabel("0123456789ABCDEF","Christopher Weldon Henderson");
 	}
 }

@@ -10,12 +10,13 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import util.Package;
+import util.Pair;
 import util.Person;
+import util.PropertyHandler;
 
 /*
  * Class that handles sending notification and reminder emails to students through
@@ -24,31 +25,115 @@ import util.Person;
 
 public class Emailer {
 	
+	private PropertyHandler propHandler;
+	private String senderAddress;
+	private String senderPassword;
+	private String senderAlias;
+	
+	private String host;
 	private Session session;
 	private Transport transport;
-	private String senderEmail;
 	
-	private static final String senderAlias = "Jones Mail Room";
+	public Emailer() {
+		// get PropertyHandler instance
+		this.propHandler = PropertyHandler.getInstance();
+	}
 	
+	public void start() {
+		// get properties from PropertyHandler
+		this.senderAddress = propHandler.getProperty("email.email_address");
+		this.senderPassword = propHandler.getProperty("email.password");
+		this.senderAlias = propHandler.getProperty("email.alias");
+		
+		if(this.senderAddress == null || this.senderPassword == null || this.senderAlias == null) {
+			//TODO add to log
+			System.out.println("Failed to load email properties.");
+			//TODO get from view and delete test code
+//			String[] newEmail = viewAdaptor.changeEmail(senderAddress,senderPassword,senderAlias);
+			String[] newEmail = {"JonesCollegeMailRoom@gmail.com","jonesmailroomisbadass",
+					"Jones Mail Room"};
+			changeEmail(newEmail[0],newEmail[1],newEmail[2]);
+		}
+		
+		// attempt to connect to the mail server
+		
+		// notify user if connection was not successful
+	}
+	
+	/**
+	 * Function changes email, password, and alias to passed values
+	 * @param newAddress		New Email address
+	 * @param newPassword		New Password to email address
+	 * @param newAlias			New Alias for sender
+	 */
+	private void changeEmail(String newAddress, String newPassword, String newAlias) {
+
+		propHandler.setProperty("email.email_address",newAddress);
+		propHandler.setProperty("email.password",newPassword);
+		propHandler.setProperty("email.alias",newAlias);
+		
+		this.senderAddress = newAddress;
+		this.senderPassword = newPassword;
+		this.senderAlias = newAlias;
+		
+	}
+
+	//TODO
+	public void sendAllReminders(ArrayList<Pair<Person,Package>> allEntriesSortedByPerson) {
+		
+		//collect ArrayList of pairs of person,ArrayList<Package>
+		
+		try {
+			connect(senderAddress,senderPassword);
+			//iterate through ArrayList, sending emails if the person has packages
+			closeConnection();
+		} catch(NoSuchProviderException e) {
+			//TODO
+		} catch(MessagingException e) {
+			//TODO
+		}
+	}
+	
+	/*
+	 * Sends a notification email to the recipient informing them that they 
+	 * have a new package 
+	 */
+	//TODO If notification sending fails, add to a list of emails to send
+	//TODO Change input to Pair<Person,Package>
+	public void sendPackageNotification(Person recipient, Package pkg) 
+			throws UnsupportedEncodingException, MessagingException {
+		
+		String subject = "[Test][Package Notification] New Package for " + recipient.getFullName();
+		String body = new String();
+//		body += "Hello " + recipient.getFirstName() + ",\n\n"
+//				+ "You have a new package in the Jones Mail Room.\n ";
+		
+		String comment = pkg.getComment();
+		if(comment != null && !comment.isEmpty()) {
+			body += "Comment: " + comment + "\n\n";
+		}
+		
+//		body += "Please pick it up at your earliest convenience.\n \n" 
+		body += "Jones Mail Room";
+		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
+		
+	}
 	
 	// connect to the mail server
-	public void connect(String userEmail, String password) 
+	private void connect(String userEmail, String password) 
 			throws NoSuchProviderException, MessagingException {
-
-		senderEmail = userEmail;
+		
 		Properties props = System.getProperties();
-        String host = "smtp.gmail.com";
+        this.host = "smtp.gmail.com";
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.user", senderEmail);
+        props.put("mail.smtp.user", senderAddress);
         props.put("mail.smtp.password", password);
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
-
         session = Session.getDefaultInstance(props);
-        
 		transport = session.getTransport("smtp");
-		transport.connect(host, senderEmail, password);
+		transport.connect(host, senderAddress, password);
 		
 	}
 	
@@ -58,7 +143,7 @@ public class Emailer {
 		
         MimeMessage message = new MimeMessage(session);
         
-        message.setFrom(new InternetAddress(senderEmail, senderAlias));
+        message.setFrom(new InternetAddress(senderAddress, senderAlias));
         message.addRecipient(Message.RecipientType.TO, 
         		new InternetAddress(recipientEmail, recipientAlias));
         
@@ -68,31 +153,15 @@ public class Emailer {
 	}
 
 	// close the connection to the mail server
-	public void closeConnection() throws MessagingException {
+	private void closeConnection() throws MessagingException {
         transport.close();
-	}
-
-	/*
-	 * Sends a notification email to the recipient informing them that they 
-	 * have a new package 
-	 */
-	public void sendPackageNotification(Person recipient) 
-			throws UnsupportedEncodingException, MessagingException {
-		
-		String subject = "[Test][Package Notification] New Package for " + recipient.getFullName();
-		String body = "Hello " + recipient.getFirstName() + ",\n\n"
-				+ "You have a new package in the Jones Mail Room. "
-				+ "Please pick it up at your earliest convenience.\n\n"
-				+ "Jones Mail Room";
-		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
-		
 	}
 	
 	/*
 	 * Sends a reminder email to the recipient reminding them of each package that
 	 * is returned by recipient.getPackageList()
 	 */
-	public void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
+	private void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
 			throws UnsupportedEncodingException, MessagingException {
 		
 		String subject = "[Test][Package Reminder] You have " + packages.size() + " package";
@@ -115,7 +184,7 @@ public class Emailer {
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 	}
 	
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		Emailer emailer = new Emailer();
 		
 		String senderEmail = "JonesCollegeMailRoom@gmail.com";
@@ -137,7 +206,8 @@ public class Emailer {
 		
 		try {
 			emailer.connect(senderEmail, password);
-			emailer.sendPackageNotification(navin);
+			emailer.sendPackageNotification(navin,p1);
+			emailer.sendPackageNotification(navin,p2);
 			//Emailer.sendPackageReminder(navin, new Package[]{p1});
 			//Emailer.sendPackageReminder(navin, new Package[]{p2});
 			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2});
@@ -152,11 +222,6 @@ public class Emailer {
 		} catch(UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} 
-	}
-
-	public void start() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

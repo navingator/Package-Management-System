@@ -51,9 +51,9 @@ public class BarcodeGenerator {
 
         //configure the barcode generator
         bean.setModuleWidth(UnitConv.in2mm(8.0f / dpi)); //makes a dot/module exactly eight pixels
-        bean.setBarHeight(50);
+        bean.setBarHeight(20);
         bean.doQuietZone(false);
-		bean.setFontSize(5);
+		bean.setFontSize(4);
         //TODO bean.setPattern("____-__-__ __:__:__:__");
 
         boolean antiAlias = false;
@@ -73,7 +73,7 @@ public class BarcodeGenerator {
 
         
         //make room for text
-        int nameSize = (int) (120.0/300*dpi); //pixels
+        int nameSize = (int) (96.0/300*dpi); //pixels
         int width = symbol.getWidth();
         int height = symbol.getHeight();
         int lineHeight = (int)(nameSize * 1.2);
@@ -84,7 +84,7 @@ public class BarcodeGenerator {
         FontRenderContext frc = new FontRenderContext(new AffineTransform(), antiAlias, true);
         String line = fullName;
         Rectangle2D bounds = font.getStringBounds(line, frc);
-        width = (int)Math.ceil(Math.max(width, bounds.getWidth()));
+//        width = (int)Math.ceil(Math.max(width, bounds.getWidth())); // will cause them to shrink
         height += lineHeight;
 
         //add padding

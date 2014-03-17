@@ -20,8 +20,7 @@ public class PackageManager {
 	private Emailer mailer;
 	private LabelPrinter printer;
 	
-	private String rootDirName;
-	private String[] subDirectories;
+	private String progDirName;
 	
 	public PackageManager(IModelToViewAdaptor adpt) {
 		
@@ -29,17 +28,17 @@ public class PackageManager {
 		
 		// set and create root directory, if it doesn't exist
 		String home = System.getProperty("user.home");
-		rootDirName = home + "/Documents/Package Management System";
-		System.out.println("Creating root directory: " + rootDirName);
-		FileIO.makeDirs(rootDirName);
+		progDirName = home + "/Documents/Package Management System";
+		System.out.println("Creating root directory: " + progDirName);
+		FileIO.makeDirs(progDirName);
 		
 		// initialize the database
-		db = new Database(rootDirName);
+		db = new Database(progDirName);
 		mailer = new Emailer();
 		printer = new LabelPrinter();
 		
 		//TODO viewAdaptor
-//		db = new Database(rootDirName,viewAdaptor);
+//		db = new Database(progDirName,viewAdaptor);
 //		mailer = new Emailer(viewAdaptor);
 //		printer = new LabelPrinter(viewAdaptor);
 	}
