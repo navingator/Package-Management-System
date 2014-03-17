@@ -39,6 +39,7 @@ public class Emailer {
 		this.propHandler = PropertyHandler.getInstance();
 	}
 	
+	//TODO finish function
 	public void start() {
 		// get properties from PropertyHandler
 		this.senderAddress = propHandler.getProperty("email.email_address");
@@ -120,6 +121,7 @@ public class Emailer {
 	}
 	
 	// connect to the mail server
+	//TODO change class to reflect private variables
 	private void connect(String userEmail, String password) 
 			throws NoSuchProviderException, MessagingException {
 		
@@ -127,7 +129,7 @@ public class Emailer {
         this.host = "smtp.gmail.com";
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.user", senderAddress);
+        props.put("mail.smtp.user", userEmail);
         props.put("mail.smtp.password", password);
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
