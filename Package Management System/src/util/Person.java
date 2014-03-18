@@ -19,12 +19,21 @@ public class Person {
 	
 	/*
 	 * Getters:
+	 * 	LastFirstName
 	 * 	fullName
 	 * 	lastName
 	 * 	firstName
 	 * 	emailAddress
 	 * 	personID
 	 */
+	
+	/**
+	 * Function returns lastName, firstName
+	 * @return				
+	 */
+	public String getLastFirstName() {
+		return lastName + ", " + firstName;
+	}
 	
 	public String getFullName() {
 		return firstName + ' ' + lastName;

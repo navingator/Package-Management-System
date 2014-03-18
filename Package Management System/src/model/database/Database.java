@@ -88,16 +88,6 @@ public class Database {
 		// write to file
 		writePersonFile(dbMaps.getOwnerID(pkgID),currentDirName);
 	}
-	
-	/* Return a list of all persons in the current directory */
-	public ArrayList<Person> getAllCurrentPersons() {
-		return dbMaps.getAllPersons();
-	}
-	
-	/* returns a list of all packages in the current directory */
-	public ArrayList<Package> getAllCurrentPackages() {
-		return dbMaps.getAllPackages();
-	}
 
 	/*
 	 * Returns a list of filtered and sorted packages, according to the options string
@@ -115,12 +105,31 @@ public class Database {
 		return result;
 	}
 	
+	/**
+	 * Returns a list of all people whose name contains searchString
+	 * Uses the java String contains function
+	 * @param searchString		String containing user input search
+	 * @return					ArrayList of people with searchString in their
+	 * 							lastName, firstName representation
+	 */
 	public ArrayList<Person> getPersonList(String searchString) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Person> result = new ArrayList<Person>();
+		ArrayList<Person> allPersons = getAllCurrentPersons();
+		
+		//convert searchString to lower case for searching
+		//internet says this is locale specific, beware
+		searchString = searchString.toLowerCase();
+		
+		for (Person person: allPersons) {
+			if(person.getLastFirstName().toLowerCase().contains(searchString)) {
+				result.add(person);
+			}
+		}
+		
+		return result;
 	}
 	
-	/*
+	/**
 	 * Adds a person to the database maps and writes a file for the person
 	 * 
 	 * If the person is already in the archive, their file will be moved and their
@@ -129,6 +138,7 @@ public class Database {
 	 * If the person is not in the archive, a new person will be added to the database maps
 	 * and a new file will be written for them.
 	 * 
+	 * @param person			Person object containing new person information
 	 */
 	public void addPerson(Person person) {
 		//Check if person is already in the system
@@ -161,7 +171,7 @@ public class Database {
 	/**
 	 * Edits a person in the database, editing the DBMaps and
 	 * writing the changes to their file
-	 * @param newPerson		Person object containing new attributes for the person
+	 * @param newPerson			Person object containing new attributes for the person
 	 */
 	public void editPerson(Person newPerson) {
 		String personID = newPerson.getPersonID();
@@ -192,6 +202,16 @@ public class Database {
 		// remove person from DBMaps - must be after reading and writing file
 		dbMaps.deletePerson(personID);
 		
+	}
+	
+	/* Return a list of all persons in the current directory */
+	private ArrayList<Person> getAllCurrentPersons() {
+		return dbMaps.getAllPersons();
+	}
+	
+	/* returns a list of all packages in the current directory */
+	private ArrayList<Package> getAllCurrentPackages() {
+		return dbMaps.getAllPackages();
 	}
 	
 	/*
