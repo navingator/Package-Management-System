@@ -2,8 +2,6 @@ package controller;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.logging.Logger;
-
 import model.IModelToViewAdaptor;
 import model.PackageManager;
 import util.FileIO;

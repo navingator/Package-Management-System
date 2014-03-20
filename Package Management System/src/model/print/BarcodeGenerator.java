@@ -21,15 +21,11 @@ package model.print;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-
 import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.output.bitmap.BitmapEncoder;
@@ -54,7 +50,7 @@ public class BarcodeGenerator {
         bean.setBarHeight(20);
         bean.doQuietZone(false);
 		bean.setFontSize(4);
-        //TODO bean.setPattern("____-__-__ __:__:__:__");
+        bean.setPattern("____-__-__-__-__-__-__");
 
         boolean antiAlias = false;
         int orientation = 0;
@@ -81,10 +77,6 @@ public class BarcodeGenerator {
         	lineHeight = 0;
         }
         Font font = new Font("Times", Font.PLAIN, nameSize);
-        FontRenderContext frc = new FontRenderContext(new AffineTransform(), antiAlias, true);
-        String line = fullName;
-        Rectangle2D bounds = font.getStringBounds(line, frc);
-//        width = (int)Math.ceil(Math.max(width, bounds.getWidth())); // will cause them to shrink
         height += lineHeight;
 
         //add padding
@@ -101,7 +93,7 @@ public class BarcodeGenerator {
 
         //add text lines
         int y = lineHeight;
-        g2d.drawString(line, 0, y);
+        g2d.drawString(fullName, 0, y);
         
         //place the barcode symbol
         AffineTransform symbolPlacement = new AffineTransform();
