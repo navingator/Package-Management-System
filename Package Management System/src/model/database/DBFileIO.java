@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import util.Package;
 import util.Pair;
@@ -25,6 +26,12 @@ import com.google.gson.reflect.TypeToken;
  * pulling person objects from a csv file.
  */
 public class DBFileIO {
+	
+	private Logger logger; 
+	
+	public DBFileIO() {
+		this.logger = Logger.getLogger(DBFileIO.class.getName());
+	}
 	
 	/**
 	 * Function that will write a pair containing a person object and all associated packages
@@ -116,13 +123,11 @@ public class DBFileIO {
 			
 			//handle header
 			line = br.readLine();
-			//TODO Check correct file format and throw FileFormatException
 			String[] header = line.split(delimiter,4);
-			if (!(header[0].contains("last") || header[0].contains("Last")) ||
-					!(header[1].contains("first") || header[1].contains("First")) ||
-					!(header[2].contains("mail")) ||
-					!(header[3].contains("ID") || header[3].contains("Id") || header[3].contains("id"))
-					) {
+			if (!(header[0].toLowerCase().contains("last")) ||
+					!(header[1].toLowerCase().contains("first")) ||
+					!(header[2].toLowerCase().contains("mail")) ||
+					!(header[3].toLowerCase().contains("ID"))) {
 				throw new FileFormatException("File must be .csv with appropriate header: \n"
 						+ "Last Name,First Name,Email Address,ID");
 			}
@@ -170,8 +175,7 @@ public class DBFileIO {
 			}
 		}
 	 
-		// TODO add to logger
-		System.out.println(filePath + " was successfully read");
+		logger.info(filePath + " was successfully read");
 		return personList;
 	}
 	

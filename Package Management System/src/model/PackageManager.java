@@ -12,6 +12,12 @@ import util.Package;
 import util.Pair;
 import util.Person;
 
+/**
+ * Package Manager class functions as a large model to string together the
+ * database, emailer, and printer
+ * @author Navin
+ *
+ */
 public class PackageManager {
 
 	private IModelToViewAdaptor viewAdaptor;
@@ -25,12 +31,6 @@ public class PackageManager {
 	public PackageManager(IModelToViewAdaptor adpt) {
 		
 		viewAdaptor = adpt;
-		
-		// set and create root directory, if it doesn't exist
-		String home = System.getProperty("user.home");
-		progDirName = home + "/Documents/Package Management System";
-		System.out.println("Creating root directory: " + progDirName);
-		FileIO.makeDirs(progDirName);
 		
 		// initialize the database
 		db = new Database(progDirName);
@@ -118,8 +118,8 @@ public class PackageManager {
 	}
 	
 
-	public ArrayList<Pair<Person, Package>> getPackages(String options) {
-		return db.getEntries(options);
+	public ArrayList<Pair<Person, Package>> getPackages(String filter, String sort) {
+		return db.getEntries(filter,sort);
 	}
 
 	public void importPersonCSV(String fileName) {

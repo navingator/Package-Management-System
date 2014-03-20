@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.logging.Logger;
+
 import model.IModelToViewAdaptor;
 
 /*
@@ -26,6 +28,8 @@ public class Database {
 	private String packageDirName;
 	private String currentDirName;
 	private String archiveDirName;
+	
+	private Logger logger;
 
 	//TODO instantiate viewAdaptor
 	public Database(String progDirName) {
@@ -35,6 +39,8 @@ public class Database {
 		this.packageDirName = progDirName + "/packages";
 		this.currentDirName = packageDirName + "/current";
 		this.archiveDirName = packageDirName + "/archive";
+
+		this.logger = Logger.getLogger(Database.class.getName());
 		
 		this.dbMaps = new DBMaps();
 		this.dbIO = new DBFileIO();
@@ -89,18 +95,51 @@ public class Database {
 		writePersonFile(dbMaps.getOwnerID(pkgID),currentDirName);
 	}
 
-	/*
-	 * Returns a list of filtered and sorted packages, according to the options string
-	 * TODO make the filters work
-	 * Available filter strings:
+	/**
+	 * Returns a list of filtered and sorted packages, 
+	 * according to the filter and sort string
 	 * 
-	 * Available sort strings:
+	 * filter should be written with all filters in the format
+	 * 		field1=value1:field2=value2:field3=value3
+	 * etc., where fields and values are defined as follows
+	 * 	Fields with accompanying values:
+	 * 		checked_in			
+	 * 			<boolean>		Include only packages that have not been checked out
+	 * 		person_name
+	 * 			<String>		User input string to search Person firstName and LastName		
+	 * 		on_date
+	 * 			<String>		YYYYMMDD Date to get entries checked-in on
+	 *		before_date			
+	 * 			<String>		YYYYMMDD Date to get entries checked-in before
+	 * 		after_date
+	 * 			<String>		YYYYMMDD Date get entries checked-in after
+	 * 
+	 * sort should be written with highest priority sorts first
+	 * in the format
+	 * 		field1=value1:field2=value2:field3=value3
+	 * 
+	 * Where fields and values are defined as follows
+	 * 	Fields:
+	 * 		last_name			Person last name
+	 * 		first_name			Person first name
+	 * 		person_ID			Person personID
+	 * 		package_ID			Package packageID
+	 * 		check_in_date		Package check in date
+	 * 		check_out_date		Package check out date
+	 * 	Values:
+	 * 		ASCENDING
+	 * 		DESCENDING
+	 * 
+	 * @param filter			String containing filtering options
+	 * @param sort				String containing sort options
 	 */
 	
-	public ArrayList<Pair<Person,Package>> getEntries(String options) {
-		ArrayList<Pair<Person,Package>> result = dbMaps.getAllEntries();
+	public ArrayList<Pair<Person,Package>> getEntries(String filter, String sort) {
 		
-		//TODO Filters & Sorting
+		// get all of the entries from the database
+		ArrayList<Pair<Person,Package>> result = dbMaps.getAllEntries();
+		DBFormat.filter(result, filter);
+		DBFormat.sort(result, sort);
 		
 		return result;
 	}
@@ -235,11 +274,9 @@ public class Database {
 		try {
 			dbIO.writeDatabaseJSONFile(dbPair, fileName);
 		} catch (FileNotFoundException e) {
-			// TODO send to log
-			System.out.println("Failed to find file: " + fileName);	
+			logger.warning("Failed to find file: " + fileName);	
 		}catch(IOException e) {
-			//TODO send to log
-			System.out.println("Failed to write " + fileName);
+			logger.warning("Failed to write " + fileName);
 			e.printStackTrace();
 		}
 	}
@@ -253,11 +290,9 @@ public class Database {
 		try {
 			 dbPair = dbIO.readDatabaseJSONFile(fileName);
 		} catch (FileNotFoundException e) {
-			// TODO send to log
-			System.out.println("Failed to find file: " + fileName);	
+			logger.warning("Failed to find file: " + fileName);	
 		} catch (IOException e) {
-			// TODO send to log
-			System.out.println("Failed to read " + fileName);
+			logger.warning("Failed to read " + fileName);
 			e.printStackTrace();
 		} 
 		
@@ -293,7 +328,7 @@ public class Database {
 		}
 	}
 		 
-	public void importPersonsFromCSV(String fileName) {
+	public void importPersonsFromCSV(String filePath) {
 		// Get a list of all people in the database
 		ArrayList<String> currentPersons = dbMaps.getAllPersonIDs();
 		
@@ -306,18 +341,16 @@ public class Database {
 		ArrayList<Person> csvPersons = new ArrayList<Person>();
 		ArrayList<Pair<String,String>> failedToRead = new ArrayList<Pair<String,String>>();
 		try {
-			csvPersons = dbIO.readDatabaseCSVFile(fileName,failedToRead);
+			csvPersons = dbIO.readDatabaseCSVFile(filePath,failedToRead);
 		} catch (FileNotFoundException e) {
-			// TODO send error message
-			System.out.println("Failed to find file: " + fileName);	
+			logger.severe("Failed to find file: " + filePath);	
 		} catch (IOException e) {
-			// TODO send error message
-			System.out.println("Failed to read " + fileName);
+			logger.severe("Failed to read " + filePath);
 			e.printStackTrace();
 		} catch (FileFormatException e) {
 			// TODO send error message
+			logger.warning("Invalid csv file format for file: " + filePath);
 			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
 		
 		if(failedToRead.size() != 0) {
@@ -326,7 +359,7 @@ public class Database {
 			for (Pair<String,String> error: failedToRead) {
 				errorMsg = errorMsg + error.first + " - " + error.second + '\n';
 			}
-			// TODO send error message
+			// TODO send error message to view
 			System.out.println(errorMsg);
 		}	
 		
@@ -341,7 +374,7 @@ public class Database {
 		db.start();
 		System.out.println("Start:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current active entries = " + db.getEntries("").toString());
+		System.out.println("current active entries = " + db.getEntries("", "").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		Date now = new Date();
@@ -365,26 +398,26 @@ public class Database {
 
 		System.out.println("Added Persons:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		db.checkInPackage(navin.getPersonID(),p1);
 		System.out.println("Checked In1:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		db.checkInPackage(ambi.getPersonID(),p2);
 		db.checkInPackage(chris.getPersonID(),p3);
 		System.out.println("Checked In3:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		db.checkInPackage(chris.getPersonID(),p4);
 		db.checkInPackage(navin.getPersonID(),p5);
 		
 		System.out.println("Checked In5:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		db.checkOutPackage(p5.getPackageID());
@@ -394,14 +427,14 @@ public class Database {
 
 		System.out.println("Checked Out:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString() + '\n');
 		
 		db.deletePerson(navin.getPersonID());
 		db.editPerson(christopher);
 		
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());
-		System.out.println("current entries = " +db.getEntries("").toString());
+		System.out.println("current entries = " +db.getEntries("","").toString());
 		System.out.println("current packages = " + db.getAllCurrentPackages().toString());
 		
 	}

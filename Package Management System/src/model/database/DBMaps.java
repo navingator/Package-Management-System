@@ -3,6 +3,7 @@ package model.database;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import util.Package;
 import util.Pair;
@@ -20,23 +21,29 @@ public class DBMaps {
 	private HashMap<String,Person> personIDMap;
 	private HashMap<Long,Package> packageIDMap;
 	
+	Logger logger;
+	
 	public DBMaps() {
 		this.personID2PackageIDs = new HashMap<String, ArrayList<Long>>();
 		this.packageID2PersonID = new HashMap<Long, String>();
 		this.personIDMap = new HashMap<String,Person>();
 		this.packageIDMap = new HashMap<Long,Package>();
+		
+		this.logger = Logger.getLogger(DBMaps.class.getName());
 	}
 	
-	/*
-	 * Add a package to the maps
-	 * Will throw InDatabaseError if the package already exists
+	/**
+	 * Add a package to the maps. Associates the package with the
+	 * personID and maps the packageID to the package.
+	 * @param personID			ID of the person to add the package	
+	 * @param pkg				Package object to add
 	 */
 	public void addPackage(String personID, Package pkg) {
 		
 		long pkgID = pkg.getPackageID();
-		// If package is already in database, TODO throw DatabaseException
+		// If package is already in database, log the event
 		if(packageIDMap.containsKey(pkgID)) {
-			System.out.println("Package (ID: " + pkgID + ") to be added is already in the database.");
+			logger.warning("Package (ID: " + pkgID + ") to be added is already in the database.");
 			return;
 			//throw new DatabaseException("Package (ID: " + pkgID + ") to be added is already in the database.");
 		} 
@@ -52,35 +59,36 @@ public class DBMaps {
 		packageIDMap.put(pkgID, pkg);
 	}
 	
-	/*
-	 * Edit a package in the maps
+	/**
+	 * Edit a package, given that they MUST HAVE THE SAME PackageID in the maps. 
+	 * Edit the packageID to package map.
+	 * @param newPackage		new package to replace the old package
 	 */
 	public void editPackage(Package newPackage) {
 		long pkgID = newPackage.getPackageID();
 		
-		//If package is not in database, TODO throw DatabaseException
+		//If package is not in database, log the event
 		if (!packageIDMap.containsKey(pkgID)) {
-			System.out.println("Package (ID: " + pkgID + ") to be edited not found in database.");
+			logger.warning("Package (ID: " + pkgID + ") to be edited not found in database.");
 			return;
-			//throw new DatabaseException("Package (ID: " + pkgID + ") to be edited not found in database.")
 		}
 
 		//edit the packageIDMap only
 		packageIDMap.put(pkgID, newPackage);
 	}
 	
-	/*
-	 * Delete a package from the maps
-	 * If the package is not in the system, throws DatabaseException
+	/**
+	 * Delete a package from the maps. This removes it from the 
+	 * personID2PackageIDs map, the packageID2PersonID map, and the packageIDMap
+	 * @param pkgID				ID of package to be deleted
 	 */
 	public void deletePackage(long pkgID) {
 		String personID = packageID2PersonID.get(pkgID);
 		
-		// If the package is not in the database, TODO throw DatabaseException
+		// If the package is not in the database, log the event.
 		if(personID == null) {
-			System.out.println("Package (ID: " + pkgID + ") to be deleted not found in database.");
+			logger.warning("Package (ID: " + pkgID + ") to be deleted not found in database.");
 			return;
-			//throw new DatabaseException("Package (ID: " + pkgID + ") to be deleted not found in database.");
 		} 
 
 		// remove from personID2PackageIDs map
@@ -92,18 +100,18 @@ public class DBMaps {
 		packageIDMap.remove(pkgID);	
 	}
 	
-	/*
-	 * Add a person to the maps
-	 * If their personID already exists, throws DatabaseException
+	/**
+	 * Add a person to the maps, specifically adding to personID to person map
+	 * and personID2PackageIDs empty entry.
+	 * @param person			Person to be added
 	 */
 	public void addPerson(Person person) {
 		String personID = person.getPersonID();
 		
-		// Check if a person exists and TODO throw DatabaseException if so
+		// If the person does not exist, return and log the event.
 		if(personIDMap.containsKey(personID)) {
-			System.out.println("Person (ID: " + personID + ") to be added is already in database.");
+			logger.warning("Person (ID: " + personID + ") to be added is already in database.");
 			return;
-			//throw new DatabaseException("Person (Name: " + person.getFullName() + ") to be added is already in database.");
 		}
 
 		personIDMap.put(personID, person);
@@ -111,38 +119,40 @@ public class DBMaps {
 		
 	}
 	
-	/*
+	/**
 	 * Edit a person in the maps
 	 * This will retain all of their packages when their information is edited
 	 * 
 	 * Note: The new Person object must have the same personID as before
+	 * 
+	 * @param newPerson			Person to be edited (must have same personID)
 	 */
 	
 	public void editPerson(Person newPerson) {
 		String personID = newPerson.getPersonID();
 		
-		//If person is not in database, TODO throw DatabaseException
+		//If person is not in database, log the event
 		if (!personIDMap.containsKey(personID)) {
-			System.out.println("Person (ID: " + personID + ") to be edited not found in database.");
+			logger.warning("Person (ID: " + personID + ") to be edited not found in database.");
 			return;
-			//throw new DatabaseException("Person (Name: " + newPerson.getFullName() + ") to be edited not found in database.")
 		} 
 
 		//edit the personIDMap only
 		personIDMap.put(personID, newPerson);
 	}
 	
-	/*
+	/**
 	 * Delete a person and all of person's packages from the maps
-	 * If the person does not exist, throws DatabaseException
+	 * 
+	 * @param personID			ID of the person to be deleted
 	 */
 	public void deletePerson(String personID) {
 		
 		Person person = personIDMap.get(personID);
 		
-		// If person not found, TODO throw DatabaseException
+		// If person not found, log the event
 		if(person == null) {
-			System.out.println("Person (ID: " + personID + ") to be deleted delete not found in database.");
+			logger.warning("Person (ID: " + personID + ") to be deleted delete not found in database.");
 			return;
 			//throw new DatabaseException("Person (Name: " + person.getFullName() + ") to be deleted delete not found in database.")
 		} 
@@ -196,6 +206,10 @@ public class DBMaps {
 		return new ArrayList<Long>(packageIDMap.keySet());
 	}
 	
+	/**
+	 * Returns an ArrayList of all entries
+	 * @return					ArrayList of all entries
+	 */
 	public ArrayList<Pair<Person,Package>> getAllEntries() {
 		ArrayList<Pair<Person,Package>> result = new ArrayList<Pair<Person,Package>>();
 		ArrayList<Long> pkgIDList = getAllPackageIDs(); 

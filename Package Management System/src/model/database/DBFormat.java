@@ -1,5 +1,6 @@
 package model.database;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,8 +12,6 @@ import util.Person;
 import util.Package;
 
 public class DBFormat {
-	
-	//TODO Remove return functions
 	
 	/*
 	 * Filters
@@ -30,11 +29,11 @@ public class DBFormat {
 	 * 		person_name
 	 * 			<String>		User input string to search Person firstName and LastName		
 	 * 		on_date
-	 * 			<String>		YYYYMMDD Date to get entries on
-	 *		Before_date			
-	 * 			<String>		YYYYMMDD Date to get entries before
-	 * 		AfterDate
-	 * 			<String>		YYYYMMDD Date get entries after
+	 * 			<String>		YYYYMMDD Date to get entries checked-in on
+	 *		before_date			
+	 * 			<String>		YYYYMMDD Date to get entries checked-in before
+	 * 		after_date
+	 * 			<String>		YYYYMMDD Date get entries checked-in after
 	 * 			
 	 * 		
 	 * 
@@ -42,7 +41,6 @@ public class DBFormat {
 	 * @param filterString		String containing filters to be applied, in order
 	 * @return					Filtered ArrayList<Pair<Person,Package>> entries
 	 */
-	//TODO
 	public static void filter(
 			ArrayList<Pair<Person,Package>> dbEntries,
 			String filterString) {
@@ -52,6 +50,27 @@ public class DBFormat {
 			return;
 		}
 		
+		// parse the string for options
+		ArrayList<Pair<String,String>> filtOpts = parseLang(filterString);
+		for (Pair<String,String> opt: filtOpts) {
+			switch (opt.first.toUpperCase()) {
+			case "CHECKED_IN":
+				filterCheckedIn(dbEntries,Boolean.valueOf(opt.second));
+				break;
+			case "PERSON_NAME":
+				filterPersonName(dbEntries,opt.second);
+				break;
+			case "BEFORE_DATE":
+				filterDate(dbEntries,opt.second,"before");
+				break;
+			case "ON_DATE":
+				filterDate(dbEntries,opt.second,"on");
+				break;
+			case "AFTER_DATE":
+				filterDate(dbEntries,opt.second,"after");
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -59,16 +78,19 @@ public class DBFormat {
 	 * @param dbEntries			Database ArrayList<Pair<Person,Package>> entries
 	 * @return					Checked in ArrayList<Pair<Person,Package>> entries
 	 */
-	//TODO
 	private static void filterCheckedIn(
-			ArrayList<Pair<Person,Package>> dbEntries) {
+			ArrayList<Pair<Person,Package>> dbEntries,
+			boolean doFilter) {
 		
-		Iterator<Pair<Person, Package>> entryIt = dbEntries.iterator();
-		
-		while(entryIt.hasNext()) {
-			Pair<Person,Package> entry = entryIt.next();
-			if(entry.second.getCheckOutDate() != null) {
-				entryIt.remove();
+		if(doFilter) {
+			Iterator<Pair<Person, Package>> entryIt = dbEntries.iterator();
+			
+			// Iterate through entries, removing them if they have been checked out
+			while(entryIt.hasNext()) {
+				Pair<Person,Package> entry = entryIt.next();
+				if(entry.second.getCheckOutDate() != null) {
+					entryIt.remove();
+				}
 			}
 		}
 	}
@@ -79,32 +101,65 @@ public class DBFormat {
 	 * @param personIDs			Array of personIDs to search for
 	 * @return					Owned ArrayList<Pair<Person,Package>> entries
 	 */
-	//TODO
-	private static void filterPersonNames(
+	private static void filterPersonName(
 			ArrayList<Pair<Person,Package>> dbEntries,
 			String searchString) {
 		
-		// use equals
+		// make the string lower case for case insensitivity
+		searchString = searchString.toLowerCase();
+		
+		// Iterate through all entries and remove non-matching entries
+		Iterator<Pair<Person,Package>> entryIt = dbEntries.iterator();
+		while(entryIt.hasNext()) {
+			Pair<Person,Package> entry = entryIt.next();
+			String fullName = entry.first.getFullName().toLowerCase();
+			String lastFirst = entry.first.getLastFirstName().toLowerCase();
+			
+			// remove if neither name contains the search string
+			if (!(fullName.contains(searchString) || lastFirst.contains(searchString))) {
+				entryIt.remove();
+			}
+		}
+		
 		
 		// check forward and reverse
 	}
 	
 	/**
-	 * Function that returns all packages with specified dates
+	 * Function that returns all packages with specified check-in dates
 	 * @param dbEntries			Database ArrayList<Pair<Person,Package>> entries
-	 * @param date				date to search around
+	 * @param date				(YYYYMMDD) date to search around
 	 * @param predicate			"on," "before," or "after" specific date
 	 * @return					Matching ArrayList<Pair<Person,Package>> entries
 	 */
-	//TODO
-	//TODO change predicate to enum
+	
 	private static void filterDate(
 			ArrayList<Pair<Person,Package>> dbEntries,
-			Date date, 
+			String date, 
 			String predicate) {
+		
+		// Iterate through entries and remove if in the wrong category
+		int setCalendarDate = Integer.valueOf(date);
+		Iterator<Pair<Person,Package>> entryIt = dbEntries.iterator();
+		SimpleDateFormat ft = new SimpleDateFormat("YYYYMMdd");
+		while(entryIt.hasNext()) {
+			Pair<Person,Package> entry = entryIt.next();
+			int checkInCalendarDate = Integer.valueOf(ft.format(entry.second.getCheckInDate()));
+			switch (predicate.toLowerCase()) {
+			case "on":
+				if(checkInCalendarDate != setCalendarDate) {entryIt.remove();}
+				break;
+			case "before":
+				if(checkInCalendarDate >= setCalendarDate) {entryIt.remove();}
+				break;
+			case "after":
+				if(checkInCalendarDate <= setCalendarDate) {entryIt.remove();}
+				break;
+			}
+		}
+		
 	}
 	
-	//TODO
 	/**
 	 * Sort function that calls all of the other sort functions
 	 * 
@@ -118,7 +173,7 @@ public class DBFormat {
 	 * 		first_name			Person first name
 	 * 		person_ID			Person personID
 	 * 		package_ID			Package packageID
-	 * 		check_in_date			Package check in date
+	 * 		check_in_date		Package check in date
 	 * 		check_out_date		Package check out date
 	 * 	Values:
 	 * 		ASCENDING
@@ -256,7 +311,7 @@ public class DBFormat {
 		Package p3 = new Package(309435+now.getTime(),"",new Date(now.getTime()-200000000));
 		Package p4 = new Package(1+now.getTime(),"",new Date(now.getTime()-300000000));
 		Package p5 = new Package(2+now.getTime(),"",new Date(now.getTime()-400000000));
-		p4.setCheckOutDate(now);
+		//p4.setCheckOutDate(now);
 		p5.setCheckOutDate(new Date(now.getTime()-200000000));
 
 		Person navin = new Person("Pathak", "Navin", "np8@rice.edu", "np8");
@@ -273,6 +328,9 @@ public class DBFormat {
 		
 		String sortString = "check_out_date=DESCENDING:person_ID=ASCENDING:first_name=ASCENDING";
 		sort(dbEntries,sortString);
+		
+		String filterString = "person_name=h";
+		filter(dbEntries,filterString);
 		
 		for(Pair<Person,Package> entry: dbEntries) {
 			System.out.println(entry.first.getFullName() + ' ' +

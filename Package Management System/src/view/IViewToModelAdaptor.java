@@ -103,10 +103,11 @@ public interface IViewToModelAdaptor {
 	/**
 	 * Returns all of the packages with the appropriate filters applied
 	 * 
-	 * @param options		String containing filtering and sorting options
+	 * @param filter		String containing filtering information
+	 * @param sort			String containing sorting information
 	 * @return				ArrayList of (person, package) pairs after filter is applied
 	 */
-	public ArrayList<Pair<Person,Package>> getPackages(String options);
+	public ArrayList<Pair<Person,Package>> getPackages(String filter, String sort);
 	
 	/**
 	 * Reads a list of people from a csv file and adds the people to the database

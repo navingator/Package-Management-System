@@ -2,11 +2,11 @@ package controller;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.logging.Logger;
 
 import model.IModelToViewAdaptor;
 import model.PackageManager;
-import model.database.Database;
+import util.FileIO;
 import util.Package;
 import util.Pair;
 import util.Person;
@@ -18,11 +18,15 @@ import view.MainFrame;
  * Controller controlling the view and the underlying model,
  * instantiating them both as well as their communications and adaptors.
  */
-
 public class Controller{
 	
 	private MainFrame viewFrame;
 	private PackageManager modelPM;
+	
+	private LogHandler logHandler;
+	private PropertyHandler propHandler;
+	
+	private String progDirName;
 	
 	/**
 	 * Function which initializes and starts the controller
@@ -43,7 +47,12 @@ public class Controller{
 	/**
 	 * Class which acts as the go between for the model and the view
 	 */
-	public Controller() {
+	public Controller() { 
+		
+		this.propHandler = PropertyHandler.getInstance();
+		this.logHandler = new LogHandler();
+		init();
+		
 		/* Initializes the view */
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
 
@@ -75,8 +84,8 @@ public class Controller{
 				return modelPM.printLabel(pkgID);
 			}
 			
-			public ArrayList<Pair<Person,Package>> getPackages(String filter) {
-				return modelPM.getPackages(filter);
+			public ArrayList<Pair<Person,Package>> getPackages(String filter, String sort) {
+				return modelPM.getPackages(filter,sort);
 			}
 			
 			public boolean authenticate(String password) {
@@ -121,16 +130,26 @@ public class Controller{
 		});
 	}
 	
+	/**
+	 * Function initializes helper classes
+	 */
+	public void init() {
+		// set and create root directory, if it doesn't exist
+		String home = System.getProperty("user.home");
+		this.progDirName = home + "/Documents/Package Management System";
+		FileIO.makeDirs(progDirName);
+		
+		// Start helper classes
+		propHandler.init(progDirName);
+		logHandler.init(progDirName);
+		
+		logHandler.cleanLogs();
+	}
+	
 	public void start() {
-		//TODO Make root directory
-		//TODO Start PropertyHandler and add root directory
-//		PropertyHandler.getInstance().init(programDirectory);
-		//TODO Start logger
+		// Start view and model
 		viewFrame.start();
 		modelPM.start();
 	}
-	
-	//TODO Send this to another file
-
 
 }
