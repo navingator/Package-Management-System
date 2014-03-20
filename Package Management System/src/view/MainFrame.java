@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -18,6 +19,7 @@ import javax.swing.JTabbedPane;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -27,7 +29,6 @@ import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
-
 import javax.swing.SwingConstants;
 
 public class MainFrame extends JFrame {
@@ -275,10 +276,32 @@ public class MainFrame extends JFrame {
 		tableStudentInfo.setCellSelectionEnabled(true);
 		panelStudInfoTable.add(tableStudentInfo, "1, 1, fill, fill");
 	}
+	
 	/*
 	 * Start the frame
 	 */
 	public void start() {
 		setVisible(true);
 	}
+	
+	//TODO
+	public void displayMessage(String msg) {
+		
+	}
+	
+	//TODO
+	public void displayError(String err) {
+		
+	}
+	
+	//TODO
+	public String getChoiceFromList(String[] choices) {
+		return null;
+	}
+	
+	//TODO
+	public String[] changeEmail(String senderAddress, String senderPassword, String senderAlias) {
+		return null;
+	}
+	
 }

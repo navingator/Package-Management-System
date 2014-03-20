@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
+
 import model.IModelToViewAdaptor;
 import model.PackageManager;
 import util.FileIO;
@@ -124,6 +125,22 @@ public class Controller{
 			//TODO write IModelToViewAdaptor
 			public void displayMessage(String message) {
 				
+			}
+
+			public void displayError(String string) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public String getChoiceFromList(String[] choices) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public String[] changeEmail(String senderAddress,
+					String senderPassword, String senderAlias) {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		});
 	}
