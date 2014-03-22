@@ -17,19 +17,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
 import javax.swing.JTextField;
-import javax.swing.JTextArea;
 import javax.swing.JLabel;
-
-import java.awt.Font;
 
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
-import javax.swing.SwingConstants;
 
 public class MainFrame extends JFrame {
 
@@ -41,13 +34,11 @@ public class MainFrame extends JFrame {
 	private IViewToModelAdaptor modelAdaptor;
 	
 	private JPanel contentPane;
-	private JTextField textField;
 	private JTable tableActivePackages;
 	private JTable tableStudentInfo;
 	private JTextField textFieldNewEmail;
 	private JPasswordField passwordNewConfirm;
 	private JPasswordField passwordNew;
-	private JTextField textField_1;
 	private JTextField textFieldNewEmailName;
 
 	/**
@@ -89,82 +80,12 @@ public class MainFrame extends JFrame {
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		String pickUpPanelName = "<html><body><table width='80'><tr><td><center>Pick Up</center></td></tr></table></body></html>";
-		JPanel panelPickUp = new JPanel();
+		PanelPickUp panelPickUp = new PanelPickUp();
 		tabbedPane.addTab(pickUpPanelName, null, panelPickUp, null);
-		panelPickUp.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
-		
-		JLabel lblPleaseScanA = new JLabel("Please Scan a Package");
-		lblPleaseScanA.setFont(new Font("Dialog", Font.BOLD, 24));
-		panelPickUp.add(lblPleaseScanA, "4, 4, center, default");
-		
-		textField_1 = new JTextField();
-		textField_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textField_1.setHorizontalAlignment(SwingConstants.CENTER);
-		panelPickUp.add(textField_1, "4, 8, fill, default");
-		textField_1.setColumns(10);
-		
-		JButton btnSubmit = new JButton("Submit");
-		panelPickUp.add(btnSubmit, "4, 10, center, default");
 		
 		String checkInPanelName = "<html><body><table width='80'><tr><td><center>Check In</center></td></tr></table></body></html>";
-		JPanel panelCheckIn = new JPanel();
-		panelCheckIn.setBorder(null);
+		JPanel panelCheckIn = new PanelCheckIn();
 		tabbedPane.addTab(checkInPanelName, null, panelCheckIn, null);
-		panelCheckIn.setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("pref:grow"),
-				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
-				ColumnSpec.decode("400px"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("pref:grow"),},
-			new RowSpec[] {
-				RowSpec.decode("36px:grow"),
-				RowSpec.decode("20px"),
-				RowSpec.decode("33px"),
-				RowSpec.decode("168px"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
-		
-		JLabel lblStudent = new JLabel("Student:");
-		panelCheckIn.add(lblStudent, "3, 1, left, bottom");
-		
-		textField = new JTextField();
-		panelCheckIn.add(textField, "3, 2, fill, top");
-		textField.setColumns(10);
-		
-		JLabel lblNewLabel = new JLabel("Comment:");
-		panelCheckIn.add(lblNewLabel, "3, 3, left, bottom");
-		
-		JTextArea textArea = new JTextArea();
-		panelCheckIn.add(textArea, "3, 4, fill, fill");
-		
-		JButton btnConfirmCheckIn = new JButton("Confirm");
-		btnConfirmCheckIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		panelCheckIn.add(btnConfirmCheckIn, "3, 6, center, default");
 		
 		String adminPanelName = "<html><body><table width='80'><tr><td><center>Admin</center></td></tr></table></body></html>";
 		JPanel panelAdmin = new JPanel();
@@ -192,7 +113,7 @@ public class MainFrame extends JFrame {
 		panelEditPackages.add(tableActivePackages, "4, 2, fill, fill");
 		
 		JPanel panelEditEmail = new JPanel();
-		tabbedPaneAdmin.addTab("Email PropertyHandler", null, panelEditEmail, null);
+		tabbedPaneAdmin.addTab("Email", null, panelEditEmail, null);
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),

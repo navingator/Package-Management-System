@@ -31,10 +31,9 @@ public class Database {
 	
 	private Logger logger;
 
-	//TODO instantiate viewAdaptor
-	public Database(String progDirName) {
+	public Database(String progDirName, IModelToViewAdaptor viewAdaptor) {
 		
-//		this.viewAdaptor = viewAdaptor;
+		this.viewAdaptor = viewAdaptor;
 		
 		this.packageDirName = progDirName + "/packages";
 		this.currentDirName = packageDirName + "/current";
@@ -80,11 +79,10 @@ public class Database {
 		// modify package checkOut date
 		Package pkg = dbMaps.getPackage(pkgID);
 		if(pkg.getCheckOutDate() != null) {
-			System.out.println("Package ID: " + pkgID + " was already checked out.");
+			logger.info("Package ID: " + pkgID + " was already checked out.");
 			//TODO Sound Clip
-			//TODO uncomment when ready and delete above
-//			viewAdaptor.displayMessage("This package was previously checked out on " + 
-//					pkg.getCheckOutDate().toString());			
+			viewAdaptor.displayMessage("This package was previously checked out on " + 
+					pkg.getCheckOutDate().toString());			
 			return;
 		} 		
 
@@ -320,15 +318,13 @@ public class Database {
 		Person person = dbPair.first;
 		ArrayList<Package> packages = dbPair.second;
 		
-		
-		//TODO check if person and package are already in system? Would not be catastrophic
 		dbMaps.addPerson(person);
 		for (Package pkg: packages) {
 			dbMaps.addPackage(person.getPersonID(), pkg);
 		}
 	}
 		 
-	public void importPersonsFromCSV(String filePath) {
+	public boolean importPersonsFromCSV(String filePath) {
 		// Get a list of all people in the database
 		ArrayList<String> currentPersons = dbMaps.getAllPersonIDs();
 		
@@ -343,14 +339,16 @@ public class Database {
 		try {
 			csvPersons = dbIO.readDatabaseCSVFile(filePath,failedToRead);
 		} catch (FileNotFoundException e) {
-			logger.severe("Failed to find file: " + filePath);	
+			logger.severe("Failed to find file: " + filePath);
+			viewAdaptor.displayError("Failed to find file: " + filePath);
 		} catch (IOException e) {
-			logger.severe("Failed to read " + filePath);
-			e.printStackTrace();
+			logger.severe("Failed to read file:" + filePath);
+			viewAdaptor.displayError("Failed to read file: " + filePath);
 		} catch (FileFormatException e) {
-			// TODO send error message
 			logger.warning("Invalid csv file format for file: " + filePath);
-			System.out.println(e.getMessage());
+			viewAdaptor.displayError("Invalid file format for file: " + filePath +
+					"\n Please ensure the file has a header and follows the format: " +
+					"\n Last Name, First Name, Email, ID");
 		}
 		
 		if(failedToRead.size() != 0) {
@@ -359,18 +357,20 @@ public class Database {
 			for (Pair<String,String> error: failedToRead) {
 				errorMsg = errorMsg + error.first + " - " + error.second + '\n';
 			}
-			// TODO send error message to view
-			System.out.println(errorMsg);
+			logger.warning(errorMsg);
+			viewAdaptor.displayError(errorMsg);
 		}	
 		
 		// Add all people to the database
 		for(Person person: csvPersons) {
 			addPerson(person);
 		}
+		
+		return true;
 	}
 	
 	public static void main(String[] args) {
-		Database db = new Database("testFiles");
+		Database db = new Database("testFiles", null);
 		db.start();
 		System.out.println("Start:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());

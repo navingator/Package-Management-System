@@ -124,7 +124,7 @@ public class Controller{
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
 			//TODO write IModelToViewAdaptor
 			public void displayMessage(String message) {
-				
+				// TODO
 			}
 
 			public void displayError(String string) {

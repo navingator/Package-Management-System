@@ -33,7 +33,7 @@ public class PackageManager {
 		viewAdaptor = adpt;
 		
 		// initialize the database
-		db = new Database(progDirName);
+		db = new Database(progDirName,viewAdaptor);
 		mailer = new Emailer();
 		printer = new LabelPrinter();
 		
