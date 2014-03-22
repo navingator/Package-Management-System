@@ -112,90 +112,68 @@ public class MainFrame extends JFrame {
 		tableActivePackages.setCellSelectionEnabled(true);
 		panelEditPackages.add(tableActivePackages, "4, 2, fill, fill");
 		
+		JScrollPane scrollPaneEditStudentInfo = new JScrollPane();
+		tabbedPaneAdmin.addTab("Student Information", null, scrollPaneEditStudentInfo, null);
+		
+		JPanel panelStudInfoTable = new JPanel();
+		scrollPaneEditStudentInfo.setViewportView(panelStudInfoTable);
+		panelStudInfoTable.setLayout(new FormLayout(new ColumnSpec[] {
+				ColumnSpec.decode("default:grow"),
+				FormFactory.DEFAULT_COLSPEC,
+				FormFactory.DEFAULT_COLSPEC,},
+			new RowSpec[] {
+				FormFactory.DEFAULT_ROWSPEC,
+				RowSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),}));
+		
+		JButton btnImport = new JButton("Import");
+		panelStudInfoTable.add(btnImport, "1, 1, left, bottom");
+		btnImport.setToolTipText("Import student information from a csv file. Format: LastName,FirstName,NetID");
+		
+		JButton btnAddStudent = new JButton("Add");
+		panelStudInfoTable.add(btnAddStudent, "2, 1");
+		btnAddStudent.setToolTipText("Save changes to student information.");
+		
+		tableStudentInfo = new JTable();
+		tableStudentInfo.setCellSelectionEnabled(true);
+		panelStudInfoTable.add(tableStudentInfo, "1, 2, 2, 7, fill, fill");
+		
+		JButton btnEditStudent = new JButton("Edit");
+		panelStudInfoTable.add(btnEditStudent, "3, 4");
+		
+		JButton btnDeleteStudent = new JButton("Delete");
+		panelStudInfoTable.add(btnDeleteStudent, "3, 6");
+		
 		JPanel panelEditEmail = new JPanel();
-		tabbedPaneAdmin.addTab("Email", null, panelEditEmail, null);
+		tabbedPaneAdmin.addTab("Email and Printer", null, panelEditEmail, null);
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(125dlu;default):grow"),
+				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
+				RowSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
-		JLabel lblChangeEmailName = new JLabel("Name");
-		panelEditEmail.add(lblChangeEmailName, "4, 3");
+		JButton btnChangeEmail = new JButton("Change Email");
+		panelEditEmail.add(btnChangeEmail, "4, 4, default, fill");
 		
-		textFieldNewEmailName = new JTextField();
-		textFieldNewEmailName.setToolTipText("The name displayed in the \"From:\" field of all emails");
-		panelEditEmail.add(textFieldNewEmailName, "6, 3, fill, default");
-		textFieldNewEmailName.setColumns(10);
-		
-		JLabel lblNewEmail = new JLabel("Email");
-		panelEditEmail.add(lblNewEmail, "4, 4");
-		
-		textFieldNewEmail = new JTextField();
-		textFieldNewEmail.setToolTipText("The email that will be sending all notifications and reminders.");
-		panelEditEmail.add(textFieldNewEmail, "6, 4, fill, default");
-		textFieldNewEmail.setColumns(10);
-		
-		JLabel lblNewPassword = new JLabel("New Password");
-		panelEditEmail.add(lblNewPassword, "4, 5");
-		
-		passwordNew = new JPasswordField();
-		panelEditEmail.add(passwordNew, "6, 5, fill, default");
-		
-		JLabel lblConfirmNewPassword = new JLabel("Confirm New Password");
-		panelEditEmail.add(lblConfirmNewPassword, "4, 6");
-		
-		passwordNewConfirm = new JPasswordField();
-		panelEditEmail.add(passwordNewConfirm, "6, 6, fill, default");
-		
-		JButton btnSubmitEmailChanges = new JButton("Submit");
-		panelEditEmail.add(btnSubmitEmailChanges, "6, 8, center, default");
-		
-		JScrollPane scrollPaneEditStudentInfo = new JScrollPane();
-		tabbedPaneAdmin.addTab("Student Information", null, scrollPaneEditStudentInfo, null);
-		
-		JPanel panelStudInfoImportSave = new JPanel();
-		scrollPaneEditStudentInfo.setColumnHeaderView(panelStudInfoImportSave);
-		panelStudInfoImportSave.setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("100dlu:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(101dlu;default):grow"),},
-			new RowSpec[] {
-				RowSpec.decode("26px"),}));
-		
-		JButton btnImport = new JButton("Import");
-		btnImport.setToolTipText("Import student information from a csv file. Format: LastName,FirstName,NetID");
-		panelStudInfoImportSave.add(btnImport, "1, 1, left, center");
-		
-		JButton btnAddStudent = new JButton("Add Student");
-		btnAddStudent.setToolTipText("Save changes to student information.");
-		panelStudInfoImportSave.add(btnAddStudent, "3, 1, right, center");
-		
-		JPanel panelStudInfoTable = new JPanel();
-		scrollPaneEditStudentInfo.setViewportView(panelStudInfoTable);
-		panelStudInfoTable.setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				RowSpec.decode("default:grow"),}));
-		
-		tableStudentInfo = new JTable();
-		tableStudentInfo.setCellSelectionEnabled(true);
-		panelStudInfoTable.add(tableStudentInfo, "1, 1, fill, fill");
+		JButton btnSelectPrinter = new JButton("Select Printer");
+		panelEditEmail.add(btnSelectPrinter, "4, 6, default, fill");
+
 	}
 	
 	/*
