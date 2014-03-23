@@ -1,7 +1,6 @@
 package view;
 
 import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -15,14 +14,12 @@ import com.jgoodies.forms.factories.FormFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
-
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
-import javax.swing.JPasswordField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
 
@@ -36,10 +33,7 @@ public class MainFrame extends JFrame {
 	private JPanel contentPane;
 	private JTable tableActivePackages;
 	private JTable tableStudentInfo;
-	private JTextField textFieldNewEmail;
-	private JPasswordField passwordNewConfirm;
-	private JPasswordField passwordNew;
-	private JTextField textFieldNewEmailName;
+	private JFrame frame;
 
 	/**
 	 * Create the frame.
@@ -48,9 +42,11 @@ public class MainFrame extends JFrame {
 		
 		// set model adaptor
 		this.modelAdaptor = adpt;
+		this.frame = this;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 720, 446);
+		setSize(720, 446);
+		setLocationRelativeTo(null);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -169,6 +165,22 @@ public class MainFrame extends JFrame {
 				RowSpec.decode("default:grow"),}));
 		
 		JButton btnChangeEmail = new JButton("Change Email");
+		btnChangeEmail.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				// open the change email dialog
+				String oldEmail = modelAdaptor.getEmailAddress();
+				String oldAlias = modelAdaptor.getEmailAlias();
+				
+				ChangeEmail emailDlg = new ChangeEmail(frame,oldAlias,oldEmail);
+				String newEmail[] = emailDlg.showDialog();
+				
+				// make the changes in the model
+				if(newEmail != null) {
+					modelAdaptor.changeEmail(newEmail[1], newEmail[2], newEmail[0]);
+				}
+			}
+		});
 		panelEditEmail.add(btnChangeEmail, "4, 4, default, fill");
 		
 		JButton btnSelectPrinter = new JButton("Select Printer");
@@ -183,19 +195,58 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 	}
 	
-	//TODO
-	public void displayMessage(String msg) {
+	/**
+	 * Display a message dialog with a given message and title
+	 * @param message			Message to be displayed
+	 * @param title				Title of the message to be displayed
+	 */
+	public void displayMessage(String message, String title) {
+		JOptionPane.showMessageDialog(frame, message, title, JOptionPane.DEFAULT_OPTION);
+	}
+	
+	/**
+	 * Display an error dialog with given text and title
+	 * @param error				Error string to be displayed
+	 * @param title				Title of the error to be displayed
+	 */
+	public void displayError(String error, String title) {
+		JOptionPane.showMessageDialog(frame, error, title, JOptionPane.ERROR_MESSAGE);
 		
 	}
 	
-	//TODO
-	public void displayError(String err) {
-		
+	/**
+	 * Display a warning dialog with given warning string and title
+	 * @param warning			Warning string to be displayed
+	 * @param title				Title of the warning to be displayed
+	 */
+	public void displayWarning(String warning, String title) {
+		JOptionPane.showMessageDialog(frame, warning, title, JOptionPane.WARNING_MESSAGE);		
 	}
 	
-	//TODO
-	public String getChoiceFromList(String[] choices) {
-		return null;
+	/**
+	 * Get a choice from a list of options from the user through 
+	 * a dialog box
+	 * 
+	 * @param message			Message string to be displayed 
+	 * @param title				Title of the dialog box to be displayed
+	 * @param choices			Choices to be displayed in the dialog box
+	 * @return					String of the choice that is chosen
+	 */
+	public String getChoiceFromList(String message, String title, String[] choices) {
+		return (String) JOptionPane.showInputDialog(frame, message, title, 
+				JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
+	}
+	
+	/**
+	 * Get input in a yes/no style dialog
+	 * @param message			Message string to be displayed
+	 * @param title				Title of the dialog box to be displayed
+	 * @param options			Options to be displayed, in order. E.g. {"Yes","No"}
+	 * @return					Integer representing the option chosen
+	 */
+	public int getButtonInput(String message, String title, String[] options) {
+		return JOptionPane.showOptionDialog(frame, message, title, JOptionPane.YES_NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 	}
 	
 	//TODO

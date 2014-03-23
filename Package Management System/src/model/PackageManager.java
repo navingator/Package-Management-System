@@ -34,7 +34,7 @@ public class PackageManager {
 		
 		// initialize the database
 		db = new Database(progDirName,viewAdaptor);
-		mailer = new Emailer();
+		mailer = new Emailer(adpt);
 		printer = new LabelPrinter();
 		
 		//TODO viewAdaptor
@@ -70,9 +70,16 @@ public class PackageManager {
 		return false;
 	}
 
-	public boolean changeEmail(String newEmail, String newPassword) {
-		// TODO Auto-generated method stub
-		return false;
+	public void changeEmail(String newEmail, String newPassword, String newAlias) {
+		mailer.setEmailProperties(newEmail, newPassword, newAlias);
+	}
+	
+	public String getEmailAddress() {
+		return mailer.getSenderAddress();
+	}
+
+	public String getEmailAlias() {
+		return mailer.getSenderAlias();
 	}
 	
 	/*
@@ -136,6 +143,11 @@ public class PackageManager {
 
 	public void deletePerson(String personID) {
 		db.deletePerson(personID);
+	}
+
+	public String[] getPrinterNames(boolean acceptingJobsOnly) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

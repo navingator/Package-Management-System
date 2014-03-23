@@ -83,6 +83,10 @@ public class Controller{
 				return modelPM.printLabel(pkgID);
 			}
 			
+			public String[] getPrinterNames(boolean acceptingJobsOnly) {
+				return modelPM.getPrinterNames(acceptingJobsOnly);
+			}
+			
 			public ArrayList<Pair<Person,Package>> getPackages(String filter, String sort) {
 				return modelPM.getPackages(filter,sort);
 			}
@@ -91,8 +95,16 @@ public class Controller{
 				return modelPM.checkAdminPassword(password);
 			}
 			
-			public boolean changeEmail(String newEmail, String newPassword) {
-				return modelPM.changeEmail(newEmail, newPassword);
+			public void changeEmail(String newEmail, String newPassword, String newAlias) {
+				modelPM.changeEmail(newEmail, newPassword, newAlias);
+			}
+			
+			public String getEmailAddress() {
+				return modelPM.getEmailAddress();
+			}
+			
+			public String getEmailAlias() {
+				return modelPM.getEmailAlias();
 			}
 			
 			public void importPersonCSV(String fileName) {
@@ -123,16 +135,24 @@ public class Controller{
 		/* Initialize model */
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
 			//TODO write IModelToViewAdaptor
-			public void displayMessage(String message) {
-				// TODO
-			}
 
-			public void displayError(String string) {
-				// TODO Auto-generated method stub
+			public void displayMessage(String message, String title) {
+				viewFrame.displayMessage(message, title);
 				
 			}
 
-			public String getChoiceFromList(String[] choices) {
+			public void displayError(String error, String title) {
+				viewFrame.displayError(error, title);
+				
+			}
+
+			public void displayWarning(String warning, String title) {
+				viewFrame.displayWarning(warning, title);
+				
+			}
+
+			public String getChoiceFromList(String message, String title,
+					String[] choices) {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -141,6 +161,13 @@ public class Controller{
 					String senderPassword, String senderAlias) {
 				// TODO Auto-generated method stub
 				return null;
+			}
+
+			public boolean getBooleanInput(String message, String title,
+					String[] options) {
+				int response = viewFrame.getButtonInput(message,title,options);
+				if(response == 0) { return true;}
+				return false;
 			}
 		});
 	}

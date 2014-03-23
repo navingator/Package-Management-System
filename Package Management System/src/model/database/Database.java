@@ -82,7 +82,7 @@ public class Database {
 			logger.info("Package ID: " + pkgID + " was already checked out.");
 			//TODO Sound Clip
 			viewAdaptor.displayMessage("This package was previously checked out on " + 
-					pkg.getCheckOutDate().toString());			
+					pkg.getCheckOutDate().toString(), "Package Already Checked Out");			
 			return;
 		} 		
 
@@ -340,15 +340,15 @@ public class Database {
 			csvPersons = dbIO.readDatabaseCSVFile(filePath,failedToRead);
 		} catch (FileNotFoundException e) {
 			logger.severe("Failed to find file: " + filePath);
-			viewAdaptor.displayError("Failed to find file: " + filePath);
+			viewAdaptor.displayError("Failed to find file: " + filePath, "Cannot Find File");
 		} catch (IOException e) {
 			logger.severe("Failed to read file:" + filePath);
-			viewAdaptor.displayError("Failed to read file: " + filePath);
+			viewAdaptor.displayError("Failed to read file: " + filePath, "Error");
 		} catch (FileFormatException e) {
 			logger.warning("Invalid csv file format for file: " + filePath);
 			viewAdaptor.displayError("Invalid file format for file: " + filePath +
 					"\n Please ensure the file has a header and follows the format: " +
-					"\n Last Name, First Name, Email, ID");
+					"\n Last Name, First Name, Email, ID", "Invalid File Format");
 		}
 		
 		if(failedToRead.size() != 0) {
@@ -358,7 +358,7 @@ public class Database {
 				errorMsg = errorMsg + error.first + " - " + error.second + '\n';
 			}
 			logger.warning(errorMsg);
-			viewAdaptor.displayError(errorMsg);
+			viewAdaptor.displayWarning(errorMsg, "Warning");
 		}	
 		
 		// Add all people to the database

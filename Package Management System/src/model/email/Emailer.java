@@ -4,7 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Date;
+import java.util.logging.Logger;
 
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
@@ -13,6 +15,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import model.IModelToViewAdaptor;
 import util.Package;
 import util.Pair;
 import util.Person;
@@ -34,9 +37,14 @@ public class Emailer {
 	private Session session;
 	private Transport transport;
 	
-	public Emailer() {
+	private Logger logger;
+	private IModelToViewAdaptor viewAdaptor;
+	
+	public Emailer(IModelToViewAdaptor viewAdaptor) {
 		// get PropertyHandler instance
 		this.propHandler = PropertyHandler.getInstance();
+		this.logger = Logger.getLogger(Emailer.class.getName());
+		this.viewAdaptor = viewAdaptor;
 	}
 	
 	//TODO finish function
@@ -46,19 +54,16 @@ public class Emailer {
 		this.senderPassword = propHandler.getProperty("email.password");
 		this.senderAlias = propHandler.getProperty("email.alias");
 		
-		if(this.senderAddress == null || this.senderPassword == null || this.senderAlias == null) {
-			//TODO add to log
-			System.out.println("Failed to load email properties.");
-			//TODO get from view and delete test code
-//			String[] newEmail = viewAdaptor.changeEmail(senderAddress,senderPassword,senderAlias);
-			String[] newEmail = {"JonesCollegeMailRoom@gmail.com","jonesmailroomisbadass",
-					"Jones Mail Room"};
-			changeEmail(newEmail[0],newEmail[1],newEmail[2]);
+		while(this.senderAddress == null || this.senderPassword == null || this.senderAlias == null) {
+			logger.warning("Failed to load email properties.");
+			viewAdaptor.displayMessage("Email information was not loaded from file.\n"
+					+ "Please change email information in the next window", 
+					"Email Not Loaded");			
+			changeEmail();
 		}
 		
-		// attempt to connect to the mail server
-		
-		// notify user if connection was not successful
+		// attempt to connect to the mail server and alert user if it fails
+		attemptConnection();
 	}
 	
 	/**
@@ -67,7 +72,7 @@ public class Emailer {
 	 * @param newPassword		New Password to email address
 	 * @param newAlias			New Alias for sender
 	 */
-	private void changeEmail(String newAddress, String newPassword, String newAlias) {
+	public void setEmailProperties(String newAddress, String newPassword, String newAlias) {
 
 		propHandler.setProperty("email.email_address",newAddress);
 		propHandler.setProperty("email.password",newPassword);
@@ -85,6 +90,7 @@ public class Emailer {
 		//collect ArrayList of pairs of person,ArrayList<Package>
 		
 		try {
+			//TODO Change to attempt connection?
 			connect(senderAddress,senderPassword);
 			//iterate through ArrayList, sending emails if the person has packages
 			closeConnection();
@@ -94,7 +100,7 @@ public class Emailer {
 			//TODO
 		}
 	}
-	
+
 	/*
 	 * Sends a notification email to the recipient informing them that they 
 	 * have a new package 
@@ -118,6 +124,14 @@ public class Emailer {
 		body += "Jones Mail Room";
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 		
+	}
+	
+	public String getSenderAddress() {
+		return senderAddress;
+	}
+
+	public String getSenderAlias() {
+		return senderAlias;
 	}
 	
 	// connect to the mail server
@@ -186,8 +200,50 @@ public class Emailer {
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 	}
 	
+	/**
+	 * Function requests the view to get user input for new email information
+	 */
+	private void changeEmail() {
+		String[] newEmail = viewAdaptor.changeEmail(senderAddress,senderPassword,senderAlias);
+		if(newEmail != null) {
+			setEmailProperties(newEmail[0],newEmail[1],newEmail[2]);
+		}
+	}
+	
+	/**
+	 * Attempts to connect to the Gmail server with stored credentials
+	 * Sends error messages to the view if an authentication error or a 
+	 * general messaging error occurs.
+	 */
+	//TODO replace the connect() function?
+	private void attemptConnection() {
+		
+		boolean retry = true;
+		while(retry) {
+			try {
+				connect(senderAddress,senderPassword);
+				closeConnection();
+				retry = false;
+			} catch (AuthenticationFailedException e){ 
+					viewAdaptor.displayMessage("Incorrect username or password.\n","");
+					changeEmail();
+			} catch (MessagingException e) {
+				logger.warning("Failed to connect to the mail server.");
+				String[] options = {"Retry", "Cancel"};
+				retry = viewAdaptor.getBooleanInput("Program failed to connect to the Gmail server.\n"
+						+ "Please check your internet connection and try again.", 
+						"Failed Connection",options);
+				if(!retry) {
+					viewAdaptor.displayMessage("Emails will not be sent until a connection is established.",
+							"");
+				}
+			}
+		}
+		
+	}
+	
 	public static void main(String[] args) {
-		Emailer emailer = new Emailer();
+		Emailer emailer = new Emailer(null);
 		
 		String senderEmail = "JonesCollegeMailRoom@gmail.com";
 		String password = "jonesmailroomisbadass";
