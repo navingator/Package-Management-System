@@ -34,8 +34,8 @@ public class PackageManager {
 		
 		// initialize the database
 		db = new Database(progDirName,viewAdaptor);
-		mailer = new Emailer(adpt);
-		printer = new LabelPrinter();
+		mailer = new Emailer(viewAdaptor);
+		printer = new LabelPrinter(viewAdaptor);
 		
 		//TODO viewAdaptor
 //		db = new Database(progDirName,viewAdaptor);
@@ -90,6 +90,14 @@ public class PackageManager {
 		return false;
 	}
 	
+	public String[] getPrinterNames() {
+		return printer.getPrinterNames();
+	}
+	
+	public void setPrinter(String printerName) {
+		printer.setPrinter(printerName);
+	}
+	
 	/*
 	 * Database functions
 	 */
@@ -109,15 +117,13 @@ public class PackageManager {
 		db.checkOutPackage(pkgID);		
 	}
 	
-	//TODO change to package state instead of checkedOut
-	public Boolean checkedOut(long pkgID) {
-		//TODO
-		return null;
+	public Boolean isCheckedOut(long pkgID) {
+		Package pkg = db.getPackage(pkgID);
+		return (pkg.getCheckOutDate() == null);
 	}
 	
 	public Person getOwner(long pkgID) {
-		//TODO
-		return null;
+		return db.getOwner(pkgID);
 	}
 
 	public ArrayList<Person> getPersonList(String searchString) {
@@ -143,11 +149,6 @@ public class PackageManager {
 
 	public void deletePerson(String personID) {
 		db.deletePerson(personID);
-	}
-
-	public String[] getPrinterNames(boolean acceptingJobsOnly) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }

@@ -53,7 +53,6 @@ public class Database {
 	 */
 	public void start() {
 		// check if rootFolder and subfolders exist, create if they do not.
-		System.out.println("Creating package directories: " + packageDirName + ", " + archiveDirName);
 		FileIO.makeDirs(new String[] {packageDirName, currentDirName, archiveDirName});
 		
 		// read the active package database
@@ -164,6 +163,33 @@ public class Database {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Returns a package from the package ID
+	 * @param pkgID				ID of package to retrieve
+	 * @return					Package object with given ID
+	 */
+	public Package getPackage(long pkgID) {
+		return dbMaps.getPackage(pkgID);
+	}
+	
+	/**
+	 * Returns a person from the person ID
+	 * @param personID			ID of the person to retrieve
+	 * @return					Person object with given ID
+	 */
+	public Person getPerson(String personID) {
+		return dbMaps.getPerson(personID);
+	}
+	
+	/**
+	 * Returns a person from a pkgID
+	 * @param pkgID				ID of the package to retrieve the person
+	 * @return					Package object
+	 */
+	public Person getOwner(long pkgID) {
+		return dbMaps.getPerson(dbMaps.getOwnerID(pkgID));
 	}
 	
 	/**

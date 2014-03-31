@@ -55,8 +55,8 @@ public class Controller{
 		/* Initializes the view */
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
 
-			public boolean checkedOut(long pkgID) {
-				return modelPM.checkedOut(pkgID);
+			public boolean isCheckedOut(long pkgID) {
+				return modelPM.isCheckedOut(pkgID);
 			}
 
 			public Person getPackageOwner(long pkgID) {
@@ -83,8 +83,12 @@ public class Controller{
 				return modelPM.printLabel(pkgID);
 			}
 			
-			public String[] getPrinterNames(boolean acceptingJobsOnly) {
-				return modelPM.getPrinterNames(acceptingJobsOnly);
+			public String[] getPrinterNames() {
+				return modelPM.getPrinterNames();
+			}
+			
+			public void setPrinter(String PrinterName) {
+				modelPM.setPrinter(PrinterName);
 			}
 			
 			public ArrayList<Pair<Person,Package>> getPackages(String filter, String sort) {
@@ -134,8 +138,6 @@ public class Controller{
 		// TODO ask chris how anonymous classes can work without an instantiated modelPM object
 		/* Initialize model */
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
-			//TODO write IModelToViewAdaptor
-
 			public void displayMessage(String message, String title) {
 				viewFrame.displayMessage(message, title);
 				

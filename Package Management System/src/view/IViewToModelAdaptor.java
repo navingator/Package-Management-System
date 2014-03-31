@@ -22,7 +22,7 @@ public interface IViewToModelAdaptor {
 	 * @param pkgID				ID of the package to determine state of
 	 * @return					Whether or not the package is checked out
 	 */
-	public boolean checkedOut(long pkgID);
+	public boolean isCheckedOut(long pkgID);
 	
 	/**
 	 * returns the owner for use in confirmation message
@@ -81,10 +81,15 @@ public interface IViewToModelAdaptor {
 	 * Returns a list of all of the printers with associated drivers on
 	 * the computer.
 	 * 
-	 * @param acceptingJobsOnly	If true, return only printers that are accepting jobs
 	 * @return					Array of Strings of printer names
 	 */
-	public String[] getPrinterNames(boolean acceptingJobsOnly);
+	public String[] getPrinterNames();
+	
+	/**
+	 * Sets the printer to the printer with the given name.
+	 * @param PrinterName		Name of the printer to set
+	 */
+	public void setPrinter(String PrinterName);
 	
 	/*
 	 * Admin functions

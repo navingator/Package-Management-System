@@ -8,55 +8,124 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.print.PrintService;
+import util.PropertyHandler;
+import model.IModelToViewAdaptor;
 
-
-
-//TODO Edit for properties file
 
 public class LabelPrinter {
 
 	private BarcodeGenerator bcgen;
 	private PrintService service;
 	
-	public LabelPrinter() {
+	private IModelToViewAdaptor viewAdaptor;
+	private PropertyHandler propHandler;
+	private Logger logger; 
+	
+	public LabelPrinter(IModelToViewAdaptor viewAdaptor) {
 		this.bcgen = new BarcodeGenerator();
-		
+		this.viewAdaptor = viewAdaptor;
+		this.propHandler = PropertyHandler.getInstance();
+		this.logger = Logger.getLogger(LabelPrinter.class.getName());
 	}
 	
-	// function to print the label
+	/**
+	 * This function will generate a barcode and print a label using
+	 * the previously set printer
+	 * @param packageID			ID of the package for which barcode will be printed
+	 * @param ownerName			Name of the owner of the package
+	 */
 	public void printLabel(String packageID, String ownerName) {
 		
-		String tempBarcodeFileName = "testFiles/barcode.png";
+		String progDirName = propHandler.getProperty("program_directory");
+		String tempBarcodeFileName = progDirName + "/barcode.png";
 		int dpi = 300;
 		
 		try {
 			File tempFile = new File(tempBarcodeFileName);
 			FileOutputStream outStream = new FileOutputStream(tempFile);
-			bcgen.getBarcode(packageID, ownerName, dpi, outStream);//, printableArea);
+			bcgen.getBarcode(packageID, ownerName, dpi, outStream);
 			sendToPrinter(tempBarcodeFileName);
 			tempFile.delete();
 			
 		} catch (IOException e) {
-			// TODO Add other stuff
-			System.out.println("Failed to generate barcode.");
-			e.printStackTrace();
+			// Log and display warning
+			logger.warning("Failed to generate barcode in file: " + tempBarcodeFileName);
+			viewAdaptor.displayWarning("Failed to generate barcode. Barcode will not be printed. \n"
+					+ "Please reprint the barcode from the admin panel.", 
+					"Barcode");
 		}
-		
 	}
 	
+	/**
+	 * Returns a list of all of the printers
+	 * @return					Array of printer names
+	 */
+	public String[] getPrinterNames() {
+		
+		// lookup printers
+		PrintService[] services = PrinterJob.lookupPrintServices();
+		
+		//
+		ArrayList<String> serviceNames = new ArrayList<String>();
+		for (PrintService pservice: services) {
+			System.out.println(pservice);
+			serviceNames.add(pservice.getName());
+		}
+		
+		return (String[]) serviceNames.toArray();
+	}
+	
+	/**
+	 * Sets the printer by changing the set service and setting it
+	 * on the PropertyHandler
+	 * @param printerName		Name of the printer to be set
+	 */
+	public void setPrinter(String printerName) {
+		PrintService[] services = PrinterJob.lookupPrintServices();
+		
+		boolean printerFound = false;
+		for (PrintService pservice: services) {
+			if (pservice.getName().equals(printerName)) {
+				service = pservice;
+				if(!pservice.getName().equals(propHandler.getProperty("printer.printer_name"))) {
+					propHandler.setProperty("printer.printer_name", pservice.getName());
+				}
+				printerFound = true;
+				break;
+			}
+		}
+		
+		if(!printerFound) {
+			//TODO
+		}
+	}
+	
+	/**
+	 * Send a barcode file to the printer
+	 * @param tempBarcodeFileName	Name of the barcode file		
+	 */
 	private void sendToPrinter(String tempBarcodeFileName) {
 		PrinterJob pj = PrinterJob.getPrinterJob();
+		
+		//TODO Throw a warning to the view
+		//TODO Throws PrinterException
+		//TODO Make the calling function handle exceptions
+		
+		//TODO This is the only case that should be handled
         if (service == null) {
         	return;
         }
     	try {
 			pj.setPrintService(service);
 		} catch (PrinterException e) {
-			// TODO Auto-generated catch block
+			// TODO Log and send a warning to the view
 			e.printStackTrace();
 		}
+    	
+    	// set Paper and PageFormat settings
         PageFormat pf = pj.defaultPage();
         Paper paper = pf.getPaper();    
         double width = mm2Pixels(54);
@@ -76,11 +145,16 @@ public class LabelPrinter {
         PageFormat validatePage = pj.validatePage(pf);
         System.out.println("Valid- " + dump(validatePage));                
 
+        // Try to print the label
         pj.setPrintable(new LabelPrintable(tempBarcodeFileName), pf);
         try {
             pj.print();
         } catch (PrinterException ex) {
-            ex.printStackTrace();
+        	// Log and send a warning to the view
+        	logger.warning("Printer failed to print label.");
+        	viewAdaptor.displayWarning("Printer failed to print label.\n"
+        			+ "Please reprint label from Admin panel.", 
+        			"Reprint Label");
         }  
 	}
 	
@@ -106,38 +180,40 @@ public class LabelPrinter {
 		return inch * 72d;
 	}
 
-
-	private void setDefaultPrinter(PrintService service) {
-		this.service = service;
-	}
-	
-	private void changePrinter() {
-		PrintService[] services = PrinterJob.lookupPrintServices();
-		
-		ArrayList<String> serviceNames = new ArrayList<String>();
-		for (PrintService pservice: services) {
-			System.out.println(pservice);
-			serviceNames.add(pservice.getName());
-		}
-		//TODO get printer from view
-		if(services.length != 0) {
-			service = services[0];
-		}
-//		if(serviceNames.size() > 0) {
-//			int sIndex = viewAdaptor.getChoiceFromList(serviceNames);
-//			service = services[sIndex]);
-//		}
+	private void getPrinterFromView() {
+		// TODO Consider replacing with function
+		setPrinter(viewAdaptor.getChoiceFromList("Please choose a printer from the list below:", 
+				"Change Printer", getPrinterNames()));
 	}
 	
 	public void start() {
+		// Load printer from properties
+		String printerName = propHandler.getProperty("print.printer_name");
+		
+		// Check if the printer currently exists
+		boolean printerFound = false;
+		if(printerName != null) {
+			String[] printerNames = getPrinterNames(); 
+			for(String pn: printerNames) {
+				if(printerName.equals(pn)) {
+					setPrinter(printerName);
+					printerFound = true;
+				}
+			}
+		}
+
+		// If the printer is not found, get from view
+		if(!printerFound) {
+			getPrinterFromView();
+		}
 		
 	}
-	//TODO
+
 	
 	public static void main(String[] args) {
-		LabelPrinter lp = new LabelPrinter();
-		lp.start();
-		lp.changePrinter();
+		LabelPrinter lp = new LabelPrinter(null);
+		PropertyHandler.getInstance().init("testfiles");
+		lp.setPrinter("PrimoPDF");
 		lp.printLabel("0123456789ABCDEF","Christopher Weldon Henderson");
 	}
 }
