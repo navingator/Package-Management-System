@@ -127,7 +127,7 @@ public class DBFileIO {
 			if (!(header[0].toLowerCase().contains("last")) ||
 					!(header[1].toLowerCase().contains("first")) ||
 					!(header[2].toLowerCase().contains("mail")) ||
-					!(header[3].toLowerCase().contains("ID"))) {
+					!(header[3].toLowerCase().contains("id"))) {
 				throw new FileFormatException("File must be .csv with appropriate header: \n"
 						+ "Last Name,First Name,Email Address,ID");
 			}
