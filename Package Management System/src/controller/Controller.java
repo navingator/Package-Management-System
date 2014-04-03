@@ -71,12 +71,16 @@ public class Controller{
 				return modelPM.getPersonList(searchString);
 			}
 			
-			public void checkInPackage(String personID, String comment) {
-				modelPM.checkInPackage(personID, comment);
+			public long checkInPackage(String personID, String comment) {
+				return modelPM.checkInPackage(personID, comment);
 			}
 			
-			public boolean sendPackageNotification(String personID) {
-				return modelPM.sendPackageNotification(personID);
+			public boolean sendPackageNotification(String personID, long pkgID) {
+				return modelPM.sendPackageNotification(personID,pkgID);
+			}
+			
+			public boolean sendPackageReminders() {
+				return modelPM.sendPackageReminders();
 			}
 			
 			public boolean printLabel(long pkgID) {

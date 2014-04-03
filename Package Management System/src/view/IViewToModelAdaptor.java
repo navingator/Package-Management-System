@@ -56,17 +56,28 @@ public interface IViewToModelAdaptor {
 	 * 
 	 * @param personID			ID of the package owner
 	 * @param comment			Comment input by the user
+	 * @return					ID of the package
 	 */
-	public void checkInPackage(String personID, String comment);
+	public long checkInPackage(String personID, String comment);
 	
 	/**
 	 * Send a package notification email alerting the person
 	 * that a package has been checked in
 	 * 
 	 * @param personID			ID of the package owner
+	 * @param pkgID				ID of the package
 	 * @return					Success of sending email
 	 */
-	public boolean sendPackageNotification(String personID);
+	public boolean sendPackageNotification(String personID, long pkgID);
+	
+	
+	/**
+	 * Send package reminders for everyone with packages not
+	 * checked out
+	 * 
+	 * @return					Success of sending all reminders
+	 */
+	public boolean sendPackageReminders();
 
 	/**
 	 * Print a label for the package. 

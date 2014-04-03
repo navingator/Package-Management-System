@@ -36,11 +36,6 @@ public class PackageManager {
 		db = new Database(progDirName,viewAdaptor);
 		mailer = new Emailer(viewAdaptor);
 		printer = new LabelPrinter(viewAdaptor);
-		
-		//TODO viewAdaptor
-//		db = new Database(progDirName,viewAdaptor);
-//		mailer = new Emailer(viewAdaptor);
-//		printer = new LabelPrinter(viewAdaptor);
 	}
 	
 	public void start() {
@@ -49,20 +44,22 @@ public class PackageManager {
 		printer.start();
 	}
 	
-	// TODO
-	private void makeDirectories() {
-		System.out.println();
-	}
-
 	//TODO Functions that run on a schedule - mainly send reminders
 	
 	/*
 	 * Emailer functions
 	 */
 	
-	public boolean sendPackageNotification(String personID) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean sendPackageNotification(String personID, long pkgID) {
+		Person person = db.getPerson(personID);
+		Package pkg = db.getPackage(pkgID);
+		return mailer.sendPackageNotification(person, pkg);
+	}
+	
+	public boolean sendPackageReminders() {
+		ArrayList<Pair<Person,Package>> entriesSortedByPerson = 
+				db.getEntries("checked_in=true", "person_ID=ASCENDING");
+		return mailer.sendAllReminders(entriesSortedByPerson);
 	}
 	
 	public boolean checkAdminPassword(String password) {
@@ -102,7 +99,7 @@ public class PackageManager {
 	 * Database functions
 	 */
 	
-	public Package checkInPackage(String personID, String comment) {
+	public long checkInPackage(String personID, String comment) {
 		// create a packageID
 		Date now = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSS");
@@ -110,7 +107,7 @@ public class PackageManager {
 		
 		Package pkg = new Package(pkgID, comment, now);
 		db.checkInPackage(personID, pkg);
-		return pkg;
+		return pkg.getPackageID();
 	}
 	
 	public void checkOutPackage(long pkgID) {

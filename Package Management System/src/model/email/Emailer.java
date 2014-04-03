@@ -26,6 +26,10 @@ import util.PropertyHandler;
  * SMTP to the Gmail mail server.
  */
 
+//TODO Timeout
+//TODO If notification sending fails, add to a list of emails to send
+//TODO Remove test tag
+
 public class Emailer {
 	
 	private PropertyHandler propHandler;
@@ -41,19 +45,23 @@ public class Emailer {
 	private IModelToViewAdaptor viewAdaptor;
 	
 	public Emailer(IModelToViewAdaptor viewAdaptor) {
-		// get PropertyHandler instance
+		// get PropertyHandler and logger instance
 		this.propHandler = PropertyHandler.getInstance();
 		this.logger = Logger.getLogger(Emailer.class.getName());
+		
 		this.viewAdaptor = viewAdaptor;
+		
+        this.host = "smtp.gmail.com";
+
 	}
 	
-	//TODO finish function
 	public void start() {
 		// get properties from PropertyHandler
 		this.senderAddress = propHandler.getProperty("email.email_address");
 		this.senderPassword = propHandler.getProperty("email.password");
 		this.senderAlias = propHandler.getProperty("email.alias");
-		
+		 
+		// warn the user if the email properties were not loaded
 		while(this.senderAddress == null || this.senderPassword == null || this.senderAlias == null) {
 			logger.warning("Failed to load email properties.");
 			viewAdaptor.displayMessage("Email information was not loaded from file.\n"
@@ -84,20 +92,40 @@ public class Emailer {
 		
 	}
 
-	//TODO
-	public void sendAllReminders(ArrayList<Pair<Person,Package>> allEntriesSortedByPerson) {
+
+	/**
+	 * Function that sends all reminder emails
+	 * @param allEntriesSortedByPerson	All active entries - MUST be sorted by person
+	 * @return							Success of sending all reminders
+	 */
+	public boolean sendAllReminders(ArrayList<Pair<Person,Package>> allEntriesSortedByPerson) {
+		
+		//TODO Check if the last reminder was within the past day from calling function
+//		propHandler.getProperty("email.last_reminder");
+//		Calendar calendar = new GregorianCalendar(); 
 		
 		//collect ArrayList of pairs of person,ArrayList<Package>
-		
+		ArrayList<Pair<Person,ArrayList<Package>>> remindList = collectPairs(allEntriesSortedByPerson);		
 		try {
-			//TODO Change to attempt connection?
-			connect(senderAddress,senderPassword);
-			//iterate through ArrayList, sending emails if the person has packages
+			connect();
+			// iterate through ArrayList, sending emails if the person has packages
+			for (Pair<Person,ArrayList<Package>> ppPair : remindList) {
+				sendPackageReminder(ppPair.first,ppPair.second);
+			}
 			closeConnection();
+			
+			// add property with the current time as the last sent date
+			propHandler.setProperty("email.last_reminder", Long.valueOf(new Date().getTime()).toString());
+			return true;
 		} catch(NoSuchProviderException e) {
-			//TODO
+			logger.warning(e.getMessage());
+			return false;
 		} catch(MessagingException e) {
-			//TODO
+			logger.warning(e.getMessage());
+			return false;
+		} catch (UnsupportedEncodingException e) {
+			logger.severe(e.getMessage());
+			return false;
 		}
 	}
 
@@ -105,24 +133,32 @@ public class Emailer {
 	 * Sends a notification email to the recipient informing them that they 
 	 * have a new package 
 	 */
-	//TODO If notification sending fails, add to a list of emails to send
-	//TODO Change input to Pair<Person,Package>
-	public void sendPackageNotification(Person recipient, Package pkg) 
-			throws UnsupportedEncodingException, MessagingException {
+	public boolean sendPackageNotification(Person recipient, Package pkg) {
 		
 		String subject = "[Test][Package Notification] New Package for " + recipient.getFullName();
 		String body = new String();
-//		body += "Hello " + recipient.getFirstName() + ",\n\n"
-//				+ "You have a new package in the Jones Mail Room.\n ";
 		
 		String comment = pkg.getComment();
 		if(comment != null && !comment.isEmpty()) {
-			body += "Comment: " + comment + "\n\n";
+			body += "Comment: " + comment + "\n";
 		}
 		
-//		body += "Please pick it up at your earliest convenience.\n \n" 
+		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n\n";
+		
 		body += "Jones Mail Room";
-		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
+		try {
+			connect();
+			sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
+			closeConnection();
+			return true;
+		} catch (UnsupportedEncodingException e) {
+			logger.severe("UnsupportedEncodingException for Person (ID: " + recipient.getPersonID() +
+					") and Package (ID: " + pkg.getPackageID() + ")");
+			return false;
+		} catch (MessagingException e) {
+			logger.warning(e.getMessage());
+			return false;
+		}
 		
 	}
 	
@@ -135,21 +171,19 @@ public class Emailer {
 	}
 	
 	// connect to the mail server
-	//TODO change class to reflect private variables
-	private void connect(String userEmail, String password) 
+	private void connect() 
 			throws NoSuchProviderException, MessagingException {
 		
 		Properties props = System.getProperties();
-        this.host = "smtp.gmail.com";
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.user", userEmail);
-        props.put("mail.smtp.password", password);
+        props.put("mail.smtp.user", senderAddress);
+        props.put("mail.smtp.password", senderPassword);
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         session = Session.getDefaultInstance(props);
 		transport = session.getTransport("smtp");
-		transport.connect(host, senderAddress, password);
+		transport.connect(host, senderAddress, senderPassword);
 		
 	}
 	
@@ -190,7 +224,7 @@ public class Emailer {
 		for (int i=0; i<packages.size(); i++) {
 			Package pkg = packages.get(i);
 			body += "\n\tPackage " + (i+1) + ":";
-			body += "\n\t\tCheck-In Date: " + pkg.getCheckInDate().toString();
+			body += "\n\t\tChecked in on " + pkg.getCheckInDate().toString();
 			if(pkg.getComment() != "") {
 				body += "\n\t\tComment: " + pkg.getComment();
 			}
@@ -215,13 +249,12 @@ public class Emailer {
 	 * Sends error messages to the view if an authentication error or a 
 	 * general messaging error occurs.
 	 */
-	//TODO replace the connect() function?
 	private void attemptConnection() {
 		
 		boolean retry = true;
 		while(retry) {
 			try {
-				connect(senderAddress,senderPassword);
+				connect();
 				closeConnection();
 				retry = false;
 			} catch (AuthenticationFailedException e){ 
@@ -242,44 +275,76 @@ public class Emailer {
 		
 	}
 	
+	/**
+	 * Function that collects all of the pairs for the send all reminders function
+	 * @param allEntriesSortedByPerson		DB entries sorted by person
+	 * @return								ArrayList of pairs of person and owned packages
+	 */
+	private ArrayList<Pair<Person,ArrayList<Package>>> collectPairs(
+			ArrayList<Pair<Person,Package>> allEntriesSortedByPerson) {
+		
+		// create a container for the result
+		ArrayList<Pair<Person,ArrayList<Package>>> result = new ArrayList<Pair<Person,ArrayList<Package>>>();
+
+		
+		// initialize holders for the last person and a package list
+		Person lastPerson = null;
+		ArrayList<Package> pkgList = new ArrayList<Package>();
+		for(Pair<Person,Package> entry : allEntriesSortedByPerson) {
+			if (entry.first != lastPerson) {
+				// if the person is new, add old person entry with packages
+				if (lastPerson != null) {
+					result.add(new Pair<Person,ArrayList<Package>>(lastPerson,pkgList));
+				}
+				
+				// set the last person and give them a new package list
+				lastPerson = entry.first;			// set the lastPerson
+				pkgList = new ArrayList<Package>(); // new reference for new person
+			}
+			
+			pkgList.add(entry.second);
+		}
+		
+		// add the last person
+		if (lastPerson != null && pkgList.size() > 0) {
+			result.add(new Pair<Person,ArrayList<Package>>(lastPerson,pkgList));
+		}
+		
+		return result;
+	}
+	
 	public static void main(String[] args) {
 		Emailer emailer = new Emailer(null);
 		
-		String senderEmail = "JonesCollegeMailRoom@gmail.com";
-		String password = "jonesmailroomisbadass";
+		emailer.senderAddress = "JonesCollegeMailRoom@gmail.com";
+		emailer.senderPassword = "jonesmailroomisbadass";
+		emailer.senderAlias = "Jones Mail Room";
 		
 		Person navin = new Person("Pathak", "Navin", "np8@rice.edu","np8");
+		Person nathan = new Person("Patrick", "Nathan", "Navin.Pathak@rice.edu","nathan");
+		Person gavin = new Person("Pathak", "Gavin", "Pathak@rice.edu", "gavin");
 		//Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
 		//Person michelle = new Person("Bennack", "Michelle", "mrb4@rice.edu");
 		//Person ambi = new Person("Bobmanuel","Ambila","ajb6@rice.edu");
 		
 		Date now = new Date();
-		Package p1 = new Package(123,"",now);
-		Package p2 = new Package(234,"It's huge. Get it out now.",new Date(now.getTime()-100000000));
-		Package p3 = new Package(309435,"",new Date(now.getTime()-200000000));
+		Package p1 = new Package(123+now.getTime(),"",now);
+		Package p2 = new Package(234+now.getTime(),"It's huge. Get it out now.",new Date(now.getTime()-100000000));
+		Package p3 = new Package(309435+now.getTime(),"",new Date(now.getTime()-200000000));
+		Package p4 = new Package(1+now.getTime(),"",new Date(now.getTime()-300000000));
+		Package p5 = new Package(2+now.getTime(),"",new Date(now.getTime()-400000000));
 		
-		ArrayList<Package> navinPkgs = new ArrayList<Package>();
-		navinPkgs.add(p2);
-		navinPkgs.add(p3);
+		ArrayList<Pair<Person,Package>> entries = new ArrayList<Pair<Person,Package>>();
+		entries.add(new Pair<Person,Package>(navin,p1));
+		entries.add(new Pair<Person,Package>(navin,p2));
+		entries.add(new Pair<Person,Package>(nathan,p3));
+		entries.add(new Pair<Person,Package>(nathan,p4));
+		entries.add(new Pair<Person,Package>(gavin,p5));
 		
-		try {
-			emailer.connect(senderEmail, password);
-			emailer.sendPackageNotification(navin,p1);
-			emailer.sendPackageNotification(navin,p2);
-			//Emailer.sendPackageReminder(navin, new Package[]{p1});
-			//Emailer.sendPackageReminder(navin, new Package[]{p2});
-			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2});
-			//Emailer.sendPackageReminder(navin, new Package[]{p1,p2,p3});
-			emailer.sendPackageReminder(navin,navinPkgs);
-			//Emailer.sendPackageReminder(navin, new Package[]{});
-			emailer.closeConnection();
-		} catch (NoSuchProviderException e) {
-			e.printStackTrace();
-		} catch (MessagingException e) {
-			e.printStackTrace();
-		} catch(UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} 
+		emailer.sendPackageNotification(navin,p2);
+		emailer.sendPackageNotification(navin,p1);
+		
+		emailer.sendAllReminders(entries);
 	}
 
 }
