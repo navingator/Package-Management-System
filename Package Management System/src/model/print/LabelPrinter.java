@@ -80,14 +80,13 @@ public class LabelPrinter {
 		// lookup printers
 		PrintService[] services = PrinterJob.lookupPrintServices();
 		
-		//
+		// get the printer names
 		ArrayList<String> serviceNames = new ArrayList<String>();
 		for (PrintService pservice: services) {
-			System.out.println(pservice);
 			serviceNames.add(pservice.getName());
 		}
 		
-		return (String[]) serviceNames.toArray();
+		return serviceNames.toArray(new String[serviceNames.size()]);
 	}
 	
 	/**
@@ -104,7 +103,7 @@ public class LabelPrinter {
 			if (pservice.getName().equals(printerName)) {
 				service = pservice;
 				if(!pservice.getName().equals(propHandler.getProperty("printer.printer_name"))) {
-					propHandler.setProperty("printer.printer_name", pservice.getName());
+					propHandler.setProperty("print.printer_name", pservice.getName());
 				}
 				return true;
 			}
@@ -164,8 +163,7 @@ public class LabelPrinter {
 	}
 
 	private void getPrinterFromView() {
-		setPrinter(viewAdaptor.getChoiceFromList("Please choose a printer from the list below:", 
-				"Change Printer", getPrinterNames()));
+		setPrinter(viewAdaptor.getPrinterNames(getPrinterNames()));
 	}
 	
 	public void start() {

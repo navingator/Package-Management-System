@@ -38,6 +38,13 @@ public interface IModelToViewAdaptor {
 	public String getChoiceFromList(String message, String title, String[] choices);
 	
 	/**
+	 * Returns a choice of printer from an array of printer name strings
+	 * @param printerNames		Array of strings containing available printer names
+	 * @return					User choice of printer
+	 */
+	public String getPrinterNames(String[] printerNames);
+	
+	/**
 	 * Returns new email settings 
 	 * @param senderAddress		Old email address
 	 * @param senderPassword	Old email password

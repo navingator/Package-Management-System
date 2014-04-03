@@ -65,7 +65,7 @@ public class Emailer {
 		while(this.senderAddress == null || this.senderPassword == null || this.senderAlias == null) {
 			logger.warning("Failed to load email properties.");
 			viewAdaptor.displayMessage("Email information was not loaded from file.\n"
-					+ "Please change email information in the next window", 
+					+ "Please change email information in the next window.", 
 					"Email Not Loaded");			
 			changeEmail();
 		}
@@ -76,11 +76,11 @@ public class Emailer {
 	
 	/**
 	 * Function changes email, password, and alias to passed values
+	 * @param newAlias			New Alias for sender
 	 * @param newAddress		New Email address
 	 * @param newPassword		New Password to email address
-	 * @param newAlias			New Alias for sender
 	 */
-	public void setEmailProperties(String newAddress, String newPassword, String newAlias) {
+	public void setEmailProperties(String newAlias, String newAddress, String newPassword) {
 
 		propHandler.setProperty("email.email_address",newAddress);
 		propHandler.setProperty("email.password",newPassword);

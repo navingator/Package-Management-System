@@ -177,13 +177,19 @@ public class MainFrame extends JFrame {
 				
 				// make the changes in the model
 				if(newEmail != null) {
-					modelAdaptor.changeEmail(newEmail[1], newEmail[2], newEmail[0]);
+					modelAdaptor.changeEmail(newEmail[0], newEmail[1], newEmail[2]);
 				}
 			}
 		});
 		panelEditEmail.add(btnChangeEmail, "4, 4, default, fill");
 		
 		JButton btnSelectPrinter = new JButton("Select Printer");
+		btnSelectPrinter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String printerName = getPrinterName(modelAdaptor.getPrinterNames());
+				modelAdaptor.setPrinter(printerName);
+			}
+		});
 		panelEditEmail.add(btnSelectPrinter, "4, 6, default, fill");
 
 	}
@@ -237,6 +243,11 @@ public class MainFrame extends JFrame {
 				JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
 	}
 	
+	public String getPrinterName(String[] printerNames) {
+		return getChoiceFromList("Please choose a printer from the list below:", 
+				"Change Printer", printerNames);
+	}
+	
 	/**
 	 * Get input in a yes/no style dialog
 	 * @param message			Message string to be displayed
@@ -249,9 +260,9 @@ public class MainFrame extends JFrame {
 				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 	}
 	
-	//TODO
-	public String[] changeEmail(String senderAddress, String senderPassword, String senderAlias) {
-		return null;
+	public String[] changeEmail(String oldEmail, String oldPassword, String oldAlias) {
+		ChangeEmail emailDlg = new ChangeEmail(frame,oldAlias,oldEmail);
+		return emailDlg.showDialog();
 	}
 	
 }

@@ -159,14 +159,12 @@ public class Controller{
 
 			public String getChoiceFromList(String message, String title,
 					String[] choices) {
-				// TODO Auto-generated method stub
-				return null;
+				return viewFrame.getChoiceFromList(message, title, choices);
 			}
 
 			public String[] changeEmail(String senderAddress,
 					String senderPassword, String senderAlias) {
-				// TODO Auto-generated method stub
-				return null;
+				return viewFrame.changeEmail(senderAddress, senderPassword, senderAlias);
 			}
 
 			public boolean getBooleanInput(String message, String title,
@@ -174,6 +172,10 @@ public class Controller{
 				int response = viewFrame.getButtonInput(message,title,options);
 				if(response == 0) { return true;}
 				return false;
+			}
+
+			public String getPrinterNames(String[] printerNames) {
+				return viewFrame.getPrinterName(printerNames);
 			}
 		});
 	}

@@ -21,9 +21,7 @@ public class LabelPrintable implements Printable {
 	@Override
     public int print(Graphics graphics, PageFormat pageFormat, 
         int pageIndex) throws PrinterException {  
-		
-        System.out.println(pageIndex);
-        
+		        
         int result = NO_SUCH_PAGE;
         
         if (pageIndex == 0) {
