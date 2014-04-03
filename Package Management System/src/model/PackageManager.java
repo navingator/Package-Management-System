@@ -7,7 +7,6 @@ import java.util.Date;
 import model.database.Database;
 import model.email.Emailer;
 import model.print.LabelPrinter;
-import util.FileIO;
 import util.Package;
 import util.Pair;
 import util.Person;
@@ -83,8 +82,8 @@ public class PackageManager {
 	 * Printer functions
 	 */
 	public boolean printLabel(long pkgID) {
-		// TODO Auto-generated method stub
-		return false;
+		String personName = db.getOwner(pkgID).getLastFirstName();
+		return printer.printLabel(Long.valueOf(pkgID).toString(), personName);
 	}
 	
 	public String[] getPrinterNames() {

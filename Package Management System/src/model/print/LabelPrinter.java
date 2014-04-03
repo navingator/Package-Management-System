@@ -36,8 +36,17 @@ public class LabelPrinter {
 	 * the previously set printer
 	 * @param packageID			ID of the package for which barcode will be printed
 	 * @param ownerName			Name of the owner of the package
+	 * @return					Success state of printing the label
 	 */
-	public void printLabel(String packageID, String ownerName) {
+	public boolean printLabel(String packageID, String ownerName) {
+		
+		// If the printer is not selected, warn the user and do not print label
+		if (service == null) {
+			logger.info("Printer was not selected and barcode was not printed");
+			viewAdaptor.displayMessage("You have not selected a printer. Barcode will not be printed. \n"
+					+ "Please choose a printer and reprint the barcode from the admin panel", "Barcode");
+			return false;
+		}
 		
 		String progDirName = propHandler.getProperty("program_directory");
 		String tempBarcodeFileName = progDirName + "/barcode.png";
@@ -56,7 +65,10 @@ public class LabelPrinter {
 			viewAdaptor.displayWarning("Failed to generate barcode. Barcode will not be printed. \n"
 					+ "Please reprint the barcode from the admin panel.", 
 					"Barcode");
+			return false;
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -82,25 +94,23 @@ public class LabelPrinter {
 	 * Sets the printer by changing the set service and setting it
 	 * on the PropertyHandler
 	 * @param printerName		Name of the printer to be set
+	 * @return					True if the printer was found and is set
 	 */
-	public void setPrinter(String printerName) {
+	public boolean setPrinter(String printerName) {
 		PrintService[] services = PrinterJob.lookupPrintServices();
 		
-		boolean printerFound = false;
+		// loop through printers until the printer name is found
 		for (PrintService pservice: services) {
 			if (pservice.getName().equals(printerName)) {
 				service = pservice;
 				if(!pservice.getName().equals(propHandler.getProperty("printer.printer_name"))) {
 					propHandler.setProperty("printer.printer_name", pservice.getName());
 				}
-				printerFound = true;
-				break;
+				return true;
 			}
 		}
 		
-		if(!printerFound) {
-			//TODO
-		}
+		return false;
 	}
 	
 	/**
@@ -108,21 +118,14 @@ public class LabelPrinter {
 	 * @param tempBarcodeFileName	Name of the barcode file		
 	 */
 	private void sendToPrinter(String tempBarcodeFileName) {
+		
 		PrinterJob pj = PrinterJob.getPrinterJob();
-		
-		//TODO Throw a warning to the view
-		//TODO Throws PrinterException
-		//TODO Make the calling function handle exceptions
-		
-		//TODO This is the only case that should be handled
-        if (service == null) {
-        	return;
-        }
     	try {
 			pj.setPrintService(service);
 		} catch (PrinterException e) {
-			// TODO Log and send a warning to the view
-			e.printStackTrace();
+			logger.info("Printer was not found and barcode was not printed");
+			viewAdaptor.displayMessage("Selected printer was not found. The barcode will not be printed. \n"
+					+ "Please choose a printer and reprint the barcode from the admin panel", "Barcode");
 		}
     	
     	// set Paper and PageFormat settings
@@ -136,14 +139,8 @@ public class LabelPrinter {
                         mm2Pixels(10), 
                         width - mm2Pixels(7.5), 
                         height - mm2Pixels(20));                
-        System.out.println("Before- " + dump(paper));    
         pf.setOrientation(PageFormat.LANDSCAPE);
-        pf.setPaper(paper);    
-        System.out.println("After- " + dump(paper));
-        System.out.println("After- " + dump(pf));                
-        dump(pf);    
-        PageFormat validatePage = pj.validatePage(pf);
-        System.out.println("Valid- " + dump(validatePage));                
+        pf.setPaper(paper);                
 
         // Try to print the label
         pj.setPrintable(new LabelPrintable(tempBarcodeFileName), pf);
@@ -158,20 +155,6 @@ public class LabelPrinter {
         }  
 	}
 	
-	protected static String dump(PageFormat pf) {    
-        Paper paper = pf.getPaper();            
-        return dump(paper);    
-    }
-	
-	protected static String dump(Paper paper) {            
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(paper.getWidth()).append("x").append(paper.getHeight())
-           .append("/").append(paper.getImageableX()).append("x").
-           append(paper.getImageableY()).append(" - ").append(paper
-       .getImageableWidth()).append("x").append(paper.getImageableHeight());            
-        return sb.toString();            
-    }
-	
 	private double mm2Pixels(double mm) {
 		return in2Pixels(mm*0.0393700787);
 	}
@@ -181,7 +164,6 @@ public class LabelPrinter {
 	}
 
 	private void getPrinterFromView() {
-		// TODO Consider replacing with function
 		setPrinter(viewAdaptor.getChoiceFromList("Please choose a printer from the list below:", 
 				"Change Printer", getPrinterNames()));
 	}
@@ -193,13 +175,7 @@ public class LabelPrinter {
 		// Check if the printer currently exists
 		boolean printerFound = false;
 		if(printerName != null) {
-			String[] printerNames = getPrinterNames(); 
-			for(String pn: printerNames) {
-				if(printerName.equals(pn)) {
-					setPrinter(printerName);
-					printerFound = true;
-				}
-			}
+			printerFound = setPrinter(printerName);
 		}
 
 		// If the printer is not found, get from view

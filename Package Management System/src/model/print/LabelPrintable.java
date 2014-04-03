@@ -3,7 +3,6 @@ package model.print;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
-import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
@@ -28,9 +27,6 @@ public class LabelPrintable implements Printable {
         int result = NO_SUCH_PAGE;
         
         if (pageIndex == 0) {
-        	          
-            System.out.println("[Print] " + dump(pageFormat));
-            
             // translate to avoid clipping
             graphics.translate((int) pageFormat.getImageableX(), 
                 (int) pageFormat.getImageableY());   
@@ -49,19 +45,5 @@ public class LabelPrintable implements Printable {
             result = PAGE_EXISTS;    
         }    
         return result;    
-    }
-	
-	protected static String dump(PageFormat pf) {    
-        Paper paper = pf.getPaper();            
-        return dump(paper);    
-    }
-	
-	protected static String dump(Paper paper) {            
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(paper.getWidth()).append("x").append(paper.getHeight())
-           .append("/").append(paper.getImageableX()).append("x").
-           append(paper.getImageableY()).append(" - ").append(paper
-       .getImageableWidth()).append("x").append(paper.getImageableHeight());            
-        return sb.toString();            
     }
 }
