@@ -100,10 +100,6 @@ public class Emailer {
 	 */
 	public boolean sendAllReminders(ArrayList<Pair<Person,Package>> allEntriesSortedByPerson) {
 		
-		//TODO Check if the last reminder was within the past day from calling function
-//		propHandler.getProperty("email.last_reminder");
-//		Calendar calendar = new GregorianCalendar(); 
-		
 		//collect ArrayList of pairs of person,ArrayList<Package>
 		ArrayList<Pair<Person,ArrayList<Package>>> remindList = collectPairs(allEntriesSortedByPerson);		
 		try {
