@@ -39,6 +39,7 @@ public class MainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainFrame(IViewToModelAdaptor adpt) {
+		setTitle("Package Management System");
 		
 		// set model adaptor
 		this.modelAdaptor = adpt;
@@ -76,11 +77,11 @@ public class MainFrame extends JFrame {
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		String pickUpPanelName = "<html><body><table width='80'><tr><td><center>Pick Up</center></td></tr></table></body></html>";
-		PanelPickUp panelPickUp = new PanelPickUp();
+		PanelPickUp panelPickUp = new PanelPickUp(frame,modelAdaptor);
 		tabbedPane.addTab(pickUpPanelName, null, panelPickUp, null);
 		
 		String checkInPanelName = "<html><body><table width='80'><tr><td><center>Check In</center></td></tr></table></body></html>";
-		JPanel panelCheckIn = new PanelCheckIn();
+		JPanel panelCheckIn = new PanelCheckIn(frame,modelAdaptor);
 		tabbedPane.addTab(checkInPanelName, null, panelCheckIn, null);
 		
 		String adminPanelName = "<html><body><table width='80'><tr><td><center>Admin</center></td></tr></table></body></html>";

@@ -113,9 +113,8 @@ public class PackageManager {
 		db.checkOutPackage(pkgID);		
 	}
 	
-	public Boolean isCheckedOut(long pkgID) {
-		Package pkg = db.getPackage(pkgID);
-		return (pkg.getCheckOutDate() == null);
+	public Package getPackage(long pkgID) {
+		return db.getPackage(pkgID);
 	}
 	
 	public Person getOwner(long pkgID) {

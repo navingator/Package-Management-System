@@ -17,12 +17,12 @@ public interface IViewToModelAdaptor {
 	 */
 	
 	/**
-	 * Returns true if the package is already checked out
+	 * Returns the package from the packageID
 	 * 
-	 * @param pkgID				ID of the package to determine state of
-	 * @return					Whether or not the package is checked out
+	 * @param pkgID				ID of the package
+	 * @return					Package object
 	 */
-	public boolean isCheckedOut(long pkgID);
+	public Package getPackage(long pkgID);
 	
 	/**
 	 * returns the owner for use in confirmation message

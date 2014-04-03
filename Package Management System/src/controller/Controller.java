@@ -55,8 +55,8 @@ public class Controller{
 		/* Initializes the view */
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
 
-			public boolean isCheckedOut(long pkgID) {
-				return modelPM.isCheckedOut(pkgID);
+			public Package getPackage(long pkgID) {
+				return modelPM.getPackage(pkgID);
 			}
 
 			public Person getPackageOwner(long pkgID) {

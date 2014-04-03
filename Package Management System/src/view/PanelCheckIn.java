@@ -4,28 +4,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import java.awt.Font;
+
+import javax.swing.JComboBox;
 
 public class PanelCheckIn extends JPanel {
 
 	private static final long serialVersionUID = -5330361979358721465L;
 	
-	private JTextField textFieldStudentName;
+	private JComboBox<String> comboBoxStudentName;
 	private JTextField textField;
 
 	/**
 	 * Create the panel.
 	 */
-	public PanelCheckIn() {
+	public PanelCheckIn(JFrame frame, IViewToModelAdaptor modelAdaptor) {
 
 		setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("default:grow"),
@@ -50,9 +51,9 @@ public class PanelCheckIn extends JPanel {
 		JLabel lblStudent = new JLabel("Student:");
 		add(lblStudent, "3, 2, left, bottom");
 		
-		textFieldStudentName = new JTextField();
-		add(textFieldStudentName, "3, 3, fill, top");
-		textFieldStudentName.setColumns(10);
+		comboBoxStudentName = new JComboBox<String>();
+		comboBoxStudentName.setEditable(true);
+		add(comboBoxStudentName, "3, 3, fill, top");
 		
 		JButton btnConfirmCheckIn = new JButton("Confirm");
 		btnConfirmCheckIn.addActionListener(new ActionListener() {

@@ -38,19 +38,6 @@ public class ChangeEmail extends JDialog {
 	private JPasswordField passwordNewConfirm;
 	private String[] result;
 
-	/**
-	 * Launch the application.
-	 */
-	//TODO remove main
-	public static void main(String[] args) {
-		try {
-			ChangeEmail dialog = new ChangeEmail(null,"bob", "kittens@cat.org");
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Create the dialog with specified previous Alias and email parameters
