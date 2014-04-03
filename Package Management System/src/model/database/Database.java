@@ -4,6 +4,7 @@ import util.FileIO;
 import util.Package;
 import util.Person;
 import util.Pair;
+import util.PropertyHandler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,19 +26,20 @@ public class Database {
 	private DBMaps dbMaps;
 	private DBFileIO dbIO;
 	
-	private String packageDirName;
-	private String currentDirName;
-	private String archiveDirName;
+	private String packageDirPath;
+	private String currentDirPath;
+	private String archiveDirPath;
 	
 	private Logger logger;
 
-	public Database(String progDirName, IModelToViewAdaptor viewAdaptor) {
+	public Database(IModelToViewAdaptor viewAdaptor) {
 		
 		this.viewAdaptor = viewAdaptor;
 		
-		this.packageDirName = progDirName + "/packages";
-		this.currentDirName = packageDirName + "/current";
-		this.archiveDirName = packageDirName + "/archive";
+		String progDirPath = PropertyHandler.getInstance().getProperty("program_directory");
+		this.packageDirPath = progDirPath + "/packages";
+		this.currentDirPath = packageDirPath + "/current";
+		this.archiveDirPath = packageDirPath + "/archive";
 
 		this.logger = Logger.getLogger(Database.class.getName());
 		
@@ -53,7 +55,7 @@ public class Database {
 	 */
 	public void start() {
 		// check if rootFolder and subfolders exist, create if they do not.
-		FileIO.makeDirs(new String[] {packageDirName, currentDirName, archiveDirName});
+		FileIO.makeDirs(new String[] {packageDirPath, currentDirPath, archiveDirPath});
 		
 		// read the active package database
 		readCurrentDatabase();
@@ -70,7 +72,7 @@ public class Database {
 		// modify current DBMaps
 		dbMaps.addPackage(personID, pkg);
 		// write new person file
-		writePersonFile(personID,currentDirName);
+		writePersonFile(personID,currentDirPath);
 	}
 	
 	/* Sets a check out date for the package */
@@ -79,7 +81,6 @@ public class Database {
 		Package pkg = dbMaps.getPackage(pkgID);
 		if(pkg.getCheckOutDate() != null) {
 			logger.info("Package ID: " + pkgID + " was already checked out.");
-			//TODO Sound Clip
 			viewAdaptor.displayMessage("This package was previously checked out on " + 
 					pkg.getCheckOutDate().toString(), "Package Already Checked Out");			
 			return;
@@ -89,7 +90,7 @@ public class Database {
 		pkg.setCheckOutDate(new Date());
 		
 		// write to file
-		writePersonFile(dbMaps.getOwnerID(pkgID),currentDirName);
+		writePersonFile(dbMaps.getOwnerID(pkgID),currentDirPath);
 	}
 
 	/**
@@ -212,12 +213,12 @@ public class Database {
 		} 
 		
 		//Check if person is in the archive
-		HashSet<String> archiveFileNames = new HashSet<String>(FileIO.getFileNamesFromDirectory(archiveDirName));
+		HashSet<String> archiveFileNames = new HashSet<String>(FileIO.getFileNamesFromDirectory(archiveDirPath));
 		HashSet<String> archivePersonIDs = archiveFileNames;
 		
 		//If person file is in archive, add file to DBMaps and delete archive file
 		if(archivePersonIDs.contains(personID)) {
-			String archiveFile = archiveDirName + '/' + personID;
+			String archiveFile = archiveDirPath + '/' + personID;
 			addPersonPackagesFromFile(archiveFile);
 			FileIO.deleteFile(archiveFile);
 			dbMaps.editPerson(person); //edit the person instead of adding
@@ -227,7 +228,7 @@ public class Database {
 		}
 		
 		//Write the new file
-		writePersonFile(personID, currentDirName);
+		writePersonFile(personID, currentDirPath);
 		 
 	}
 	
@@ -245,7 +246,7 @@ public class Database {
 		
 		// edit person in database maps and write to file
 		dbMaps.editPerson(newPerson);
-		writePersonFile(personID, currentDirName);
+		writePersonFile(personID, currentDirPath);
 		
 	}
 	
@@ -260,8 +261,8 @@ public class Database {
 		}
 		
 		// move person file to the archive 
-		writePersonFile(personID, archiveDirName);
-		FileIO.deleteFile(currentDirName + '/' + personID);
+		writePersonFile(personID, archiveDirPath);
+		FileIO.deleteFile(currentDirPath + '/' + personID);
 		// remove person from DBMaps - must be after reading and writing file
 		dbMaps.deletePerson(personID);
 		
@@ -329,9 +330,9 @@ public class Database {
 	 * and placing all of their attributes into the database maps
 	 */
 	private void readCurrentDatabase() {
-		ArrayList<String> currentFileNames = FileIO.getFileNamesFromDirectory(currentDirName);
+		ArrayList<String> currentFileNames = FileIO.getFileNamesFromDirectory(currentDirPath);
 		for (String fileName: currentFileNames) {
-			addPersonPackagesFromFile(currentDirName+'/'+fileName);
+			addPersonPackagesFromFile(currentDirPath+'/'+fileName);
 		}
 	}
 	
@@ -396,7 +397,7 @@ public class Database {
 	}
 	
 	public static void main(String[] args) {
-		Database db = new Database("testFiles", null);
+		Database db = new Database(null);
 		db.start();
 		System.out.println("Start:");
 		System.out.println("current persons = " + db.getAllCurrentPersons().toString());

@@ -25,14 +25,12 @@ public class PackageManager {
 	private Emailer mailer;
 	private LabelPrinter printer;
 	
-	private String progDirName;
-	
 	public PackageManager(IModelToViewAdaptor adpt) {
 		
 		viewAdaptor = adpt;
 		
 		// initialize the database
-		db = new Database(progDirName,viewAdaptor);
+		db = new Database(viewAdaptor);
 		mailer = new Emailer(viewAdaptor);
 		printer = new LabelPrinter(viewAdaptor);
 	}
