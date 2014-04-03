@@ -1,9 +1,11 @@
 package view;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.JButton;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -11,6 +13,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
@@ -18,8 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 public class MainFrame extends JFrame {
 
@@ -129,6 +134,32 @@ public class MainFrame extends JFrame {
 				RowSpec.decode("default:grow"),}));
 		
 		JButton btnImport = new JButton("Import");
+		btnImport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Create a file chooser
+				final JFileChooser fc = new JFileChooser();
+				fc.setAcceptAllFileFilterUsed(false);
+				fc.addChoosableFileFilter(new FileFilter() {
+					public boolean accept(File f) {
+						if (f.isDirectory()) { return true; }
+						if (f.getName().endsWith(".csv")) { return true; }
+						return false;
+					}
+					public String getDescription() {
+						return "CSV";
+					}
+				});
+				
+				
+				
+				//Open Dialog
+				int returnVal = fc.showOpenDialog(frame);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File csvFile = fc.getSelectedFile();
+		            modelAdaptor.importPersonCSV(csvFile.getAbsolutePath());
+		        }
+			}
+		});
 		panelStudInfoTable.add(btnImport, "1, 1, left, bottom");
 		btnImport.setToolTipText("Import student information from a csv file. Format: LastName,FirstName,NetID");
 		
