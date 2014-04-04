@@ -9,8 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -23,6 +25,8 @@ import util.Person;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -71,7 +75,6 @@ public class PanelCheckIn extends JPanel {
 		comboBoxStudentName.setRenderer(new PersonComboBoxRenderer());
 		comboBoxStudentName.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent arg0) {
-				//TODO
 				setMatchingPersons();
 			}
 
@@ -79,7 +82,7 @@ public class PanelCheckIn extends JPanel {
 		comboBoxStudentName.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent arg0) {
 				setPersonList();
-				//setMatchingPersons();
+				setMatchingPersons();
 			}
 		});
 		comboBoxStudentName.setEditable(true);
@@ -107,6 +110,24 @@ public class PanelCheckIn extends JPanel {
 	 */
 	private void setPersonList() {
 		personList = modelAdaptor.getPersonList("");
+		
+		// sort
+		Collections.sort(personList, new Comparator<Person>() {
+			public int compare(Person p1, Person p2) {
+				// last name
+				if(p1.getLastName().toLowerCase() != p2.getLastName().toLowerCase()) {
+					return p1.getLastName().toLowerCase().compareTo(p2.getLastName().toLowerCase());
+				} 
+				// first name
+				if (p1.getFirstName().toLowerCase() != p2.getFirstName().toLowerCase()) {
+					return p1.getFirstName().toLowerCase().compareTo(p2.getFirstName().toLowerCase());
+				} 
+				// personID
+				return p1.getPersonID().toLowerCase().compareTo(p2.getPersonID().toLowerCase());
+			}
+		});
+		
+		// add people
 		for (Person person: personList) {
 			comboBoxStudentName.addItem(person);
 		}
@@ -116,10 +137,33 @@ public class PanelCheckIn extends JPanel {
 	 * Check in the selected person
 	 */
 	private void checkInSelection() {
+		
 		Person owner = comboBoxStudentName.getItemAt(comboBoxStudentName.getSelectedIndex());
-		modelAdaptor.checkInPackage(owner.getPersonID(), textFieldComment.getText());
+		
+		if (owner == null) {
+			JOptionPane.showMessageDialog(frame, "Please choose a name from the provided list.", 
+					"Invalid Person", JOptionPane.WARNING_MESSAGE);
+			comboBoxStudentName.getEditor().getEditorComponent().requestFocus();
+		} else {
+			// check into database
+			long pkgID = modelAdaptor.checkInPackage(owner.getPersonID(), textFieldComment.getText());
+			
+			// send a package notification
+			modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID);
+			
+			// print a label
+			modelAdaptor.printLabel(pkgID);
+			
+			// notify success
+			JOptionPane.showMessageDialog(frame, "Package for " + owner.getFullName() + " successfully checked in!", 
+					"Success", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		// reset fields
 		textFieldComment.setText("");
 		comboBoxStudentName.getEditor().setItem("");
+		comboBoxStudentName.getEditor().getEditorComponent().requestFocus();
+
 	}
 	
 	/**
@@ -145,8 +189,13 @@ public class PanelCheckIn extends JPanel {
 	
 	private class PersonComboBoxRenderer extends DefaultListCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8382546602369739973L;
+
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value,
+		public Component getListCellRendererComponent(JList<?> list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
 			
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
