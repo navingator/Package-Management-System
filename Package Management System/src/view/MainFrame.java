@@ -25,6 +25,8 @@ import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 
 public class MainFrame extends JFrame {
 
@@ -39,6 +41,7 @@ public class MainFrame extends JFrame {
 	private JTable tableActivePackages;
 	private JTable tableStudentInfo;
 	private JFrame frame;
+	private JTextField textField;
 
 	/**
 	 * Create the frame.
@@ -105,14 +108,31 @@ public class MainFrame extends JFrame {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_COLSPEC,
 				FormFactory.MIN_COLSPEC,},
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,}));
+		
+		textField = new JTextField();
+		panelEditPackages.add(textField, "4, 2");
+		textField.setColumns(10);
+		
+		JButton btnSearch = new JButton("Search");
+		panelEditPackages.add(btnSearch, "6, 2, left, default");
 		
 		tableActivePackages = new JTable();
 		tableActivePackages.setCellSelectionEnabled(true);
-		panelEditPackages.add(tableActivePackages, "4, 2, fill, fill");
+		panelEditPackages.add(tableActivePackages, "4, 4, 3, 1, fill, fill");
+		
+		JCheckBox chckbxActivePackagesOnly = new JCheckBox("Active Packages Only");
+		chckbxActivePackagesOnly.setSelected(true);
+		panelEditPackages.add(chckbxActivePackagesOnly, "4, 6, left, default");
 		
 		JScrollPane scrollPaneEditStudentInfo = new JScrollPane();
 		tabbedPaneAdmin.addTab("Student Information", null, scrollPaneEditStudentInfo, null);

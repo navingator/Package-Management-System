@@ -379,8 +379,10 @@ public class Database {
 		}
 		
 		if(failedToRead.size() != 0) {
-			String errorMsg = "\nFailed to read the following people: \n"
-					+ "Person - reason\n";
+			String errorMsg = "\nFailed to read the following people: \n" + 
+					"-------------------------------------\n"
+					+ "Person - reason\n" + 
+					"-------------------------------------\n";
 			for (Pair<String,String> error: failedToRead) {
 				errorMsg = errorMsg + error.first + " - " + error.second + '\n';
 			}
