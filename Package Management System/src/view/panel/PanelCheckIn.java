@@ -1,4 +1,4 @@
-package view;
+package view.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -19,8 +19,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import javax.swing.JComboBox;
+import javax.swing.text.JTextComponent;
 
 import util.Person;
+import view.IViewToModelAdaptor;
+import view.component.PersonComboBox;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -34,9 +37,8 @@ public class PanelCheckIn extends JPanel {
 
 	private static final long serialVersionUID = -5330361979358721465L;
 	
-	private JComboBox<Person> comboBoxStudentName;
+	private PersonComboBox comboBoxStudentName;
 	private JTextField textFieldComment;
-	private ArrayList<Person> personList;
 	private JFrame frame;
 	private IViewToModelAdaptor modelAdaptor;
 
@@ -71,21 +73,14 @@ public class PanelCheckIn extends JPanel {
 		JLabel lblStudent = new JLabel("Student:");
 		add(lblStudent, "3, 2, left, bottom");
 		
-		comboBoxStudentName = new JComboBox<Person>();
-		comboBoxStudentName.setRenderer(new PersonComboBoxRenderer());
+		comboBoxStudentName = new PersonComboBox(getPersonList());
 		comboBoxStudentName.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent arg0) {
-				setMatchingPersons();
+				//setMatchingPersons();
 			}
 
 		});
-		comboBoxStudentName.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
-			public void focusGained(FocusEvent arg0) {
-				setPersonList();
-				setMatchingPersons();
-			}
-		});
-		comboBoxStudentName.setEditable(true);
+
 		add(comboBoxStudentName, "3, 3, fill, top");
 		
 		JButton btnConfirmCheckIn = new JButton("Confirm");
@@ -108,8 +103,8 @@ public class PanelCheckIn extends JPanel {
 	/**
 	 * Get a list of person objects from the database
 	 */
-	private void setPersonList() {
-		personList = modelAdaptor.getPersonList("");
+	private ArrayList<Person> getPersonList() {
+		ArrayList<Person> personList = modelAdaptor.getPersonList("");
 		
 		// sort
 		Collections.sort(personList, new Comparator<Person>() {
@@ -127,10 +122,7 @@ public class PanelCheckIn extends JPanel {
 			}
 		});
 		
-		// add people
-		for (Person person: personList) {
-			comboBoxStudentName.addItem(person);
-		}
+		return personList;
 	}
 	
 	/**
@@ -148,11 +140,11 @@ public class PanelCheckIn extends JPanel {
 			// check into database
 			long pkgID = modelAdaptor.checkInPackage(owner.getPersonID(), textFieldComment.getText());
 			
-			// send a package notification
-			modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID);
-			
 			// print a label
 			modelAdaptor.printLabel(pkgID);
+			
+			// send a package notification
+			modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID);
 			
 			// notify success
 			JOptionPane.showMessageDialog(frame, "Package for " + owner.getFullName() + " successfully checked in!", 
@@ -164,47 +156,6 @@ public class PanelCheckIn extends JPanel {
 		comboBoxStudentName.getEditor().setItem("");
 		comboBoxStudentName.getEditor().getEditorComponent().requestFocus();
 
-	}
-	
-	/**
-	 * Find persons that match the search string and put them in the 
-	 * JComboBox list.
-	 */
-	private void setMatchingPersons() {
-		comboBoxStudentName.removeAllItems();
-		String search = comboBoxStudentName.getEditor().getItem().toString().toLowerCase();
-		for (Person person: personList) {
-			String personString = person.getLastFirstName() + " (" + person.getPersonID() + ")";
-			if(personString.toLowerCase().contains(search)) {
-				comboBoxStudentName.addItem(person);
-			}
-			
-			if(search.length() > 0) {
-				comboBoxStudentName.showPopup();
-			} else {
-				comboBoxStudentName.hidePopup();
-			}
-		}
-	}
-	
-	private class PersonComboBoxRenderer extends DefaultListCellRenderer {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 8382546602369739973L;
-
-		@Override
-		public Component getListCellRendererComponent(JList<?> list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			
-			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			if(value instanceof Person){
-                Person person = (Person) value;
-                setText(person.getLastFirstName() + " (" + person.getPersonID() + ")");
-            }
-            return this;
-		}
 	}
 
 }

@@ -25,8 +25,13 @@ import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
+
+import view.dialog.ChangeEmail;
+import view.panel.PanelCheckIn;
+import view.panel.PanelPickUp;
 
 public class MainFrame extends JFrame {
 
