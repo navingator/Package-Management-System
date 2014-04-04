@@ -99,7 +99,7 @@ public class PackageManager {
 	public long checkInPackage(String personID, String comment) {
 		// create a packageID
 		Date now = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSS");
+		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmss");
 		long pkgID = Long.valueOf(ft.format(now)).longValue();
 		
 		Package pkg = new Package(pkgID, comment, now);
