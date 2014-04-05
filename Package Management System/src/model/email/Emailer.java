@@ -225,9 +225,8 @@ public class Emailer {
 		Calendar now = new GregorianCalendar();
 		
 		// Check if the hour is past 7 and the day is not a weekend
-		//TODO CHANGE BACK
 		if (now.get(Calendar.HOUR_OF_DAY) >= 7 && 
-				now.get(Calendar.DAY_OF_WEEK) != Calendar.WEDNESDAY &&
+				now.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
 				now.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
 			
 			if (propHandler.getProperty("email.last_reminder") == null && now.get(Calendar.HOUR_OF_DAY) >= 7) {

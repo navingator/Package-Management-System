@@ -3,6 +3,7 @@ package view.panel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
@@ -50,11 +51,19 @@ public class PanelEditPackages extends JPanel {
 		
 		tableActivePackages = new JTable();
 		tableActivePackages.setCellSelectionEnabled(true);
-		add(tableActivePackages, "4, 4, 3, 1, fill, fill");
+		
+		JScrollPane tableScrollPane = new JScrollPane(tableActivePackages);
+		tableActivePackages.setFillsViewportHeight(true);
+		
+		add(tableScrollPane, "4, 4, 3, 1, fill, fill");
 		
 		JCheckBox chckbxActivePackagesOnly = new JCheckBox("Active Packages Only");
 		chckbxActivePackagesOnly.setSelected(true);
 		add(chckbxActivePackagesOnly, "4, 6, left, default");
+	}
+	
+	public void init() {
+		
 	}
 
 }
