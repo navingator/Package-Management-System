@@ -27,7 +27,12 @@ public class PersonComboBox extends JComboBox<String>{
 				char key = ke.getKeyChar();
 				if (key == '\n') {
 					setSelectedIndex(0);
-				} else if (Character.isLetterOrDigit(key) || key == '\b') {
+				} else if (Character.isLetterOrDigit(key) || 
+						key == '\b' ||
+						key == ' ' ||
+						key == ',' ||
+						key == '(' ||
+						key == ')') {
 					setMatchingPersons(key);
 				}
 			}
@@ -41,6 +46,10 @@ public class PersonComboBox extends JComboBox<String>{
 	 * @return						Person object that is selected
 	 */
 	public Person getSelectedPerson() {
+		int selectedIndex = getSelectedIndex();
+		if(selectedIndex == -1) {
+			return null;
+		}
 		return currentPersons.get(getSelectedIndex());
 	}
 	
@@ -72,7 +81,7 @@ public class PersonComboBox extends JComboBox<String>{
 		// collect persons that contain the search string
 		for (Person person: personList) {
 			String personString = getPersonEntry(person);
-			if(personString.toLowerCase().startsWith(search)) {
+			if(personString.toLowerCase().startsWith(search.toLowerCase())) {
 				topPersons.add(person);
 			} else if(personString.toLowerCase().contains(search.toLowerCase())) {
 				currentPersons.add(person);

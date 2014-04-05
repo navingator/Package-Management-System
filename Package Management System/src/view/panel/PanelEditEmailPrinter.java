@@ -16,6 +16,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 public class PanelEditEmailPrinter extends JPanel{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1347840240775088592L;
+
 	public PanelEditEmailPrinter(final MainFrame frame, final IViewToModelAdaptor modelAdaptor) {
 		setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,

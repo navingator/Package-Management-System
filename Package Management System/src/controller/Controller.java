@@ -139,7 +139,6 @@ public class Controller{
 			
 		});
 		
-		// TODO ask chris how anonymous classes can work without an instantiated modelPM object
 		/* Initialize model */
 		modelPM = new PackageManager(new IModelToViewAdaptor() {
 			public void displayMessage(String message, String title) {
