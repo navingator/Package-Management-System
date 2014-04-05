@@ -5,33 +5,16 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.JButton;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
-
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JScrollPane;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.JTextField;
-import javax.swing.JCheckBox;
-
 import view.dialog.ChangeEmail;
 import view.panel.PanelCheckIn;
 import view.panel.PanelPickUp;
+import view.panel.TabbedPaneAdmin;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
@@ -45,11 +28,7 @@ public class MainFrame extends JFrame {
 	private IViewToModelAdaptor modelAdaptor;
 	
 	private JPanel contentPane;
-	private JTable tableActivePackages;
-	private JTable tableStudentInfo;
-	private JFrame frame;
-	private JTextField textField;
-
+	private MainFrame frame;
 	/**
 	 * Create the frame.
 	 */
@@ -120,152 +99,8 @@ public class MainFrame extends JFrame {
 		
 		panelAdmin.setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPaneAdmin = new JTabbedPane(JTabbedPane.TOP);
+		TabbedPaneAdmin tabbedPaneAdmin = new TabbedPaneAdmin(frame,modelAdaptor);
 		panelAdmin.add(tabbedPaneAdmin, BorderLayout.CENTER);
-		
-		JPanel panelEditPackages = new JPanel();
-		tabbedPaneAdmin.addTab("Packages", null, panelEditPackages, null);
-		panelEditPackages.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.MIN_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.MIN_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
-		
-		textField = new JTextField();
-		panelEditPackages.add(textField, "4, 2");
-		textField.setColumns(10);
-		
-		JButton btnSearch = new JButton("Search");
-		panelEditPackages.add(btnSearch, "6, 2, left, default");
-		
-		tableActivePackages = new JTable();
-		tableActivePackages.setCellSelectionEnabled(true);
-		panelEditPackages.add(tableActivePackages, "4, 4, 3, 1, fill, fill");
-		
-		JCheckBox chckbxActivePackagesOnly = new JCheckBox("Active Packages Only");
-		chckbxActivePackagesOnly.setSelected(true);
-		panelEditPackages.add(chckbxActivePackagesOnly, "4, 6, left, default");
-		
-		JScrollPane scrollPaneEditStudentInfo = new JScrollPane();
-		tabbedPaneAdmin.addTab("Student Information", null, scrollPaneEditStudentInfo, null);
-		
-		JPanel panelStudInfoTable = new JPanel();
-		scrollPaneEditStudentInfo.setViewportView(panelStudInfoTable);
-		panelStudInfoTable.setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("default:grow"),
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.DEFAULT_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
-		
-		JButton btnImport = new JButton("Import");
-		btnImport.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				//Create a file chooser
-				final JFileChooser fc = new JFileChooser();
-				fc.setAcceptAllFileFilterUsed(false);
-				fc.addChoosableFileFilter(new FileFilter() {
-					public boolean accept(File f) {
-						if (f.isDirectory()) { return true; }
-						if (f.getName().endsWith(".csv")) { return true; }
-						return false;
-					}
-					public String getDescription() {
-						return "CSV";
-					}
-				});
-				
-				
-				
-				//Open Dialog
-				int returnVal = fc.showOpenDialog(frame);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File csvFile = fc.getSelectedFile();
-		            modelAdaptor.importPersonCSV(csvFile.getAbsolutePath());
-		        }
-			}
-		});
-		panelStudInfoTable.add(btnImport, "1, 1, left, bottom");
-		btnImport.setToolTipText("Import student information from a csv file. Format: LastName,FirstName,NetID");
-		
-		JButton btnAddStudent = new JButton("Add");
-		panelStudInfoTable.add(btnAddStudent, "2, 1");
-		btnAddStudent.setToolTipText("Save changes to student information.");
-		
-		tableStudentInfo = new JTable();
-		tableStudentInfo.setCellSelectionEnabled(true);
-		panelStudInfoTable.add(tableStudentInfo, "1, 2, 2, 7, fill, fill");
-		
-		JButton btnEditStudent = new JButton("Edit");
-		panelStudInfoTable.add(btnEditStudent, "3, 4");
-		
-		JButton btnDeleteStudent = new JButton("Delete");
-		panelStudInfoTable.add(btnDeleteStudent, "3, 6");
-		
-		JPanel panelEditEmail = new JPanel();
-		tabbedPaneAdmin.addTab("Email and Printer", null, panelEditEmail, null);
-		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				RowSpec.decode("default:grow"),}));
-		
-		JButton btnChangeEmail = new JButton("Change Email");
-		btnChangeEmail.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				// open the change email dialog
-				String oldEmail = modelAdaptor.getEmailAddress();
-				String oldAlias = modelAdaptor.getEmailAlias();
-				
-				ChangeEmail emailDlg = new ChangeEmail(frame,oldAlias,oldEmail);
-				String newEmail[] = emailDlg.showDialog();
-				
-				// make the changes in the model
-				if(newEmail != null) {
-					modelAdaptor.changeEmail(newEmail[0], newEmail[1], newEmail[2]);
-				}
-			}
-		});
-		panelEditEmail.add(btnChangeEmail, "4, 4, default, fill");
-		
-		JButton btnSelectPrinter = new JButton("Select Printer");
-		btnSelectPrinter.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String printerName = getPrinterName(modelAdaptor.getPrinterNames());
-				modelAdaptor.setPrinter(printerName);
-			}
-		});
-		panelEditEmail.add(btnSelectPrinter, "4, 6, default, fill");
 
 	}
 	
