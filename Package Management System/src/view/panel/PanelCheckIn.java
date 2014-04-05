@@ -43,7 +43,7 @@ public class PanelCheckIn extends JPanel {
 		setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("default:grow"),
 				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
+				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("pref:grow"),},
 			new RowSpec[] {
@@ -79,7 +79,7 @@ public class PanelCheckIn extends JPanel {
 		
 		textFieldComment = new JTextField();
 		add(textFieldComment, "3, 6, fill, default");
-		textFieldComment.setColumns(20);
+		textFieldComment.setColumns(30);
 		add(btnConfirmCheckIn, "3, 8, center, default");
 		
 	}

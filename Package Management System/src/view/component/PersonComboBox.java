@@ -3,8 +3,8 @@ package view.component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
 import javax.swing.JComboBox;
+import javax.swing.text.JTextComponent;
 
 import util.Person;
 
@@ -16,15 +16,20 @@ public class PersonComboBox extends JComboBox<String>{
 	private static final long serialVersionUID = 6672267768163626009L;
 	private ArrayList<Person> personList;
 	private ArrayList<Person> currentPersons;
-
+	private final JTextComponent inputTextBox = (JTextComponent) getEditor().getEditorComponent();
+	
 	public PersonComboBox() {
 		
 		personList = new ArrayList<Person>();
 		currentPersons = new ArrayList<Person>();
-		
-		getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent arg0) {
-				setMatchingPersons();
+		inputTextBox.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent ke) {
+				char key = ke.getKeyChar();
+				if (key == '\n') {
+					setSelectedIndex(0);
+				} else if (Character.isLetterOrDigit(key) || key == '\b') {
+					setMatchingPersons(key);
+				}
 			}
 		});
 		
@@ -54,30 +59,44 @@ public class PersonComboBox extends JComboBox<String>{
 	 * Find persons that match the search string and put them in the 
 	 * JComboBox list.
 	 */
-	private void setMatchingPersons() {
+	private void setMatchingPersons(char input) {
+		String oldInput = inputTextBox.getText();
+		String search = oldInput + input;
+		if (input == '\b' && oldInput.length() >= 1) {
+			search = search.substring(0, search.length()-1);
+		}
 		removeAllItems();
 		currentPersons.clear();
-		String search = (String) getEditor().getItem();
-		System.out.println(getEditor().getItem());
 		
+		ArrayList<Person> topPersons = new ArrayList<Person>();
 		// collect persons that contain the search string
 		for (Person person: personList) {
 			String personString = getPersonEntry(person);
-			if(personString.toLowerCase().contains(search.toLowerCase())) {
+			if(personString.toLowerCase().startsWith(search)) {
+				topPersons.add(person);
+			} else if(personString.toLowerCase().contains(search.toLowerCase())) {
 				currentPersons.add(person);
 			}
 		}
+		currentPersons.addAll(0, topPersons);
 		
 		// add all persons to list
 		for (Person person: currentPersons) {
 			addItem(getPersonEntry(person));
 		}
 		
-		if(search.length() > 0) {
-			showPopup();
+		if(currentPersons.size() > 0) {
+			if (currentPersons.size() > 8) {
+				setMaximumRowCount(8);
+			} else {
+				setMaximumRowCount(currentPersons.size());
+			}
+			setPopupVisible(true);
 		} else {
-			hidePopup();
+			setPopupVisible(false);
 		}
+		
+		inputTextBox.setText(oldInput);
 	}
 	
 	/**
@@ -88,5 +107,4 @@ public class PersonComboBox extends JComboBox<String>{
 	private String getPersonEntry(Person person) {
 		return person.getLastFirstName() + " (" + person.getPersonID() + ")";
 	}
-
 }
