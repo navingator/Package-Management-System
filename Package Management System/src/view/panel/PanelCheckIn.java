@@ -125,10 +125,18 @@ public class PanelCheckIn extends JPanel {
 			long pkgID = modelAdaptor.checkInPackage(owner.getPersonID(), textFieldComment.getText());
 			
 			// print a label
-			modelAdaptor.printLabel(pkgID);
+			if (!modelAdaptor.printLabel(pkgID)) {
+				JOptionPane.showMessageDialog(frame, "Failed to print the package label.\n"
+						+ "Please reprint the label from the packages tab of the admin panel.", 
+						"Failed Print", JOptionPane.WARNING_MESSAGE);
+			}
 			
 			// send a package notification
-			modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID);
+			if (!modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID)); {
+				JOptionPane.showMessageDialog(frame, "Failed to send package notification.\n"
+						+ "Please resend notification from the packages tab of the admin panel.", 
+						"Failed Notification", JOptionPane.WARNING_MESSAGE);
+			}
 			
 			// notify success
 			JOptionPane.showMessageDialog(frame, "Package for " + owner.getFullName() + " successfully checked in!", 
