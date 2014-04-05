@@ -36,8 +36,9 @@ public class PackageManager {
 	}
 	
 	public void start() {
+		// Start the database, mailer, and printer
 		db.start();
-		mailer.start();
+		mailer.start(db.getEntries("checked_in=TRUE", "person_ID=ASCENDING"));
 		printer.start();
 	}
 	

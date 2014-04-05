@@ -2,6 +2,8 @@ package model.email;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -55,7 +57,7 @@ public class Emailer {
 
 	}
 	
-	public void start() {
+	public void start(ArrayList<Pair<Person, Package>> activeEntriesSortedByPerson) {
 		// get properties from PropertyHandler
 		this.senderAddress = propHandler.getProperty("email.email_address");
 		this.senderPassword = propHandler.getProperty("email.password");
@@ -72,8 +74,12 @@ public class Emailer {
 		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();
+		
+		if(checkReminder()) {
+			sendAllReminders(activeEntriesSortedByPerson);
+		}
 	}
-	
+
 	/**
 	 * Function changes email, password, and alias to passed values
 	 * @param newAlias			New Alias for sender
@@ -110,6 +116,8 @@ public class Emailer {
 			}
 			closeConnection();
 			
+			logger.info("Successfully sent reminder emails.");
+			
 			// add property with the current time as the last sent date
 			propHandler.setProperty("email.last_reminder", Long.valueOf(new Date().getTime()).toString());
 			return true;
@@ -139,14 +147,14 @@ public class Emailer {
 			body += "Comment: " + comment + "\n";
 		}
 		
-		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n\n";
+		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
+		body += "Package ID: " + pkg.getPackageID() + "\n\n";
 		
 		body += "Jones Mail Room";
 		try {
 			connect();
 			sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 			closeConnection();
-			return true;
 		} catch (UnsupportedEncodingException e) {
 			logger.severe("UnsupportedEncodingException for Person (ID: " + recipient.getPersonID() +
 					") and Package (ID: " + pkg.getPackageID() + ")");
@@ -156,6 +164,7 @@ public class Emailer {
 			return false;
 		}
 		
+		return true;
 	}
 	
 	public String getSenderAddress() {
@@ -203,7 +212,41 @@ public class Emailer {
         transport.close();
 	}
 	
-	/*
+	/**
+	 * Check if a reminder email should be sent. Reminder email will be sent if
+	 * 		1) The last reminder was not sent within the same day
+	 * 		2) The time is at least 07:00
+	 * 		3) The day is a weekday
+	 * @return					True if a reminder email should be sent
+	 */
+	private boolean checkReminder() {
+		
+		// Initialize calendar
+		Calendar now = new GregorianCalendar();
+		
+		// Check if the hour is past 7 and the day is not a weekend
+		//TODO CHANGE BACK
+		if (now.get(Calendar.HOUR_OF_DAY) >= 7 && 
+				now.get(Calendar.DAY_OF_WEEK) != Calendar.WEDNESDAY &&
+				now.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+			
+			if (propHandler.getProperty("email.last_reminder") == null && now.get(Calendar.HOUR_OF_DAY) >= 7) {
+				return true;
+			}
+			
+			// Initialize last reminder calendar
+			Calendar lastReminder = new GregorianCalendar();
+			lastReminder.setTimeInMillis(Long.valueOf(propHandler.getProperty("email.last_reminder")));
+			
+			if (now.get(Calendar.DAY_OF_YEAR) != lastReminder.get(Calendar.DAY_OF_YEAR)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Sends a reminder email to the recipient reminding them of each package that
 	 * is returned by recipient.getPackageList()
 	 */
@@ -219,7 +262,7 @@ public class Emailer {
 		
 		for (int i=0; i<packages.size(); i++) {
 			Package pkg = packages.get(i);
-			body += "\n\tPackage " + (i+1) + ":";
+			body += "\n\tPackage " + (i+1) + "(ID: " + pkg.getPackageID() + ")" + ":";
 			body += "\n\t\tChecked in on " + pkg.getCheckInDate().toString();
 			if(pkg.getComment() != "") {
 				body += "\n\t\tComment: " + pkg.getComment();

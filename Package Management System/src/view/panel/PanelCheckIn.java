@@ -132,7 +132,7 @@ public class PanelCheckIn extends JPanel {
 			}
 			
 			// send a package notification
-			if (!modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID)); {
+			if (!modelAdaptor.sendPackageNotification(owner.getPersonID(), pkgID)) {
 				JOptionPane.showMessageDialog(frame, "Failed to send package notification.\n"
 						+ "Please resend notification from the packages tab of the admin panel.", 
 						"Failed Notification", JOptionPane.WARNING_MESSAGE);
