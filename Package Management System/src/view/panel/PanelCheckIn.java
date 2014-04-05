@@ -1,14 +1,11 @@
 package view.panel;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -18,15 +15,10 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import javax.swing.JComboBox;
-import javax.swing.text.JTextComponent;
-
 import util.Person;
 import view.IViewToModelAdaptor;
 import view.component.PersonComboBox;
 
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -73,13 +65,7 @@ public class PanelCheckIn extends JPanel {
 		JLabel lblStudent = new JLabel("Student:");
 		add(lblStudent, "3, 2, left, bottom");
 		
-		comboBoxStudentName = new PersonComboBox(getPersonList());
-		comboBoxStudentName.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent arg0) {
-				//setMatchingPersons();
-			}
-
-		});
+		comboBoxStudentName = new PersonComboBox();
 
 		add(comboBoxStudentName, "3, 3, fill, top");
 		
@@ -158,4 +144,8 @@ public class PanelCheckIn extends JPanel {
 
 	}
 
+	public void init() {
+		comboBoxStudentName.setPersonList(getPersonList());
+	}
+	
 }

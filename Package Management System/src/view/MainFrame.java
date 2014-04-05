@@ -32,6 +32,8 @@ import javax.swing.JCheckBox;
 import view.dialog.ChangeEmail;
 import view.panel.PanelCheckIn;
 import view.panel.PanelPickUp;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class MainFrame extends JFrame {
 
@@ -86,20 +88,36 @@ public class MainFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+
+		
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		final String pickUpPanelName = "<html><body><table width='80'><tr><td><center>Pick Up</center></td></tr></table></body></html>";
+		final String checkInPanelName = "<html><body><table width='80'><tr><td><center>Check In</center></td></tr></table></body></html>";
+		final String adminPanelName = "<html><body><table width='80'><tr><td><center>Admin</center></td></tr></table></body></html>";
+
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
-		String pickUpPanelName = "<html><body><table width='80'><tr><td><center>Pick Up</center></td></tr></table></body></html>";
-		PanelPickUp panelPickUp = new PanelPickUp(frame,modelAdaptor);
+		final PanelPickUp panelPickUp = new PanelPickUp(frame,modelAdaptor);
 		tabbedPane.addTab(pickUpPanelName, null, panelPickUp, null);
 		
-		String checkInPanelName = "<html><body><table width='80'><tr><td><center>Check In</center></td></tr></table></body></html>";
-		JPanel panelCheckIn = new PanelCheckIn(frame,modelAdaptor);
+		final PanelCheckIn panelCheckIn = new PanelCheckIn(frame,modelAdaptor);
 		tabbedPane.addTab(checkInPanelName, null, panelCheckIn, null);
 		
-		String adminPanelName = "<html><body><table width='80'><tr><td><center>Admin</center></td></tr></table></body></html>";
-		JPanel panelAdmin = new JPanel();
+		final JPanel panelAdmin = new JPanel();
 		tabbedPane.addTab(adminPanelName, null, panelAdmin, null);
+		
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				switch(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())) {
+				case checkInPanelName:
+					panelCheckIn.init();
+					break;
+				}
+			}
+		});
+		
+		
+		
 		panelAdmin.setLayout(new BorderLayout(0, 0));
 		
 		JTabbedPane tabbedPaneAdmin = new JTabbedPane(JTabbedPane.TOP);
