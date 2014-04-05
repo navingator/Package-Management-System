@@ -22,8 +22,6 @@ import view.component.PersonComboBox;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class PanelCheckIn extends JPanel {
 
@@ -116,7 +114,7 @@ public class PanelCheckIn extends JPanel {
 	 */
 	private void checkInSelection() {
 		
-		Person owner = comboBoxStudentName.getItemAt(comboBoxStudentName.getSelectedIndex());
+		Person owner = comboBoxStudentName.getSelectedPerson();
 		
 		if (owner == null) {
 			JOptionPane.showMessageDialog(frame, "Please choose a name from the provided list.", 
@@ -145,7 +143,9 @@ public class PanelCheckIn extends JPanel {
 	}
 
 	public void init() {
+		comboBoxStudentName.removeAllItems();
 		comboBoxStudentName.setPersonList(getPersonList());
+		comboBoxStudentName.getEditor().setItem("");
 	}
 	
 }
