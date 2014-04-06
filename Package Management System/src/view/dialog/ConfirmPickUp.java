@@ -36,8 +36,6 @@ public class ConfirmPickUp extends JDialog {
 		super(frame,true);
 		setTitle("Confirm Pick Up");
 		setSize(450,300);
-		setLocationRelativeTo(null);
-
 		this.result = false;
 		
 		getContentPane().setLayout(new BorderLayout());

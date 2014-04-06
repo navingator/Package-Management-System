@@ -40,7 +40,7 @@ public class MainFrame extends JFrame {
 		this.frame = this;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(720, 446);
+		setSize(800, 450);
 		setLocationRelativeTo(null);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -85,22 +85,23 @@ public class MainFrame extends JFrame {
 		final JPanel panelAdmin = new JPanel();
 		tabbedPane.addTab(adminPanelName, null, panelAdmin, null);
 		
+		panelAdmin.setLayout(new BorderLayout(0, 0));
+		
+		final TabbedPaneAdmin tabbedPaneAdmin = new TabbedPaneAdmin(frame,modelAdaptor);
+		panelAdmin.add(tabbedPaneAdmin, BorderLayout.CENTER);
+//		tabbedPane.addTab(adminPanelName, null, tabbedPaneAdmin, null);
+		
 		tabbedPane.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				switch(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex())) {
 				case checkInPanelName:
 					panelCheckIn.init();
 					break;
+				case adminPanelName:
+					tabbedPaneAdmin.init();
 				}
 			}
 		});
-		
-		
-		
-		panelAdmin.setLayout(new BorderLayout(0, 0));
-		
-		TabbedPaneAdmin tabbedPaneAdmin = new TabbedPaneAdmin(frame,modelAdaptor);
-		panelAdmin.add(tabbedPaneAdmin, BorderLayout.CENTER);
 
 	}
 	

@@ -86,4 +86,9 @@ public class PanelStudentInformation extends JPanel {
 		btnDeleteStudent.setToolTipText("Delete selected student");
 		add(btnDeleteStudent, "3, 6");
 	}
+
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
 }
