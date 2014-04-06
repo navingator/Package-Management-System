@@ -45,11 +45,14 @@ public class TabbedPaneAdmin extends JTabbedPane {
 		case panelEditPackagesName:
 			panelEditPackages.init();
 			break;
+		case panelStudInfoName:
+			panelStudInfo.init();
+			break;
 		}
 	}
 //	
 	public void init() {
 		panelEditPackages.init();
-//		panelStudInfo.init();
+		panelStudInfo.init();
 	}
 }
