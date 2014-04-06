@@ -38,6 +38,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class PanelEditPackages extends JPanel {
 	
@@ -57,6 +58,7 @@ public class PanelEditPackages extends JPanel {
     private JPopupMenu popup;
 	
 	private ArrayList<Pair<Person,Package>> packages;
+	private JLabel lblSearch;
 
 	public PanelEditPackages(MainFrame frame, IViewToModelAdaptor modelAdaptor) {
 		
@@ -64,14 +66,15 @@ public class PanelEditPackages extends JPanel {
 		this.modelAdaptor = modelAdaptor;
 		
 		setLayout(new FormLayout(new ColumnSpec[] {
+				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.MIN_COLSPEC,
+				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.MIN_COLSPEC,},
+				FormFactory.DEFAULT_COLSPEC,},
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
@@ -81,6 +84,7 @@ public class PanelEditPackages extends JPanel {
 				FormFactory.DEFAULT_ROWSPEC,}));
 		
 		
+		// popup menu
 		popup = new JPopupMenu();
 		JMenuItem printLabelItem = new JMenuItem("Print Label");
 		printLabelItem.addActionListener(new ActionListener() {
@@ -104,22 +108,7 @@ public class PanelEditPackages extends JPanel {
 		});
 		popup.add(checkOutPackageItem);
 		
-		filterText = new JTextField();
-		filterText.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                    public void insertUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                    public void removeUpdate(DocumentEvent e) {
-                        newFilter();
-                    }
-                });
-		add(filterText, "4, 2");
-		filterText.setColumns(10);
-		
+		// active packages table
 		tableActivePackages = new JTable();
 		tableActivePackages.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
@@ -144,19 +133,40 @@ public class PanelEditPackages extends JPanel {
 		
 		tableModel = (DefaultTableModel) tableActivePackages.getModel();
 		
-		JScrollPane tableScrollPane = new JScrollPane(tableActivePackages);
+		// filter text field
+		filterText = new JTextField();
+		filterText.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                    public void insertUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                    public void removeUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                });
+		
+		lblSearch = new JLabel("Search:");
+		add(lblSearch, "3, 2");
+		add(filterText, "5, 2, 3, 1");
+		filterText.setColumns(10);
+		
+		JScrollPane tableActivePackagesScrollPane = new JScrollPane(tableActivePackages);
 		tableActivePackages.setFillsViewportHeight(true);
 		
-		add(tableScrollPane, "4, 4, 3, 1, fill, fill");
+		add(tableActivePackagesScrollPane, "3, 4, 5, 1, fill, fill");
 		
 		chckbxActivePackagesOnly = new JCheckBox("Active Packages Only");
+		chckbxActivePackagesOnly.setToolTipText("Only show packages that have not been checked out.");		
 		chckbxActivePackagesOnly.setSelected(true);
 		chckbxActivePackagesOnly.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				generateTable();
 			}
 		});
-		add(chckbxActivePackagesOnly, "4, 6, left, default");
+		add(chckbxActivePackagesOnly, "3, 6, 3, 1, left, default");
 	}
 	
 	/**
@@ -169,6 +179,8 @@ public class PanelEditPackages extends JPanel {
 	/**
 	 * Generates a table from the database with filter supplied from buildFilter and default
 	 * sorting options
+	 * Rows of the table are as follows:
+	 * 		LastName, FirstName, netID, CheckInDate, CheckOutDate, PackageID
 	 */
 	private void generateTable() {
 		packages = modelAdaptor.getPackages(buildFilter(), 
@@ -202,6 +214,7 @@ public class PanelEditPackages extends JPanel {
 			data.add(dataEntry);
 		}
 		
+		// get the sort and filter keys for setting the sorter after the model is set
 		List<? extends SortKey> sortKeys = sorter.getSortKeys();
 		RowFilter<? super DefaultTableModel, ? super Integer> rowFilter = sorter.getRowFilter();
 		
