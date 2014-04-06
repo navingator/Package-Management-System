@@ -2,17 +2,22 @@ package view.panel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -29,6 +34,10 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class PanelEditPackages extends JPanel {
 	
@@ -73,28 +82,65 @@ public class PanelEditPackages extends JPanel {
 		
 		
 		popup = new JPopupMenu();
-		JMenuItem printLabel = new JMenuItem("Print Label");
-		popup.add(printLabel);
-		JMenuItem resendNotification = new JMenuItem("Resend Notification");
-		popup.add(resendNotification);
-		JMenuItem checkOutPackage = new JMenuItem("Check Out Package");
-		popup.add(checkOutPackage);
+		JMenuItem printLabelItem = new JMenuItem("Print Label");
+		printLabelItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				reprintLabel();
+			}
+		});
+		popup.add(printLabelItem);
+		JMenuItem resendNotificationItem = new JMenuItem("Resend Notification");
+		resendNotificationItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				resendNotification();
+			}
+		});
+		popup.add(resendNotificationItem);
+		JMenuItem checkOutPackageItem = new JMenuItem("Check Out Package");
+		checkOutPackageItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				checkOutPackage();
+			}
+		});
+		popup.add(checkOutPackageItem);
 		
 		filterText = new JTextField();
+		filterText.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                    public void insertUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                    public void removeUpdate(DocumentEvent e) {
+                        newFilter();
+                    }
+                });
 		add(filterText, "4, 2");
 		filterText.setColumns(10);
 		
-		JButton btnSearch = new JButton("Search");
-		add(btnSearch, "6, 2, left, default");
-		
 		tableActivePackages = new JTable();
 		tableActivePackages.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent e) {
+				int r = tableActivePackages.rowAtPoint(e.getPoint());
+		        if (r >= 0 && r < tableActivePackages.getRowCount()) {
+		            tableActivePackages.setRowSelectionInterval(r, r);
+		        } else {
+		            tableActivePackages.clearSelection();
+		        }
+
+		        int rowindex = tableActivePackages.getSelectedRow();
+		        if (rowindex < 0)
+		            return;
+		        if (e.isPopupTrigger()) {
+		        	popup.show(e.getComponent(), e.getX(), e.getY());
+		        }
 			}
 		});
 		tableActivePackages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableActivePackages.setAutoCreateRowSorter(true);
+		sorter = new TableRowSorter<DefaultTableModel>();
+		tableActivePackages.setRowSorter(sorter);
 		
 		tableModel = (DefaultTableModel) tableActivePackages.getModel();
 		
@@ -104,14 +150,26 @@ public class PanelEditPackages extends JPanel {
 		add(tableScrollPane, "4, 4, 3, 1, fill, fill");
 		
 		chckbxActivePackagesOnly = new JCheckBox("Active Packages Only");
+		chckbxActivePackagesOnly.setSelected(true);
+		chckbxActivePackagesOnly.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				generateTable();
+			}
+		});
 		add(chckbxActivePackagesOnly, "4, 6, left, default");
 	}
 	
+	/**
+	 * Initializes the panel
+	 */
 	public void init() {
-		chckbxActivePackagesOnly.setSelected(true);
 		generateTable();
 	}
 	
+	/**
+	 * Generates a table from the database with filter supplied from buildFilter and default
+	 * sorting options
+	 */
 	private void generateTable() {
 		packages = modelAdaptor.getPackages(buildFilter(), 
 				"last_name=ASCENDING:first_name=ASCENDING:check_in_date=ASCENDING");
@@ -126,7 +184,7 @@ public class PanelEditPackages extends JPanel {
 		dataHeaders.add("Package ID");
 
 		// collect data
-		SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 		Vector<Vector<String>> data = new Vector<Vector<String>>();
 		for (Pair<Person,Package> dbEntry : packages) {
 			Vector<String> dataEntry = new Vector<String>();
@@ -144,16 +202,135 @@ public class PanelEditPackages extends JPanel {
 			data.add(dataEntry);
 		}
 		
+		List<? extends SortKey> sortKeys = sorter.getSortKeys();
+		RowFilter<? super DefaultTableModel, ? super Integer> rowFilter = sorter.getRowFilter();
+		
 		// set model for table
 		tableModel.setDataVector(data, dataHeaders);
+		// sort table
+		sorter.setModel(tableModel);
+		sorter.setSortKeys(sortKeys);
+		sorter.setRowFilter(rowFilter);
 	}
 
+	/**
+	 * Function will build a filter for the database depending on whether or not
+	 * the checked in packages only checkbox is selected.
+	 * @return
+	 */
 	private String buildFilter() {
 		String filter = "";
 		if(chckbxActivePackagesOnly.isSelected()) {
 			filter += "checked_in=true";
 		}
 		return filter;
+	}
+	
+	/** 
+     * Update the row filter regular expression from the expression in
+     * the text box.
+     */
+    private void newFilter() {
+        RowFilter<DefaultTableModel, Object> rf = null;
+        //If current expression doesn't parse, don't update.
+        try {
+            rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0,1,2);
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+        sorter.setRowFilter(rf);
+    }
+	
+	/**
+	 * Function will reprint label after requesting confirmation
+	 * from the user for the specific label
+	 */
+	private void reprintLabel() {
+		int row = tableActivePackages.getSelectedRow();
+		String lastName = (String) tableActivePackages.getValueAt(row, 0);
+		String firstName = (String) tableActivePackages.getValueAt(row, 1);
+		String netID = (String) tableActivePackages.getValueAt(row,2);
+		String checkOut = (String) tableActivePackages.getValueAt(row,4);
+		String pkgID = (String) tableActivePackages.getValueAt(row,5);
+		String message = "Reprint label for package (ID:" + 
+				pkgID + ") for " + firstName + " " + lastName + " (" + netID + ")?";
+		
+		if(!checkOut.isEmpty()) {
+			JOptionPane.showMessageDialog(frame, 
+					"This package was already checked out on " + checkOut + "." +
+					"\nNo label will be printed.", 
+					"Package Checked Out", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		//TODO Add icon
+		// get confirmation and reprint the label
+		if(JOptionPane.showConfirmDialog(frame, message, "Reprint Label", 
+				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			modelAdaptor.printLabel(Long.valueOf(pkgID));
+		}
+	}
+	
+	/**
+	 * Function will resend an email notification with confirmation
+	 */
+	private void resendNotification() {
+		int row = tableActivePackages.getSelectedRow();
+		String lastName = (String) tableActivePackages.getValueAt(row, 0);
+		String firstName = (String) tableActivePackages.getValueAt(row, 1);
+		String netID = (String) tableActivePackages.getValueAt(row,2);
+		String checkOut = (String) tableActivePackages.getValueAt(row,4);
+		String pkgID = (String) tableActivePackages.getValueAt(row,5);
+		String message = "Resend email notification to " + 
+				firstName + " " + lastName + " (" + netID + ")" + 
+				" for package (ID:" + pkgID + ")?";
+		
+		//TODO Add icon
+		// get confirmation and send package notification
+		if(!checkOut.isEmpty()) {
+			JOptionPane.showMessageDialog(frame, 
+					"This package was already checked out on " + checkOut + "." +
+					"\nNo notification will be sent.", 
+					"Package Checked Out", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		if(JOptionPane.showConfirmDialog(frame, message, "Resend Package Notification", 
+				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			modelAdaptor.sendPackageNotification(netID, Long.valueOf(pkgID));
+		}
+	}
+	
+	/**
+	 * Function checks out a package with confirmation
+	 */
+	private void checkOutPackage() {
+		int row = tableActivePackages.getSelectedRow();
+		String lastName = (String) tableActivePackages.getValueAt(row, 0);
+		String firstName = (String) tableActivePackages.getValueAt(row, 1);
+		String netID = (String) tableActivePackages.getValueAt(row,2);
+		String checkOut = (String) tableActivePackages.getValueAt(row,4);
+		String pkgID = (String) tableActivePackages.getValueAt(row,5);
+		String message = "Check out package (ID:" + 
+				pkgID + ") for " + firstName + " " + lastName + " (" + netID + ")? \n" +
+				"Please note this cannot be undone!";
+		
+		if(!checkOut.isEmpty()) {
+			JOptionPane.showMessageDialog(frame, 
+					"This package was already checked out on " + checkOut + "." +
+					"\nThe package will not be checked out again.", 
+					"Package Checked Out", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		//TODO Add icon
+		//get confirmation and check out package
+		if(JOptionPane.showConfirmDialog(frame, message, "Check Out Package", 
+				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			modelAdaptor.checkOutPackage(Long.valueOf(pkgID));;
+		}
+		
+		// regenerate the table
+		generateTable();
 	}
 
 }

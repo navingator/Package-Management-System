@@ -26,7 +26,9 @@ public class PersonComboBox extends JComboBox<String>{
 			public void keyTyped(KeyEvent ke) {
 				char key = ke.getKeyChar();
 				if (key == '\n') {
-					setSelectedIndex(0);
+					if(getSelectedIndex() == -1) {
+						setSelectedIndex(0);
+					}
 				} else if (Character.isLetterOrDigit(key) || 
 						key == '\b' ||
 						key == ' ' ||
