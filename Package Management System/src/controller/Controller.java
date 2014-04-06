@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import model.IModelToViewAdaptor;
 import model.PackageManager;
@@ -25,6 +26,7 @@ public class Controller{
 	private LogHandler logHandler;
 	private PropertyHandler propHandler;
 	
+	private static Logger logger;
 	private String progDirName;
 	
 	/**
@@ -37,7 +39,7 @@ public class Controller{
 					Controller control = new Controller();
 					control.start();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.severe(e.getMessage());
 				}
 			}
 		});
@@ -51,6 +53,8 @@ public class Controller{
 		this.propHandler = PropertyHandler.getInstance();
 		this.logHandler = new LogHandler();
 		init();
+		
+		Controller.logger = Logger.getLogger(Controller.class.getName());
 		
 		/* Initializes the view */
 		viewFrame = new MainFrame(new IViewToModelAdaptor() {
