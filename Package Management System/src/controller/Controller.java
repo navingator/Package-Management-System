@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import model.IModelToViewAdaptor;
 import model.PackageManager;
 import util.FileIO;
+import util.LogHandler;
 import util.Package;
 import util.Pair;
 import util.Person;
