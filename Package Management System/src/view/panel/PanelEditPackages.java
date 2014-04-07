@@ -18,6 +18,7 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -32,12 +33,15 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JLabel;
 
 public class PanelEditPackages extends JPanel {
@@ -201,6 +205,7 @@ public class PanelEditPackages extends JPanel {
 		dataHeaders.add("Check In Date");
 		dataHeaders.add("Check Out Date");
 		dataHeaders.add("Package ID");
+		dataHeaders.add("Email");
 
 		// collect data
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -218,6 +223,12 @@ public class PanelEditPackages extends JPanel {
 				dataEntry.add("");
 			}
 			dataEntry.add(Long.valueOf(dbEntry.second.getPackageID()).toString());
+			
+			if(dbEntry.second.isNotificationSent()) {
+				dataEntry.add("Yes");
+			} else {
+				dataEntry.add("No");
+			}
 			data.add(dataEntry);
 		}
 		
@@ -227,10 +238,50 @@ public class PanelEditPackages extends JPanel {
 		
 		// set model for table
 		tableModel.setDataVector(data, dataHeaders);
+		
 		// sort table
 		sorter.setModel(tableModel);
 		sorter.setSortKeys(sortKeys);
 		sorter.setRowFilter(rowFilter);
+		
+		// Set column sizes
+		tableActivePackages.getColumnModel().getColumn(0).setPreferredWidth(100);
+		tableActivePackages.getColumnModel().getColumn(1).setPreferredWidth(100);
+		tableActivePackages.getColumnModel().getColumn(2).setPreferredWidth(30);
+		tableActivePackages.getColumnModel().getColumn(3).setPreferredWidth(100);
+		tableActivePackages.getColumnModel().getColumn(4).setPreferredWidth(100);
+		tableActivePackages.getColumnModel().getColumn(5).setPreferredWidth(100);
+		tableActivePackages.getColumnModel().getColumn(6).setPreferredWidth(30);
+		
+		// Center align
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		tableActivePackages.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+		tableActivePackages.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+		tableActivePackages.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+		tableActivePackages.getColumnModel().getColumn(5).setCellRenderer( centerRenderer );
+		
+		// render email column
+		DefaultTableCellRenderer emailRenderer = new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1435774334371903319L;
+			public Component getTableCellRendererComponent(JTable table, Object value, 
+					boolean isSelected, boolean hasFocus, int row, int col) {
+				JLabel cell = (JLabel) super.getTableCellRendererComponent(table, 
+						value, isSelected, hasFocus, row, col);
+			
+				setHorizontalAlignment( JLabel.CENTER );
+				
+				if((String) tableModel.getValueAt(row, col) == "No") {
+					cell.setBackground(Color.RED);
+				} else {
+					cell.setBackground(Color.WHITE);
+				}
+				
+				return cell;
+			}
+			
+		};
+		tableActivePackages.getColumnModel().getColumn(6).setCellRenderer( emailRenderer );
 	}
 
 	/**
@@ -326,6 +377,8 @@ public class PanelEditPackages extends JPanel {
 				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 			modelAdaptor.sendPackageNotification(netID, Long.valueOf(pkgID));
 		}
+		
+		generateTable();
 	}
 	
 	/**
