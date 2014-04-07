@@ -44,7 +44,7 @@ public class LabelPrinter {
 		if (service == null) {
 			logger.info("Printer was not selected and barcode was not printed");
 			viewAdaptor.displayMessage("You have not selected a printer. Barcode will not be printed. \n"
-					+ "Please choose a printer and reprint the barcode from the admin panel", "Barcode");
+					+ "Please choose a printer and reprint the barcode from the admin panel.", "Barcode");
 			return false;
 		}
 		

@@ -131,7 +131,14 @@ public class PanelEditPackages extends JPanel {
 		sorter = new TableRowSorter<DefaultTableModel>();
 		tableActivePackages.setRowSorter(sorter);
 		
-		tableModel = (DefaultTableModel) tableActivePackages.getModel();
+		tableModel = new DefaultTableModel() {
+			private static final long serialVersionUID = 6852954056260852138L;
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		       return false;
+		    }
+		};
+		tableActivePackages.setModel(tableModel);
 		
 		// filter text field
 		filterText = new JTextField();

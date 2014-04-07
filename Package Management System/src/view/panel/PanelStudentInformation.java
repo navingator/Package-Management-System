@@ -112,7 +112,14 @@ public class PanelStudentInformation extends JPanel {
 		sorter = new TableRowSorter<DefaultTableModel>();
 		tableStudentInfo.setRowSorter(sorter);
 		
-		tableModel = (DefaultTableModel) tableStudentInfo.getModel();
+		tableModel = new DefaultTableModel() {
+			private static final long serialVersionUID = -8300662810704394429L;
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		       return false;
+		    }
+		};
+		tableStudentInfo.setModel(tableModel);
 		
 		tableStudentInfoScrollPane = new JScrollPane(tableStudentInfo);
 		tableStudentInfo.setFillsViewportHeight(true);
@@ -308,4 +315,6 @@ public class PanelStudentInformation extends JPanel {
 //		
 //		generateTable();
 //	}
+	
+
 }
