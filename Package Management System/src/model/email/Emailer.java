@@ -78,7 +78,7 @@ public class Emailer {
 			sendAllReminders(activeEntriesSortedByPerson);
 		}
 	}
-
+	
 	/**
 	 * Function changes email, password, and alias to passed values
 	 * @param newAlias			New Alias for sender
@@ -95,8 +95,42 @@ public class Emailer {
 		this.senderPassword = newPassword;
 		this.senderAlias = newAlias;
 		
+		attemptConnection();
+		
 	}
-
+	
+	/**
+	 * Attempts to connect to the Gmail server with stored credentials
+	 * Sends error messages to the view if an authentication error or a 
+	 * general messaging error occurs.
+	 */
+	public void attemptConnection() {
+		boolean retry = true;
+		while(retry) {
+			try {
+				connect();
+				closeConnection();
+				retry = false;
+			} catch (AuthenticationFailedException e){ 
+					viewAdaptor.displayMessage("Incorrect username or password.\n","");
+					if (!changeEmail()) {
+						retry = false;
+						viewAdaptor.displayMessage("Emails will not be sent until a connection is established.",
+								"");
+					}
+			} catch (MessagingException e) {
+				logger.warning("Failed to connect to the mail server.");
+				String[] options = {"Retry", "Cancel"};
+				retry = viewAdaptor.getBooleanInput("Program failed to connect to the Gmail server.\n"
+						+ "Please check your internet connection and try again.", 
+						"Failed Connection",options);
+				if(!retry) {
+					viewAdaptor.displayMessage("Emails will not be sent until a connection is established.",
+							"");
+				}
+			}
+		}
+	}
 
 	/**
 	 * Function that sends all reminder emails
@@ -276,43 +310,15 @@ public class Emailer {
 	
 	/**
 	 * Function requests the view to get user input for new email information
+	 * @return								True if the user input email information
 	 */
-	private void changeEmail() {
+	private boolean changeEmail() {
 		String[] newEmail = viewAdaptor.changeEmail(senderAddress,senderPassword,senderAlias);
 		if(newEmail != null) {
 			setEmailProperties(newEmail[0],newEmail[1],newEmail[2]);
+			return true;
 		}
-	}
-	
-	/**
-	 * Attempts to connect to the Gmail server with stored credentials
-	 * Sends error messages to the view if an authentication error or a 
-	 * general messaging error occurs.
-	 */
-	private void attemptConnection() {
-		
-		boolean retry = true;
-		while(retry) {
-			try {
-				connect();
-				closeConnection();
-				retry = false;
-			} catch (AuthenticationFailedException e){ 
-					viewAdaptor.displayMessage("Incorrect username or password.\n","");
-					changeEmail();
-			} catch (MessagingException e) {
-				logger.warning("Failed to connect to the mail server.");
-				String[] options = {"Retry", "Cancel"};
-				retry = viewAdaptor.getBooleanInput("Program failed to connect to the Gmail server.\n"
-						+ "Please check your internet connection and try again.", 
-						"Failed Connection",options);
-				if(!retry) {
-					viewAdaptor.displayMessage("Emails will not be sent until a connection is established.",
-							"");
-				}
-			}
-		}
-		
+		return false;
 	}
 	
 	/**
