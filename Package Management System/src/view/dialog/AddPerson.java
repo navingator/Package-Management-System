@@ -100,7 +100,7 @@ public class AddPerson extends JDialog {
 		// First Name field
 		textFieldFirstName = new JTextField();
 		textFieldFirstName.setColumns(10);
-		textFieldFirstName.setText(oldLastName);
+		textFieldFirstName.setText(oldFirstName);
 		textFieldFirstName.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent arg0) {
 	   	    	SwingUtilities.invokeLater( new Runnable() {
