@@ -47,7 +47,7 @@ public class Database {
 		this.dbIO = new DBFileIO();
 	}
 	
-	/*
+	/**
 	 * Function whose start is controlled by the controller
 	 * 
 	 * Creates new package directories if they do not exist
@@ -61,29 +61,38 @@ public class Database {
 		readCurrentDatabase();
 	}
 	
-	/* Checks in a package into the DBMaps and write a new file for the person */
-	public void checkInPackage(String personID, Package pkg) {
+	/**
+	 * Checks in a package into the system, adding it to the dbMaps
+	 * @param personID			ID of the owner
+	 * @param pkg				package object to be added
+	 * @return					Success of checking in package
+	 */
+	public boolean checkInPackage(String personID, Package pkg) {
 		// check if package already exists
 		long pkgID = pkg.getPackageID();
 		if(dbMaps.getPackage(pkgID) != null) {
 			logger.warning("Package ID: " + pkgID + " was already checked in.");
-			return;
+			return false;
 		}
 		// modify current DBMaps
 		dbMaps.addPackage(personID, pkg);
 		// write new person file
 		writePersonFile(personID,currentDirPath);
+		
+		return true;
 	}
 	
-	/* Sets a check out date for the package */
-	public void checkOutPackage(long pkgID) {
+	/**
+	 * Sets a check out date for the package
+	 * @param pkgID				Package to check out
+	 * @return					Success of checking out package
+	 */
+	public boolean checkOutPackage(long pkgID) {
 		// modify package checkOut date
 		Package pkg = dbMaps.getPackage(pkgID);
 		if(pkg.getCheckOutDate() != null) {
-			logger.info("Package ID: " + pkgID + " was already checked out.");
-			viewAdaptor.displayMessage("This package was previously checked out on " + 
-					pkg.getCheckOutDate().toString(), "Package Already Checked Out");			
-			return;
+			logger.info("Package ID: " + pkgID + " was already checked out.");		
+			return false;
 		} 		
 
 		// note that this automatically edits the package in DBMaps
@@ -91,6 +100,8 @@ public class Database {
 		
 		// write to file
 		writePersonFile(dbMaps.getOwnerID(pkgID),currentDirPath);
+		
+		return true;
 	}
 
 	/**
@@ -203,15 +214,14 @@ public class Database {
 	 * and a new file will be written for them.
 	 * 
 	 * @param person			Person object containing new person information
+	 * @return					Success of adding the person
 	 */
-	public void addPerson(Person person) {
+	public boolean addPerson(Person person) {
 		//Check if person is already in the system
 		String personID = person.getPersonID();
 		if(dbMaps.getPerson(personID) != null) {
 			logger.warning("Person (ID: " + personID + ") to be added by database already exists.");
-			viewAdaptor.displayWarning(person.getFullName() + " (ID: " + personID + 
-					") is already in the system and cannot be added again", null);
-			return;
+			return false;
 		} 
 		
 		//Check if person is in the archive
@@ -231,6 +241,8 @@ public class Database {
 		
 		//Write the new file
 		writePersonFile(personID, currentDirPath);
+		
+		return true;
 		 
 	}
 	
@@ -238,28 +250,31 @@ public class Database {
 	 * Edits a person in the database, editing the DBMaps and
 	 * writing the changes to their file
 	 * @param newPerson			Person object containing new attributes for the person
+	 * @return					Success of editing the person
 	 */
-	public void editPerson(Person newPerson) {
+	public boolean editPerson(Person newPerson) {
 		String personID = newPerson.getPersonID();
 		if(dbMaps.getPerson(personID) == null) {
 			logger.warning("Person (ID: " + personID + ") to be edited by database not found.");
-			return;
+			return false;
 		}
 		
 		// edit person in database maps and write to file
 		dbMaps.editPerson(newPerson);
 		writePersonFile(personID, currentDirPath);
-		
+		return true;
 	}
 	
-	/*
+	/**
 	 * Moves a person from the current directory to the archive directory and deletes
 	 * their information from the DBMaps
+	 * @param personID			ID of the person to be deleted
+	 * @return					Success of deleting the person
 	 */
-	public void deletePerson(String personID) {
+	public boolean deletePerson(String personID) {
 		if(dbMaps.getPerson(personID) == null) {
-			System.out.println("Person (ID: " + personID + ") to be deleted by database not found.");
-			return;
+			logger.warning("Person (ID: " + personID + ") to be deleted by database not found.");
+			return false;
 		}
 		
 		// move person file to the archive 
@@ -267,6 +282,8 @@ public class Database {
 		FileIO.deleteFile(currentDirPath + '/' + personID);
 		// remove person from DBMaps - must be after reading and writing file
 		dbMaps.deletePerson(personID);
+		
+		return true;
 		
 	}
 	
