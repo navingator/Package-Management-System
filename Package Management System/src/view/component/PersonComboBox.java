@@ -73,8 +73,6 @@ public class PersonComboBox extends JComboBox<String>{
 	private void setMatchingPersons(char input) {
 		String oldInput = inputTextBox.getText();
 		String search = oldInput + input;
-		System.out.println(search);
-		System.out.println(oldInput.length());
 		
 		// handle backspace
 		if (input == '\b') {
