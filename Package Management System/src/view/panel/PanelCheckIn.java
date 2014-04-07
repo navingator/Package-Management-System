@@ -66,6 +66,14 @@ public class PanelCheckIn extends JPanel {
 		comboBoxStudentName = new PersonComboBox();
 
 		add(comboBoxStudentName, "3, 3, fill, top");
+
+		JLabel lblNewLabel = new JLabel("Comment:");
+		add(lblNewLabel, "3, 5, left, bottom");
+		
+		textFieldComment = new JTextField();
+		add(textFieldComment, "3, 6, fill, default");
+		textFieldComment.setColumns(30);
+		textFieldComment.setToolTipText("Optional comment to be displayed with email notification");
 		
 		JButton btnConfirmCheckIn = new JButton("Confirm");
 		btnConfirmCheckIn.addActionListener(new ActionListener() {
@@ -73,13 +81,6 @@ public class PanelCheckIn extends JPanel {
 				checkInSelection();
 			}
 		});
-		
-		JLabel lblNewLabel = new JLabel("Comment:");
-		add(lblNewLabel, "3, 5, left, bottom");
-		
-		textFieldComment = new JTextField();
-		add(textFieldComment, "3, 6, fill, default");
-		textFieldComment.setColumns(30);
 		add(btnConfirmCheckIn, "3, 8, center, default");
 		
 	}
