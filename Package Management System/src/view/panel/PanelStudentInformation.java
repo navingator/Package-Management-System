@@ -2,6 +2,8 @@ package view.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +13,10 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -55,6 +59,8 @@ public class PanelStudentInformation extends JPanel {
 	private ArrayList<Person> personList;
 	private JTextField filterField;
 
+	private JPopupMenu popup;
+
 	
 	public PanelStudentInformation(MainFrame frame, IViewToModelAdaptor modelAdaptor) {
 		
@@ -87,6 +93,23 @@ public class PanelStudentInformation extends JPanel {
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,}));
+		
+		// popup menu
+		popup = new JPopupMenu();
+		JMenuItem editStudentItem = new JMenuItem("Edit Student");
+		editStudentItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editStudent();
+			}
+		});
+		popup.add(editStudentItem);
+		JMenuItem deleteStudentItem = new JMenuItem("Delete Student");
+		deleteStudentItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				deleteStudent();
+			}
+		});
+		popup.add(deleteStudentItem);
 		
 		JLabel lblSearch = new JLabel("Search:");
 		add(lblSearch, "3, 2, right, default");
@@ -123,6 +146,24 @@ public class PanelStudentInformation extends JPanel {
 		
 		tableStudentInfoScrollPane = new JScrollPane(tableStudentInfo);
 		tableStudentInfo.setFillsViewportHeight(true);
+		tableStudentInfo.addMouseListener(new MouseAdapter() {
+			public void mouseReleased(MouseEvent e) {
+				int r = tableStudentInfo.rowAtPoint(e.getPoint());
+		        if (r >= 0 && r < tableStudentInfo.getRowCount()) {
+		            tableStudentInfo.setRowSelectionInterval(r, r);
+		        } else {
+		            tableStudentInfo.clearSelection();
+		        }
+
+		        int rowindex = tableStudentInfo.getSelectedRow();
+		        if (rowindex < 0)
+		            return;
+		        if (e.isPopupTrigger()) {
+		        	popup.show(e.getComponent(), e.getX(), e.getY());
+		        }
+			}
+		});
+
 		
 		add(tableStudentInfoScrollPane, "3, 4, 6, 7, fill, fill");
 		
@@ -254,6 +295,9 @@ public class PanelStudentInformation extends JPanel {
         sorter.setRowFilter(rf);
     }
     
+    /**
+     * Creates a dialog that adds a student to the database
+     */
 	private void addStudent() {
 		AddPerson addDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.ADD_PERSON);
 		String[] result = addDlg.showDialog();
@@ -280,33 +324,46 @@ public class PanelStudentInformation extends JPanel {
 	}
 	
 	
-	//TODO Implement with table selection
-//	private void editStudent() {
-//		AddPerson editDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.EDIT_PERSON);
-//		String[] result = editDlg.showDialog();
-//		if(result != null) {
-//			String lastName = result[0];
-//			String firstName = result[1];
-//			String netID = result[2];
-//			String emailAddress = result[3];
-//			if (modelAdaptor.editPerson(netID, firstName, lastName, emailAddress)) {
-//				JOptionPane.showMessageDialog(frame, 
-//						firstName + " " + lastName + " (" + netID + ") "
-//								+ "was successfully edited.", 
-//								null, JOptionPane.INFORMATION_MESSAGE);
-//			} else {
-//				JOptionPane.showMessageDialog(frame, 
-//						firstName + " " + lastName + " (" + netID + ") "
-//								+ "was not found. \n", 
-//								null, JOptionPane.WARNING_MESSAGE);
-//			}
-//		}
-//		
-//		generateTable();
-//	}
-//	
-//	private void deleteStudent() {
-//		
+	/**
+	 * Creates a dialog that edits a person in the database
+	 */
+	private void editStudent() {
+		
+		int row = tableStudentInfo.getSelectedRow();
+		String oldLastName = (String) tableStudentInfo.getValueAt(row, 0);
+		String oldFirstName = (String) tableStudentInfo.getValueAt(row, 1);
+		String netID = (String) tableStudentInfo.getValueAt(row, 2);
+		String oldEmail = (String) tableStudentInfo.getValueAt(row, 3);
+		
+		AddPerson editDlg = new AddPerson(frame, oldLastName, oldFirstName, 
+				netID, oldEmail, AddPerson.Predicate.EDIT_PERSON);
+		String[] result = editDlg.showDialog();
+		if(result != null) {
+			String lastName = result[0];
+			String firstName = result[1];
+			String emailAddress = result[3];
+			if (modelAdaptor.editPerson(netID, firstName, lastName, emailAddress)) {
+				JOptionPane.showMessageDialog(frame, 
+						firstName + " " + lastName + " (" + netID + ") "
+								+ "was successfully edited.", 
+								null, JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(frame, 
+						firstName + " " + lastName + " (" + netID + ") "
+								+ "was not found. \n", 
+								null, JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		
+		generateTable();
+	}
+	
+	/**
+	 * Creates a dialog that confirms the deletion of the student 
+	 * from the database and does so.
+	 */
+	private void deleteStudent() {
+		
 //		String message = "Are you sure you want to delete " + 
 //		if(JOptionPane.showConfirmDialog(frame, message, "Delete Student", 
 //				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
@@ -314,7 +371,7 @@ public class PanelStudentInformation extends JPanel {
 //		}
 //		
 //		generateTable();
-//	}
+	}
 	
 
 }
