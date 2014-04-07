@@ -46,7 +46,7 @@ public class AddPerson extends JDialog {
 	public AddPerson(JFrame frame, String oldLastName, String oldFirstName, 
 			String netID, String oldEmail, Predicate pred) {
 		super(frame,true);
-		setSize(500, 200);
+		setSize(400, 200);
 		setLocationRelativeTo(frame);
 		
 		if(pred == Predicate.ADD_PERSON) { setTitle("Add Person"); }
