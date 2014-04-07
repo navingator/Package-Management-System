@@ -73,9 +73,17 @@ public class PersonComboBox extends JComboBox<String>{
 	private void setMatchingPersons(char input) {
 		String oldInput = inputTextBox.getText();
 		String search = oldInput + input;
-		if (input == '\b' && oldInput.length() >= 1) {
+		System.out.println(search);
+		System.out.println(oldInput.length());
+		
+		// handle backspace
+		if (input == '\b') {
+			if(oldInput.length() >= 1) {
 			search = search.substring(0, search.length()-1);
-		}
+			} else if (oldInput.length() == 0) {
+				search = "";
+			}
+		} 
 		removeAllItems();
 		currentPersons.clear();
 		
@@ -104,6 +112,10 @@ public class PersonComboBox extends JComboBox<String>{
 			}
 			setPopupVisible(true);
 		} else {
+			setPopupVisible(false);
+		}
+		
+		if(search == "") {
 			setPopupVisible(false);
 		}
 		
