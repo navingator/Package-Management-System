@@ -97,51 +97,48 @@ public class PanelPickUp extends JPanel {
 	
 	private void confirmAndCheckOut() {
 		
-		try {
-			long pkgID = Long.valueOf(textFieldPkgInput.getText());
-			// Get person information and get response from dialog for confirmation
-			Package pkg = modelAdaptor.getPackage(pkgID);
-			Person owner = modelAdaptor.getPackageOwner(pkgID);
-			
-			// If the package doesn't exist, warn the user
-			if(pkg == null) {
-				JOptionPane.showMessageDialog(frame, "The package was not found.",
-						"Package Not Found", JOptionPane.DEFAULT_OPTION);
-				return;
-			}
-			
-			// If the package is already checked out, warn the user
-			if(pkg.getCheckOutDate() != null) {
-				JOptionPane.showMessageDialog(frame, "The package is already checked out.",
-						"Checked Out", JOptionPane.DEFAULT_OPTION);
-				return;
-			}
-			
-			// Get confirmation that the package is for the user
-			ConfirmPickUp confirmPickUpDlg = new ConfirmPickUp(frame,
-					owner.getFullName(),owner.getPersonID());
-			
-			if(confirmPickUpDlg.showDialog()) {
-				if (modelAdaptor.checkOutPackage(pkgID)) {
-					JOptionPane.showMessageDialog(frame, "The package was successfully checked out.",
-							"Success", JOptionPane.DEFAULT_OPTION);
-//					if(owner.getPersonID() == "sg35" ||
-//							owner.getPersonID() == "bct2" ||
-//							owner.getPersonID() == "mjt5") {
-//						thankYouComeAgain();
-//					}
-				}
-			} else {
-				JOptionPane.showMessageDialog(frame, "The package was not checked out.",
-						"Not Checked Out", JOptionPane.DEFAULT_OPTION);
-			}
-		} catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(frame, "The barcode can only contain numbers (0-9).",
-					"Invalid Input", JOptionPane.DEFAULT_OPTION);
-		} finally {
-			textFieldPkgInput.setText("");
-			textFieldPkgInput.requestFocus();
+		String input = textFieldPkgInput.getText().replaceAll("[^0-9]", "");
+		long pkgID = Long.valueOf(input);
+		// Get person information and get response from dialog for confirmation
+		Package pkg = modelAdaptor.getPackage(pkgID);
+		Person owner = modelAdaptor.getPackageOwner(pkgID);
+		
+		// If the package doesn't exist, warn the user
+		if(pkg == null) {
+			JOptionPane.showMessageDialog(frame, "The package was not found.",
+					"Package Not Found", JOptionPane.DEFAULT_OPTION);
+			return;
 		}
+		
+		// If the package is already checked out, warn the user
+		if(pkg.getCheckOutDate() != null) {
+			JOptionPane.showMessageDialog(frame, "The package is already checked out.",
+					"Checked Out", JOptionPane.DEFAULT_OPTION);
+			return;
+		}
+		
+		// Get confirmation that the package is for the user
+		ConfirmPickUp confirmPickUpDlg = new ConfirmPickUp(frame,
+				owner.getFullName(),owner.getPersonID());
+		
+		if(confirmPickUpDlg.showDialog()) {
+			if (modelAdaptor.checkOutPackage(pkgID)) {
+				JOptionPane.showMessageDialog(frame, "The package was successfully checked out.",
+						"Success", JOptionPane.DEFAULT_OPTION);
+				
+				//TODO
+//				if(owner.getPersonID() == "sg35" ||
+//						owner.getPersonID() == "bct2" ||
+//						owner.getPersonID() == "mjt5") {
+//					thankYouComeAgain();
+//				}
+			}
+		} else {
+			JOptionPane.showMessageDialog(frame, "The package was not checked out.",
+					"Not Checked Out", JOptionPane.DEFAULT_OPTION);
+		}
+		textFieldPkgInput.setText("");
+		textFieldPkgInput.requestFocus();
 	}
 
 //	private synchronized void thankYouComeAgain() {
