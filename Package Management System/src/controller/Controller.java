@@ -138,8 +138,8 @@ public class Controller{
 				
 			}
 
-			public void deletePerson(String personID) {
-				modelPM.deletePerson(personID);
+			public boolean deletePerson(String personID) {
+				return modelPM.deletePerson(personID);
 			}
 			
 		});

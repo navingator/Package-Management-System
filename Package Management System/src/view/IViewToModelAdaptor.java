@@ -181,6 +181,7 @@ public interface IViewToModelAdaptor {
 	 * Deletes a person already in the database
 	 * 
 	 * @param personID			personID of the person - must already exist in the database
+	 * @return 
 	 */
-	public void deletePerson(String personID);
+	public boolean deletePerson(String personID);
 }

@@ -364,13 +364,29 @@ public class PanelStudentInformation extends JPanel {
 	 */
 	private void deleteStudent() {
 		
-//		String message = "Are you sure you want to delete " + 
-//		if(JOptionPane.showConfirmDialog(frame, message, "Delete Student", 
-//				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-//			
-//		}
-//		
-//		generateTable();
+		int row = tableStudentInfo.getSelectedRow();
+		String lastName = (String) tableStudentInfo.getValueAt(row, 0);
+		String firstName = (String) tableStudentInfo.getValueAt(row, 1);
+		String netID = (String) tableStudentInfo.getValueAt(row, 2);
+		String message = "Are you sure you want to delete " + firstName + " " + lastName + 
+				" (" + netID + ")? \n";
+		
+		if(JOptionPane.showConfirmDialog(frame, message, "Delete Student", 
+				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			if(modelAdaptor.deletePerson(netID)) {
+			JOptionPane.showMessageDialog(frame, 
+					firstName + " " + lastName + " (" + netID + ") "
+							+ "was successfully deleted.", 
+							null, JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(frame, 
+						firstName + " " + lastName + " (" + netID + ") "
+								+ "was not deleted.", 
+								null, JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		
+		generateTable();
 	}
 	
 

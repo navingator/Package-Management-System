@@ -141,8 +141,8 @@ public class PackageManager {
 		return db.editPerson(person);		
 	}
 
-	public void deletePerson(String personID) {
-		db.deletePerson(personID);
+	public boolean deletePerson(String personID) {
+		return db.deletePerson(personID);
 	}
 	
 }
