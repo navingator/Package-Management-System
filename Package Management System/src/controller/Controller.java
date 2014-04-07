@@ -68,8 +68,8 @@ public class Controller{
 				return modelPM.getOwner(pkgID);
 			}
 			
-			public void checkOutPackage(long pkgID) {
-				modelPM.checkOutPackage(pkgID);
+			public boolean checkOutPackage(long pkgID) {
+				return modelPM.checkOutPackage(pkgID);
 			}
 			
 			public ArrayList<Person> getPersonList(String searchString) {
@@ -124,17 +124,17 @@ public class Controller{
 				modelPM.importPersonCSV(fileName);
 			}
 
-			public void addPerson(String personID, String firstName,
+			public boolean addPerson(String personID, String firstName,
 					String lastName, String emailAddress) {
 				Person person = new Person(lastName,firstName,emailAddress,personID);
-				modelPM.addPerson(person);
+				return modelPM.addPerson(person);
 				
 			}
 
-			public void editPerson(String personID, String firstName,
+			public boolean editPerson(String personID, String firstName,
 					String lastName, String emailAddress) {
 				Person person = new Person(lastName,firstName,emailAddress,personID);
-				modelPM.editPerson(person);
+				return modelPM.editPerson(person);
 				
 			}
 

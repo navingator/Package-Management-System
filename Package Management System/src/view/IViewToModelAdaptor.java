@@ -36,8 +36,9 @@ public interface IViewToModelAdaptor {
 	 * Checks out the package after getting confirmation
 	 * 
 	 * @param pkgID				ID of the package to be checked out
+	 * @return					Success of checking out package
 	 */
-	public void checkOutPackage(long pkgID);
+	public boolean checkOutPackage(long pkgID);
 	
 	/*
 	 * Check in functions
@@ -161,8 +162,9 @@ public interface IViewToModelAdaptor {
 	 * @param firstName			First Name of the person - user input
 	 * @param lastName			Last Name of the person - user input
 	 * @param emailAddress		Email Address of the person - user input
+	 * @return					Success of adding person
 	 */
-	public void addPerson(String personID, String firstName, String lastName, String emailAddress);
+	public boolean addPerson(String personID, String firstName, String lastName, String emailAddress);
 	
 	/**
 	 * Edits a person already in the database
@@ -171,8 +173,9 @@ public interface IViewToModelAdaptor {
 	 * @param firstName			First Name of the person - user input
 	 * @param lastName			Last Name of the person - user input
 	 * @param emailAddress		Email Address of the person - user input
+	 * @return					Success of editing person
 	 */
-	public void editPerson(String personID, String firstName, String lastName, String emailAddress);
+	public boolean editPerson(String personID, String firstName, String lastName, String emailAddress);
 	
 	/**
 	 * Deletes a person already in the database

@@ -108,8 +108,8 @@ public class PackageManager {
 		return pkg.getPackageID();
 	}
 	
-	public void checkOutPackage(long pkgID) {
-		db.checkOutPackage(pkgID);		
+	public boolean checkOutPackage(long pkgID) {
+		return db.checkOutPackage(pkgID);		
 	}
 	
 	public Package getPackage(long pkgID) {
@@ -133,12 +133,12 @@ public class PackageManager {
 		db.importPersonsFromCSV(fileName);		
 	}
 
-	public void addPerson(Person person) {
-		db.addPerson(person);
+	public boolean addPerson(Person person) {
+		return db.addPerson(person);
 	}
 
-	public void editPerson(Person person) {
-		db.editPerson(person);		
+	public boolean editPerson(Person person) {
+		return db.editPerson(person);		
 	}
 
 	public void deletePerson(String personID) {
