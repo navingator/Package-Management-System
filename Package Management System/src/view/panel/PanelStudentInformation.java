@@ -26,6 +26,7 @@ import javax.swing.table.TableRowSorter;
 import util.Person;
 import view.IViewToModelAdaptor;
 import view.MainFrame;
+import view.dialog.AddPerson;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -127,7 +128,12 @@ public class PanelStudentInformation extends JPanel {
 		btnImport.setToolTipText("Import student information from a csv file. Format: LastName,FirstName,NetID");
 		
 		JButton btnAddStudent = new JButton("Add");
-		add(btnAddStudent, "7, 12, left, default");
+		btnAddStudent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addStudent();
+			}
+		});
+		add(btnAddStudent, "8, 12, right, default");
 		btnAddStudent.setToolTipText("Add a new person to the system.");
 	}
 
@@ -168,8 +174,8 @@ public class PanelStudentInformation extends JPanel {
 		Vector<String> dataHeaders = new Vector<String>();
 		dataHeaders.add("Last Name");
 		dataHeaders.add("First Name");
-		dataHeaders.add("Email Address");
 		dataHeaders.add("NetID");
+		dataHeaders.add("Email Address");
 		
 		// collect data
 		Vector<Vector<String>> data = new Vector<Vector<String>>();
@@ -177,8 +183,8 @@ public class PanelStudentInformation extends JPanel {
 			Vector<String> dataEntry = new Vector<String>();
 			dataEntry.add(person.getLastName());
 			dataEntry.add(person.getFirstName());
-			dataEntry.add(person.getEmailAddress());
 			dataEntry.add(person.getPersonID());
+			dataEntry.add(person.getEmailAddress());
 			data.add(dataEntry);
 		}
 		
@@ -220,6 +226,9 @@ public class PanelStudentInformation extends JPanel {
             File csvFile = fc.getSelectedFile();
             modelAdaptor.importPersonCSV(csvFile.getAbsolutePath());
         }
+		
+		// regenerate the table
+		generateTable();
 	}
 	
 	/** 
@@ -236,4 +245,18 @@ public class PanelStudentInformation extends JPanel {
         }
         sorter.setRowFilter(rf);
     }
+    
+	private void addStudent() {
+		AddPerson addDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.ADD_PERSON);
+		String[] result = addDlg.showDialog();
+		if(result != null) {
+			modelAdaptor.addPerson(result[2], result[1], result[0], result[3]);
+		}
+	}
+	
+	private void editStudent(){
+		AddPerson editDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.ADD_PERSON);
+		String[] result = editDlg.showDialog();
+		modelAdaptor.editPerson(result[2], result[1], result[0], result[3]);
+	}
 }
