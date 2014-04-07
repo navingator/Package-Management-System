@@ -50,7 +50,7 @@ public class BarcodeGenerator {
         bean.setBarHeight(20);
         bean.doQuietZone(false);
 		bean.setFontSize(4);
-        bean.setPattern("____-__-__-__-__-__");
+        bean.setPattern("____-__-__ __:__:__");
 
         boolean antiAlias = false;
         int orientation = 0;
