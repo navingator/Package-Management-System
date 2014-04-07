@@ -30,7 +30,6 @@ import util.PropertyHandler;
 
 //TODO Timeout
 //TODO If notification sending fails, add to a list of emails to send
-//TODO Remove test tag
 
 public class Emailer {
 	
