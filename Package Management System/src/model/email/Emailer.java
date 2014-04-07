@@ -139,7 +139,7 @@ public class Emailer {
 	 */
 	public boolean sendPackageNotification(Person recipient, Package pkg) {
 		
-		String subject = "[Test][Package Notification] New Package for " + recipient.getFullName();
+		String subject = "[Package Notification] New Package for " + recipient.getFullName();
 		String body = new String();
 		
 		String comment = pkg.getComment();
@@ -252,7 +252,7 @@ public class Emailer {
 	private void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
 			throws UnsupportedEncodingException, MessagingException {
 		
-		String subject = "[Test][Package Reminder] You have " + packages.size() + " package";
+		String subject = "[Package Reminder] You have " + packages.size() + " package";
 		if (packages.size() != 1) {
 			subject += 's';
 		}
