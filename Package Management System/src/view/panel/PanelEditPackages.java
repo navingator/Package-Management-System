@@ -139,6 +139,7 @@ public class PanelEditPackages extends JPanel {
 		    }
 		};
 		tableActivePackages.setModel(tableModel);
+		tableActivePackages.setComponentPopupMenu(popup);
 		
 		// filter text field
 		filterText = new JTextField();
