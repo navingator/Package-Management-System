@@ -129,11 +129,11 @@ public class PanelPickUp extends JPanel {
 				if (modelAdaptor.checkOutPackage(pkgID)) {
 					JOptionPane.showMessageDialog(frame, "The package was successfully checked out.",
 							"Success", JOptionPane.DEFAULT_OPTION);
-					if(owner.getPersonID() == "sg35" ||
-							owner.getPersonID() == "bct2" ||
-							owner.getPersonID() == "mjt5") {
-						thankYouComeAgain();
-					}
+//					if(owner.getPersonID() == "sg35" ||
+//							owner.getPersonID() == "bct2" ||
+//							owner.getPersonID() == "mjt5") {
+//						thankYouComeAgain();
+//					}
 				}
 			} else {
 				JOptionPane.showMessageDialog(frame, "The package was not checked out.",
@@ -148,23 +148,22 @@ public class PanelPickUp extends JPanel {
 		}
 	}
 
-	private synchronized void thankYouComeAgain() {
-		System.out.println("made it!");
-		new Thread(new Runnable() {
-			  // The wrapper thread is unnecessary, unless it blocks on the
-			  // Clip finishing; see comments.
-			    public void run() {
-			      try {
-			        Clip clip = AudioSystem.getClip();
-			        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-			          new File("audio/thank_you_come_again.mp3"));
-			        clip.open(inputStream);
-			        clip.start(); 
-			      } catch (Exception e) {
-			        System.err.println(e.getMessage());
-			      }
-			    }
-		  }).start();
-	}
+//	private synchronized void thankYouComeAgain() {
+//		new Thread(new Runnable() {
+//			  // The wrapper thread is unnecessary, unless it blocks on the
+//			  // Clip finishing; see comments.
+//			    public void run() {
+//			      try {
+//			        Clip clip = AudioSystem.getClip();
+//			        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+//			          new File("audio/thank_you_come_again.mp3"));
+//			        clip.open(inputStream);
+//			        clip.start(); 
+//			      } catch (Exception e) {
+//			        System.err.println(e.getMessage());
+//			      }
+//			    }
+//		  }).start();
+//	}
 
 }
