@@ -46,6 +46,7 @@ public class ChangeEmail extends JDialog {
 		super(frame,true);
 		setTitle("Change Email");
 		setSize(500, 300);
+		setLocationRelativeTo(frame);
 		
 		getContentPane().setLayout(new BorderLayout());
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
