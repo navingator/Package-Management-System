@@ -43,6 +43,8 @@ public class MainFrame extends JFrame {
 		setSize(800, 450);
 		setLocationRelativeTo(null);
 		
+		
+		//TODO Menu Bar
 //		JMenuBar menuBar = new JMenuBar();
 //		setJMenuBar(menuBar);
 //		
