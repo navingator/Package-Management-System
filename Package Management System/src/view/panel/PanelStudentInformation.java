@@ -285,10 +285,18 @@ public class PanelStudentInformation extends JPanel {
      * the text box.
      */
     private void newFilter() {
-        RowFilter<DefaultTableModel, Object> rf = null;
+    	RowFilter<DefaultTableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
+        String filtText = filterField.getText();
+        filtText = filtText.replaceAll("[^a-zA-Z 0-9._]", "");
+        String[] filters = filtText.split(" ");
+        ArrayList<RowFilter<Object, Object>> rowFilters = 
+        		new ArrayList<RowFilter<Object, Object>>();
         try {
-            rf = RowFilter.regexFilter("(?i)" + filterField.getText(), 0,1,2);
+        	for (String filter: filters) {
+        		rowFilters.add(RowFilter.regexFilter("(?i)" + filter));
+        	}
+        	rf = RowFilter.andFilter(rowFilters);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }

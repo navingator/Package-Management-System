@@ -253,8 +253,16 @@ public class PanelEditPackages extends JPanel {
     private void newFilter() {
         RowFilter<DefaultTableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
+        String filtText = filterText.getText();
+        filtText = filtText.replaceAll("[^a-zA-Z 0-9:.//]", "");
+        String[] filters = filtText.split(" ");
+        ArrayList<RowFilter<Object, Object>> rowFilters = 
+        		new ArrayList<RowFilter<Object, Object>>();
         try {
-            rf = RowFilter.regexFilter("(?i)" + filterText.getText());
+        	for (String filter: filters) {
+        		rowFilters.add(RowFilter.regexFilter("(?i)" + filter));
+        	}
+        	rf = RowFilter.andFilter(rowFilters);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
