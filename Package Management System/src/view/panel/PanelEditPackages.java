@@ -195,7 +195,7 @@ public class PanelEditPackages extends JPanel {
 	 */
 	private void generateTable() {
 		packages = modelAdaptor.getPackages(buildFilter(), 
-				"last_name=ASCENDING:first_name=ASCENDING:check_in_date=ASCENDING");
+				"check_in_date=DESCENDING");
 		
 		// create headers
 		Vector<String> dataHeaders = new Vector<String>();
@@ -224,7 +224,10 @@ public class PanelEditPackages extends JPanel {
 			}
 			dataEntry.add(Long.valueOf(dbEntry.second.getPackageID()).toString());
 			
-			if(dbEntry.second.isNotificationSent()) {
+			if(dbEntry.second.getCheckOutDate() != null) {
+				dataEntry.add("");
+			}
+			else if(dbEntry.second.isNotificationSent()) {
 				dataEntry.add("Yes");
 			} else {
 				dataEntry.add("No");
@@ -238,11 +241,6 @@ public class PanelEditPackages extends JPanel {
 		
 		// set model for table
 		tableModel.setDataVector(data, dataHeaders);
-		
-		// sort table
-		sorter.setModel(tableModel);
-		sorter.setSortKeys(sortKeys);
-		sorter.setRowFilter(rowFilter);
 		
 		// Set column sizes
 		tableActivePackages.getColumnModel().getColumn(0).setPreferredWidth(100);
@@ -271,8 +269,10 @@ public class PanelEditPackages extends JPanel {
 			
 				setHorizontalAlignment( JLabel.CENTER );
 				
-				if((String) tableModel.getValueAt(row, col) == "No") {
-					cell.setBackground(Color.RED);
+				int modelRow = table.convertRowIndexToModel(row);
+				
+				if((String) tableModel.getValueAt(modelRow, col) == "No") {
+					cell.setBackground(Color.PINK);
 				} else {
 					cell.setBackground(Color.WHITE);
 				}
@@ -282,6 +282,11 @@ public class PanelEditPackages extends JPanel {
 			
 		};
 		tableActivePackages.getColumnModel().getColumn(6).setCellRenderer( emailRenderer );
+		
+		// sort table
+		sorter.setModel(tableModel);
+		sorter.setSortKeys(sortKeys);
+		sorter.setRowFilter(rowFilter);
 	}
 
 	/**
