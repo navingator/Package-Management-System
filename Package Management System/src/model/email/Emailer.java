@@ -138,18 +138,19 @@ public class Emailer {
 	 */
 	public boolean sendPackageNotification(Person recipient, Package pkg) {
 		
-		String subject = "[Package Notification] New Package for " + recipient.getFullName();
+		String comment = pkg.getComment();
+		String subject = "[Package Notification] " + comment;
 		String body = new String();
 		
-		String comment = pkg.getComment();
+		body += recipient.getFullName() + ", You have a new package in the mail room.\n\n";
+		
+		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
 		if(comment != null && !comment.isEmpty()) {
 			body += "Comment: " + comment + "\n";
 		}
-		
-		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
 		body += "Package ID: " + pkg.getPackageID() + "\n\n";
 		
-		body += "Jones Mail Room";
+		body += senderAlias;
 		try {
 			connect();
 			sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
@@ -256,18 +257,18 @@ public class Emailer {
 			subject += 's';
 		}
 		subject += " in the mail room";
-		String body = "Hello " + recipient.getFirstName() + ",\n\nYour packages include: ";
+		
+		String body = "Please retrieve your packages as soon as possible.\n\n";
 		
 		for (int i=0; i<packages.size(); i++) {
 			Package pkg = packages.get(i);
-			body += "\n\tPackage " + (i+1) + "(ID: " + pkg.getPackageID() + ")" + ":";
-			body += "\n\t\tChecked in on " + pkg.getCheckInDate().toString();
-			if(pkg.getComment() != "") {
-				body += "\n\t\tComment: " + pkg.getComment();
+			body += "Package " + (i+1) + " (ID: " + pkg.getPackageID() + ")" + ":";
+			body += "\n\tChecked in on " + pkg.getCheckInDate().toString();
+			if(!pkg.getComment().isEmpty()) {
+				body += "\n\tComment: " + pkg.getComment() + "\n\n";
 			}
 		}
-		body += "\n\nPlease retrieve your packages as soon as possible.\n\n" + 
-				"Jones Mail Room";
+		body += "Jones Mail Room";
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 	}
 	
