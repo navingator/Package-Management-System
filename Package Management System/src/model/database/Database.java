@@ -66,7 +66,7 @@ public class Database {
 		// check if package already exists
 		long pkgID = pkg.getPackageID();
 		if(dbMaps.getPackage(pkgID) != null) {
-			System.out.println("Package ID: " + pkgID + " was already checked in.");
+			logger.warning("Package ID: " + pkgID + " was already checked in.");
 			return;
 		}
 		// modify current DBMaps
@@ -208,7 +208,9 @@ public class Database {
 		//Check if person is already in the system
 		String personID = person.getPersonID();
 		if(dbMaps.getPerson(personID) != null) {
-			System.out.println("Person (ID: " + personID + ") to be added by database already exists.");
+			logger.warning("Person (ID: " + personID + ") to be added by database already exists.");
+			viewAdaptor.displayWarning(person.getFullName() + " (ID: " + personID + 
+					") is already in the system and cannot be added again", null);
 			return;
 		} 
 		
@@ -240,7 +242,7 @@ public class Database {
 	public void editPerson(Person newPerson) {
 		String personID = newPerson.getPersonID();
 		if(dbMaps.getPerson(personID) == null) {
-			System.out.println("Person (ID: " + personID + ") to be edited by database not found.");
+			logger.warning("Person (ID: " + personID + ") to be edited by database not found.");
 			return;
 		}
 		
