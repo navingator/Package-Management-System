@@ -262,11 +262,12 @@ public class Emailer {
 		
 		for (int i=0; i<packages.size(); i++) {
 			Package pkg = packages.get(i);
-			body += "Package " + (i+1) + " (ID: " + pkg.getPackageID() + ")" + ":";
-			body += "\n\tChecked in on " + pkg.getCheckInDate().toString();
+			body += "Package " + (i+1) + " (ID: " + pkg.getPackageID() + ")" + ":\n";
+			body += "\tChecked in on " + pkg.getCheckInDate().toString() + "\n";
 			if(!pkg.getComment().isEmpty()) {
-				body += "\n\tComment: " + pkg.getComment() + "\n\n";
+				body += "\tComment: " + pkg.getComment() + "\n";
 			}
+			body += "\n";
 		}
 		body += "Jones Mail Room";
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
@@ -351,38 +352,38 @@ public class Emailer {
 		return result;
 	}
 	
-	public static void main(String[] args) {
-		Emailer emailer = new Emailer(null);
-		
-		emailer.senderAddress = "JonesCollegeMailRoom@gmail.com";
-		emailer.senderPassword = "jonesmailroomisbadass";
-		emailer.senderAlias = "Jones Mail Room";
-		
-		Person navin = new Person("Pathak", "Navin", "np8@rice.edu","np8");
-		Person nathan = new Person("Patrick", "Nathan", "Navin.Pathak@rice.edu","nathan");
-		Person gavin = new Person("Pathak", "Gavin", "Pathak@rice.edu", "gavin");
-		//Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
-		//Person michelle = new Person("Bennack", "Michelle", "mrb4@rice.edu");
-		//Person ambi = new Person("Bobmanuel","Ambila","ajb6@rice.edu");
-		
-		Date now = new Date();
-		Package p1 = new Package(123+now.getTime(),"",now);
-		Package p2 = new Package(234+now.getTime(),"It's huge. Get it out now.",new Date(now.getTime()-100000000));
-		Package p3 = new Package(309435+now.getTime(),"",new Date(now.getTime()-200000000));
-		Package p4 = new Package(1+now.getTime(),"",new Date(now.getTime()-300000000));
-		Package p5 = new Package(2+now.getTime(),"",new Date(now.getTime()-400000000));
-		
-		ArrayList<Pair<Person,Package>> entries = new ArrayList<Pair<Person,Package>>();
-		entries.add(new Pair<Person,Package>(navin,p1));
-		entries.add(new Pair<Person,Package>(navin,p2));
-		entries.add(new Pair<Person,Package>(nathan,p3));
-		entries.add(new Pair<Person,Package>(nathan,p4));
-		entries.add(new Pair<Person,Package>(gavin,p5));
-		
-		emailer.sendPackageNotification(navin,p2);
-		emailer.sendPackageNotification(navin,p1);
-		
-		emailer.sendAllReminders(entries);
-	}
+//	public static void main(String[] args) {
+//		Emailer emailer = new Emailer(null);
+//		
+//		emailer.senderAddress = "JonesCollegeMailRoom@gmail.com";
+//		emailer.senderPassword = "jonesmailroomisbadass";
+//		emailer.senderAlias = "Jones Mail Room";
+//		
+//		Person navin = new Person("Pathak", "Navin", "np8@rice.edu","np8");
+//		Person nathan = new Person("Patrick", "Nathan", "Navin.Pathak@rice.edu","nathan");
+//		Person gavin = new Person("Pathak", "Gavin", "Pathak@rice.edu", "gavin");
+//		//Person chris = new Person("Henderson", "Chris", "cwh1@rice.edu");
+//		//Person michelle = new Person("Bennack", "Michelle", "mrb4@rice.edu");
+//		//Person ambi = new Person("Bobmanuel","Ambila","ajb6@rice.edu");
+//		
+//		Date now = new Date();
+//		Package p1 = new Package(123+now.getTime(),"",now);
+//		Package p2 = new Package(234+now.getTime(),"It's huge. Get it out now.",new Date(now.getTime()-100000000));
+//		Package p3 = new Package(309435+now.getTime(),"",new Date(now.getTime()-200000000));
+//		Package p4 = new Package(1+now.getTime(),"",new Date(now.getTime()-300000000));
+//		Package p5 = new Package(2+now.getTime(),"",new Date(now.getTime()-400000000));
+//		
+//		ArrayList<Pair<Person,Package>> entries = new ArrayList<Pair<Person,Package>>();
+//		entries.add(new Pair<Person,Package>(navin,p1));
+//		entries.add(new Pair<Person,Package>(navin,p2));
+//		entries.add(new Pair<Person,Package>(nathan,p3));
+//		entries.add(new Pair<Person,Package>(nathan,p4));
+//		entries.add(new Pair<Person,Package>(gavin,p5));
+//		
+//		emailer.sendPackageNotification(navin,p2);
+//		emailer.sendPackageNotification(navin,p1);
+//		
+//		emailer.sendAllReminders(entries);
+//	}
 
 }
