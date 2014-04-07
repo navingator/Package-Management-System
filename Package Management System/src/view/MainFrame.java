@@ -43,25 +43,25 @@ public class MainFrame extends JFrame {
 		setSize(800, 450);
 		setLocationRelativeTo(null);
 		
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-		
-		JMenu mnAdmin = new JMenu("File");
-		mnAdmin.setMnemonic('f');
-		menuBar.add(mnAdmin);
-		
-		JMenuItem mntmClose = new JMenuItem("Close");
-		mnAdmin.add(mntmClose);
-		
-		JMenu mnHelp = new JMenu("Help");
-		mnHelp.setMnemonic('h');
-		menuBar.add(mnHelp);
-		
-		JMenuItem mntmHelpFiles = new JMenuItem("Help Files");
-		mnHelp.add(mntmHelpFiles);
-		
-		JMenuItem mntmAbout = new JMenuItem("About");
-		mnHelp.add(mntmAbout);
+//		JMenuBar menuBar = new JMenuBar();
+//		setJMenuBar(menuBar);
+//		
+//		JMenu mnAdmin = new JMenu("File");
+//		mnAdmin.setMnemonic('f');
+//		menuBar.add(mnAdmin);
+//		
+//		JMenuItem mntmClose = new JMenuItem("Close");
+//		mnAdmin.add(mntmClose);
+//		
+//		JMenu mnHelp = new JMenu("Help");
+//		mnHelp.setMnemonic('h');
+//		menuBar.add(mnHelp);
+//		
+//		JMenuItem mntmHelpFiles = new JMenuItem("Help Files");
+//		mnHelp.add(mntmHelpFiles);
+//		
+//		JMenuItem mntmAbout = new JMenuItem("About");
+//		mnHelp.add(mntmAbout);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
