@@ -2,6 +2,9 @@ package view.panel;
 
 import java.awt.Font;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 public class PanelPickUp extends JPanel {
 
@@ -122,8 +126,15 @@ public class PanelPickUp extends JPanel {
 					owner.getFullName(),owner.getPersonID());
 			
 			if(confirmPickUpDlg.showDialog()) {
-				modelAdaptor.checkOutPackage(pkgID);
-				//TODO Sound clip?
+				if (modelAdaptor.checkOutPackage(pkgID)) {
+					JOptionPane.showMessageDialog(frame, "The package was successfully checked out.",
+							"Success", JOptionPane.DEFAULT_OPTION);
+					if(owner.getPersonID() == "sg35" ||
+							owner.getPersonID() == "bct2" ||
+							owner.getPersonID() == "mjt5") {
+						thankYouComeAgain();
+					}
+				}
 			} else {
 				JOptionPane.showMessageDialog(frame, "The package was not checked out.",
 						"Not Checked Out", JOptionPane.DEFAULT_OPTION);
@@ -135,6 +146,25 @@ public class PanelPickUp extends JPanel {
 			textFieldPkgInput.setText("");
 			textFieldPkgInput.requestFocus();
 		}
+	}
+
+	private synchronized void thankYouComeAgain() {
+		System.out.println("made it!");
+		new Thread(new Runnable() {
+			  // The wrapper thread is unnecessary, unless it blocks on the
+			  // Clip finishing; see comments.
+			    public void run() {
+			      try {
+			        Clip clip = AudioSystem.getClip();
+			        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+			          new File("audio/thank_you_come_again.mp3"));
+			        clip.open(inputStream);
+			        clip.start(); 
+			      } catch (Exception e) {
+			        System.err.println(e.getMessage());
+			      }
+			    }
+		  }).start();
 	}
 
 }
