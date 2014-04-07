@@ -5,9 +5,6 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import view.dialog.ChangeEmail;
@@ -42,7 +39,6 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(800, 450);
 		setLocationRelativeTo(null);
-		
 		
 		//TODO Menu Bar
 //		JMenuBar menuBar = new JMenuBar();
