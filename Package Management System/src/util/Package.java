@@ -17,6 +17,7 @@ public class Package {
 		this.packageID = packageID;
 		this.comment = comment;
 		this.checkInDate = checkInDate;
+		this.notificationSent = false;
 	}
 	
 	

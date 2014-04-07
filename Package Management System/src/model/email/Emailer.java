@@ -164,6 +164,7 @@ public class Emailer {
 			return false;
 		}
 		
+		pkg.setNotificationSent(true);
 		return true;
 	}
 	
