@@ -78,6 +78,8 @@ public class PanelPickUp extends JPanel {
 		textFieldPkgInput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				confirmAndCheckOut();
+				textFieldPkgInput.setText("");
+				textFieldPkgInput.requestFocus();
 			}
 		});
 		textFieldPkgInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -89,6 +91,8 @@ public class PanelPickUp extends JPanel {
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				confirmAndCheckOut();
+				textFieldPkgInput.setText("");
+				textFieldPkgInput.requestFocus();
 			}
 		});
 		add(btnSubmit, "3, 10, center, default");
@@ -137,8 +141,6 @@ public class PanelPickUp extends JPanel {
 			JOptionPane.showMessageDialog(frame, "The package was not checked out.",
 					"Not Checked Out", JOptionPane.DEFAULT_OPTION);
 		}
-		textFieldPkgInput.setText("");
-		textFieldPkgInput.requestFocus();
 	}
 
 //	private synchronized void thankYouComeAgain() {
