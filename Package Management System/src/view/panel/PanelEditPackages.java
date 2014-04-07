@@ -255,7 +255,7 @@ public class PanelEditPackages extends JPanel {
         RowFilter<DefaultTableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0,1,2);
+            rf = RowFilter.regexFilter("(?i)" + filterText.getText());
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
