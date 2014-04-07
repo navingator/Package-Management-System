@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -250,13 +251,61 @@ public class PanelStudentInformation extends JPanel {
 		AddPerson addDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.ADD_PERSON);
 		String[] result = addDlg.showDialog();
 		if(result != null) {
-			modelAdaptor.addPerson(result[2], result[1], result[0], result[3]);
+			String lastName = result[0];
+			String firstName = result[1];
+			String netID = result[2];
+			String emailAddress = result[3];
+			if (modelAdaptor.addPerson(netID, firstName, lastName, emailAddress)) {
+				JOptionPane.showMessageDialog(frame, 
+						firstName + " " + lastName + " (" + netID + ") "
+								+ "was successfully added.", 
+								null, JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(frame, 
+						firstName + " " + lastName + " (" + netID + ") "
+								+ "is already in the system and cannot be added again. \n"
+								+ "Please delete the old entry before adding a new student.", 
+								null, JOptionPane.WARNING_MESSAGE);
+			}
 		}
+		
+		generateTable();
 	}
 	
-	private void editStudent(){
-		AddPerson editDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.ADD_PERSON);
-		String[] result = editDlg.showDialog();
-		modelAdaptor.editPerson(result[2], result[1], result[0], result[3]);
-	}
+	
+	//TODO Implement with table selection
+//	private void editStudent() {
+//		AddPerson editDlg = new AddPerson(frame,null,null,null,null,AddPerson.Predicate.EDIT_PERSON);
+//		String[] result = editDlg.showDialog();
+//		if(result != null) {
+//			String lastName = result[0];
+//			String firstName = result[1];
+//			String netID = result[2];
+//			String emailAddress = result[3];
+//			if (modelAdaptor.editPerson(netID, firstName, lastName, emailAddress)) {
+//				JOptionPane.showMessageDialog(frame, 
+//						firstName + " " + lastName + " (" + netID + ") "
+//								+ "was successfully edited.", 
+//								null, JOptionPane.INFORMATION_MESSAGE);
+//			} else {
+//				JOptionPane.showMessageDialog(frame, 
+//						firstName + " " + lastName + " (" + netID + ") "
+//								+ "was not found. \n", 
+//								null, JOptionPane.WARNING_MESSAGE);
+//			}
+//		}
+//		
+//		generateTable();
+//	}
+//	
+//	private void deleteStudent() {
+//		
+//		String message = "Are you sure you want to delete " + 
+//		if(JOptionPane.showConfirmDialog(frame, message, "Delete Student", 
+//				JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+//			
+//		}
+//		
+//		generateTable();
+//	}
 }

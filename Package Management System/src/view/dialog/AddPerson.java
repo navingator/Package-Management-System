@@ -47,6 +47,7 @@ public class AddPerson extends JDialog {
 			String netID, String oldEmail, Predicate pred) {
 		super(frame,true);
 		setSize(500, 300);
+		setLocationRelativeTo(frame);
 		
 		getContentPane().setLayout(new BorderLayout());
 		
