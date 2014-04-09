@@ -103,6 +103,25 @@ public class Database {
 		
 		return true;
 	}
+	
+	/**
+	 * Edits a package in the database, editing the DBMaps and
+	 * writing the changes to the owner's file
+	 * @param newPerson			Package object containing new attributes for the package
+	 * @return					Success of editing the package
+	 */
+	public boolean editPackage(Package pkg) {
+		long pkgID = pkg.getPackageID();
+		if(dbMaps.getPackage(pkgID) == null) {
+			logger.warning("Package (ID: " + pkgID + ") to be edited by database not found.");
+			return false;
+		}
+		
+		// edit person in database maps and write to file
+		dbMaps.editPackage(pkg);
+		writePersonFile(dbMaps.getOwnerID(pkgID), currentDirPath);
+		return true;
+	}
 
 	/**
 	 * Returns a list of filtered and sorted packages, 
