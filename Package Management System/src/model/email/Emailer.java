@@ -197,8 +197,6 @@ public class Emailer {
 			logger.warning(e.getMessage());
 			return false;
 		}
-		
-		pkg.setNotificationSent(true);
 		return true;
 	}
 	
