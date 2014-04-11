@@ -357,6 +357,7 @@ public class Emailer {
 		return result;
 	}
 	
+// Questionable comment section
 //	public static void main(String[] args) {
 //		Emailer emailer = new Emailer(null);
 //		
