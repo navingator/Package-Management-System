@@ -40,6 +40,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 /**
  * Dialog that allows the user to change the email template.
@@ -53,6 +54,7 @@ public class EditTemplate extends JDialog {
 	private final JPanel panelEditEmail = new JPanel();
 	private String newTemplate = null;
 
+	private JSplitPane splitPane;
 
 	/**
 	 * Create the dialog with specified previous Alias and email parameters
@@ -60,7 +62,7 @@ public class EditTemplate extends JDialog {
 	public EditTemplate(JFrame frame, String oldTemplate) {
 		super(frame,true);
 		setTitle("Edit Email Template");
-		setSize(900, 450);
+		setSize(1000, 450);
 		setLocationRelativeTo(frame);
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
@@ -77,16 +79,37 @@ public class EditTemplate extends JDialog {
 
 		
 		// Warning label
-		JLabel lblNote = new JLabel("<html>\r\n<center>\r\nEdit the email templates below.<br>\r\nRecall that HTML may be used. Some basic HTML tags are:<br>\r\n&lt;b&gt;bold&lt;/b&gt; for <b>bold</b> <br>\r\n&lt;u&gt;underline&lt;/u&gt; for <u>underline</u> <br>\r\n&lt;em&gt;emphasis&lt;/em&gt; for <em>emphasis</em> <br>\r\n</center>\r\n</html>");
+		JLabel lblNote = new JLabel("Edit the Email templates below.  Reminders for the format are in the box to the right.");
 		panelEditEmail.add(lblNote, "2, 2, center, default");
 		
+		this.splitPane = new JSplitPane();
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setResizeWeight(1.0);
+		panelEditEmail.add(splitPane, "2, 4, fill, fill");
+		
 		JScrollPane scrollPane = new JScrollPane();
+		splitPane.setLeftComponent(scrollPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		panelEditEmail.add(scrollPane, "2, 4, fill, fill");
 		
 		final JTextArea textArea = new JTextArea();
 		scrollPane.setViewportView(textArea);
 		textArea.setText(oldTemplate);
+		
+		textArea.setPreferredSize(null);
+		
+		JPanel panel = new JPanel();
+		splitPane.setRightComponent(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		panel.add(scrollPane_1);
+		
+		JEditorPane lblNewLabel = new JEditorPane();
+		lblNewLabel.setContentType("text/html");
+		lblNewLabel.setText("<html> \r\n<h3>HTML</h3>\r\n<p>\r\nSome basic HTML tags are:<br>\r\n&lt;b&gt;bold&lt;/b&gt; for <b>bold</b> <br>\r\n&lt;u&gt;underline&lt;/u&gt; for <u>underline</u> <br>\r\n&lt;em&gt;emphasis&lt;/em&gt; for <em>emphasis</em>\r\n</p>\r\n<br>\r\n<h3>Comments</h3>\r\n<p>\r\nComments can be used to write\r\ncomments about the templates.\r\nThese are not included in the email.<br>\r\nComments begin with <b>/*</b><br>\r\nComments end with <b>*/</b><br>\r\n</p>\r\n\r\n</html>");
+		lblNewLabel.setEditable(false);
+		scrollPane_1.setViewportView(lblNewLabel);
 	
 		
 		// Submit changes
@@ -115,7 +138,7 @@ public class EditTemplate extends JDialog {
 	public String showDialog() {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
-		
+		splitPane.setDividerLocation(0.8);
 		return newTemplate;
 	}
 }
