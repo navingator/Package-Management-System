@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 public class FileIO {
 	
+	private static String progRootDir;
+	
+	/* Getters and Setters for our root directory */
+	public static String getRootDir() { return progRootDir; }
+	public static void   setRootDir(String newRootDir) { progRootDir = newRootDir; }
+	
 	/*
 	 * Wrappers for the java.io package functions
 	 */

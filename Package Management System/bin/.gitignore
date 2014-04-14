@@ -1,4 +1,3 @@
-/controller
-/model
 /util
-/view
+/model
+/controller

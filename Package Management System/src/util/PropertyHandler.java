@@ -10,8 +10,8 @@ import java.util.Properties;
 /**
  * PropertyHandler class for the project management utility.
  * This class contains a properties object that holds settings 
- * for different functions. Note that a minimal level of security
- * is provided for this system.
+ * for different functions. NOTE THAT ALL VALUES ARE STORED IN
+ * PLAINTEXT - PASSWORDS ARE NOT SECURE.
  * @author Navin
  *
  */
@@ -88,6 +88,7 @@ public class PropertyHandler {
 		
 	}
 	
+/*
 	public static void main(String[] args) {
 		PropertyHandler ph = PropertyHandler.getInstance();
 		ph.init("testFiles");
@@ -98,7 +99,7 @@ public class PropertyHandler {
 		System.out.println(ph.getProperty("test_netID"));
 		System.out.println(ph.getProperty("test_netID","np8"));
 	}
-	
+*/
 	
 //	/*
 //	 * Global

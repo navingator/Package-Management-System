@@ -42,6 +42,11 @@ public class Emailer {
 	private Session session;
 	private Transport transport;
 	
+	private String reminderSubject;
+	private String reminderBody;
+	private String notificationSubject;
+	private String notificationBody;
+	
 	private Logger logger;
 	private IModelToViewAdaptor viewAdaptor;
 	
@@ -97,6 +102,10 @@ public class Emailer {
 		
 		attemptConnection();
 		
+	}
+	
+	public void setTemplates() {
+		//propHandler.
 	}
 	
 	/**
@@ -390,6 +399,7 @@ public class Emailer {
 //		emailer.sendPackageNotification(navin,p1);
 //		
 //		emailer.sendAllReminders(entries);
+// /
 //	}
 
 }

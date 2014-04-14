@@ -191,6 +191,8 @@ public class Controller{
 		// set and create root directory, if it doesn't exist
 		String home = System.getProperty("user.home");
 		this.progDirName = home + "/Documents/Package Management System";
+		
+		FileIO.setRootDir(progDirName);
 		FileIO.makeDirs(progDirName);
 		
 		// Start helper classes
