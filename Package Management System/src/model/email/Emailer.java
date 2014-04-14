@@ -8,6 +8,7 @@ import java.util.Properties;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.imageio.stream.FileImageOutputStream;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,6 +19,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import model.IModelToViewAdaptor;
+import util.FileIO;
 import util.Package;
 import util.Pair;
 import util.Person;
@@ -57,6 +59,9 @@ public class Emailer {
 		
 		this.viewAdaptor = viewAdaptor;
 		
+		// Give view adaptor to the email template reader
+		TemplateReader.setViewAdaptor(viewAdaptor);
+		
         this.host = "smtp.gmail.com";
 
 	}
@@ -75,6 +80,9 @@ public class Emailer {
 					"Email Not Loaded");			
 			changeEmail();
 		}
+		
+		// Load email templates from template file
+		TemplateReader.getTemplates(FileIO.getRootDir());
 		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();
