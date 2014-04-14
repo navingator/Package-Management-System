@@ -1,6 +1,7 @@
 package view.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -44,7 +45,7 @@ public class ChangeEmail extends JDialog {
 	public ChangeEmail(JFrame frame, String oldName, String oldEmail) {
 		super(frame,true);
 		setTitle("Change Email");
-		setSize(400, 200);
+		setSize(800, 200);
 		setLocationRelativeTo(frame);
 		
 		getContentPane().setLayout(new BorderLayout());
@@ -67,8 +68,13 @@ public class ChangeEmail extends JDialog {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
+		// Warning label
+		JLabel lblNote = new JLabel("NOTE: The email address should be specifically created for this purpose. " + 
+				"DO NOT use a personal/business address.");
+		panelEditEmail.add(lblNote, "6, 2");
+		
 		// New Name Alias field
-		JLabel lblChangeEmailName = new JLabel("Name");
+		JLabel lblChangeEmailName = new JLabel("Alias");
 		panelEditEmail.add(lblChangeEmailName, "4, 3");
 		
 		textFieldNewEmailName = new JTextField();
@@ -93,7 +99,7 @@ public class ChangeEmail extends JDialog {
 		panelEditEmail.add(lblNewEmail, "4, 4");
 		
 		textFieldNewEmail = new JTextField();
-		textFieldNewEmail.setToolTipText("The email that will be sending all notifications and reminders");
+		textFieldNewEmail.setToolTipText("The email address from which all notifications and reminders will be sent");
 		textFieldNewEmail.setColumns(10);
 		textFieldNewEmail.setText(oldEmail);
 		textFieldNewEmail.addFocusListener(new FocusAdapter() {
@@ -113,7 +119,7 @@ public class ChangeEmail extends JDialog {
 		panelEditEmail.add(lblNewPassword, "4, 5");
 		
 		passwordNew = new JPasswordField();
-		passwordNew.setToolTipText("The password to the Gmail account");
+		passwordNew.setToolTipText("The password for the email address account");
 		panelEditEmail.add(passwordNew, "6, 5, fill, default");
 		
 		
