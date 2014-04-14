@@ -192,7 +192,7 @@ public class Controller{
 		String home = System.getProperty("user.home");
 		this.progDirName = home + "/Documents/Package Management System";
 		
-		FileIO.setRootDir(progDirName);
+		FileIO.init(progDirName);
 		FileIO.makeDirs(progDirName);
 		
 		// Start helper classes

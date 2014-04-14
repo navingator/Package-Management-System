@@ -22,6 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.FlowLayout;
+import javax.swing.BoxLayout;
 
 /**
  * Dialog that allows the user to change an email.
@@ -45,37 +47,37 @@ public class ChangeEmail extends JDialog {
 	public ChangeEmail(JFrame frame, String oldName, String oldEmail) {
 		super(frame,true);
 		setTitle("Change Email");
-		setSize(800, 200);
+		setSize(550, 250);
 		setLocationRelativeTo(frame);
-		
-		getContentPane().setLayout(new BorderLayout());
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),
+				ColumnSpec.decode("pref:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
 				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(125dlu;default)"),
+				ColumnSpec.decode("max(90dlu;default)"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
+				FormFactory.DEFAULT_COLSPEC,
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("pref:grow"),},
 			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
-				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.PREF_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
 		// Warning label
-		JLabel lblNote = new JLabel("NOTE: The email address should be specifically created for this purpose. " + 
-				"DO NOT use a personal/business address.");
-		panelEditEmail.add(lblNote, "6, 2");
+		JLabel lblNote = new JLabel("<html><center>This email address should be specifically created for this purpose.<br><b>DO NOT use a personal/business address.</b></center></html>");
+		panelEditEmail.add(lblNote, "4, 2, 5, 1, center, default");
 		
 		// New Name Alias field
 		JLabel lblChangeEmailName = new JLabel("Alias");
-		panelEditEmail.add(lblChangeEmailName, "4, 3");
+		panelEditEmail.add(lblChangeEmailName, "4, 4, left, default");
 		
 		textFieldNewEmailName = new JTextField();
 		textFieldNewEmailName.setToolTipText(
@@ -92,11 +94,11 @@ public class ChangeEmail extends JDialog {
 	   	    	});
 			}
 		});
-		panelEditEmail.add(textFieldNewEmailName, "6, 3, fill, default");
+		panelEditEmail.add(textFieldNewEmailName, "6, 4, fill, default");
 
 		// New Email Address field
 		JLabel lblNewEmail = new JLabel("Email");
-		panelEditEmail.add(lblNewEmail, "4, 4");
+		panelEditEmail.add(lblNewEmail, "4, 5, left, default");
 		
 		textFieldNewEmail = new JTextField();
 		textFieldNewEmail.setToolTipText("The email address from which all notifications and reminders will be sent");
@@ -112,15 +114,15 @@ public class ChangeEmail extends JDialog {
 	   	    	});
 			}
 		});
-		panelEditEmail.add(textFieldNewEmail, "6, 4, fill, default");
+		panelEditEmail.add(textFieldNewEmail, "6, 5, fill, default");
 		
 		// New Password Field
 		JLabel lblNewPassword = new JLabel("Password");
-		panelEditEmail.add(lblNewPassword, "4, 5");
+		panelEditEmail.add(lblNewPassword, "4, 6, left, default");
 		
 		passwordNew = new JPasswordField();
 		passwordNew.setToolTipText("The password for the email address account");
-		panelEditEmail.add(passwordNew, "6, 5, fill, default");
+		panelEditEmail.add(passwordNew, "6, 6, fill, default");
 		
 		
 		// Submit changes
@@ -150,8 +152,9 @@ public class ChangeEmail extends JDialog {
 				}
 			}
 		});
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		panelEditEmail.add(btnSubmitEmailChanges, "6, 6, center, default");
+		panelEditEmail.add(btnSubmitEmailChanges, "6, 8, center, default");
 		getContentPane().add(panelEditEmail);
 	}
 	
