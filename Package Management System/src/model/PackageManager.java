@@ -6,6 +6,7 @@ import java.util.Date;
 
 import model.database.Database;
 import model.email.Emailer;
+import model.email.TemplateHandler;
 import model.print.LabelPrinter;
 import util.Package;
 import util.Pair;
@@ -80,6 +81,14 @@ public class PackageManager {
 
 	public String getEmailAlias() {
 		return mailer.getSenderAlias();
+	}
+	
+	public String getRawEmailTemplate() {
+		return TemplateHandler.getRawFile();
+	}
+	
+	public void changeEmailTemplate(String newTemplate) {
+		TemplateHandler.writeRawFile(newTemplate);
 	}
 	
 	/*

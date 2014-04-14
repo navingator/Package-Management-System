@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import view.IViewToModelAdaptor;
 import view.MainFrame;
 import view.dialog.ChangeEmail;
+import view.dialog.EditTemplate;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -37,12 +38,14 @@ public class PanelEditEmailPrinter extends JPanel{
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
-		JButton btnChangeEmail = new JButton("Change Email");
+		JButton btnChangeEmail = new JButton("Change Email Account");
 		btnChangeEmail.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+							
 				// open the change email dialog
 				String oldEmail = modelAdaptor.getEmailAddress();
 				String oldAlias = modelAdaptor.getEmailAlias();
@@ -54,10 +57,30 @@ public class PanelEditEmailPrinter extends JPanel{
 				if(newEmail != null) {
 					modelAdaptor.changeEmail(newEmail[0], newEmail[1], newEmail[2]);
 				}
+				
 			}
 		});
 		add(btnChangeEmail, "4, 4, default, fill");
 		
+		JButton btnChangeEmailTemplate = new JButton("Change Email Template");
+		btnChangeEmailTemplate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+		
+				// open the change email dialog
+				String oldTemplate = modelAdaptor.getRawEmailTemplate();
+				
+				EditTemplate emailDlg = new EditTemplate(frame, oldTemplate);
+				String newTemplate = emailDlg.showDialog();
+				
+				// make the changes in the model
+				if (newTemplate != null) {
+					modelAdaptor.changeEmailTemplate(newTemplate);
+				}
+				
+			}
+		});
+		add(btnChangeEmailTemplate, "4, 6, default, fill");	
+			
 		JButton btnSelectPrinter = new JButton("Select Printer");
 		btnSelectPrinter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -65,6 +88,6 @@ public class PanelEditEmailPrinter extends JPanel{
 				modelAdaptor.setPrinter(printerName);
 			}
 		});
-		add(btnSelectPrinter, "4, 6, default, fill");
+		add(btnSelectPrinter, "4, 8, default, fill");	
 	}
 }

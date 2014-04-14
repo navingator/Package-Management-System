@@ -58,7 +58,7 @@ public class Emailer {
 		this.viewAdaptor = viewAdaptor;
 		
 		// Give view adaptor to the email template reader
-		TemplateReader.setViewAdaptor(viewAdaptor);
+		TemplateHandler.setViewAdaptor(viewAdaptor);
 		
         this.host = "smtp.gmail.com";
 
@@ -80,7 +80,7 @@ public class Emailer {
 		}
 		
 		// Load email templates from template file
-		templates = TemplateReader.getTemplates(FileIO.getRootDir());
+		templates = TemplateHandler.getTemplates();
 		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();

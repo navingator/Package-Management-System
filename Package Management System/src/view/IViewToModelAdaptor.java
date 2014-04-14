@@ -1,6 +1,7 @@
 package view;
 
 import java.util.ArrayList;
+
 import util.Package;
 import util.Pair;
 import util.Person;
@@ -138,6 +139,12 @@ public interface IViewToModelAdaptor {
 	public String getEmailAlias();
 	
 	/**
+	 * Returns email template
+	 * @return                  String containing email template
+	 */
+	public String getRawEmailTemplate();
+	
+	/**
 	 * Returns all of the packages with the appropriate filters applied
 	 * 
 	 * @param filter			String containing filtering information
@@ -184,4 +191,11 @@ public interface IViewToModelAdaptor {
 	 * @return 
 	 */
 	public boolean deletePerson(String personID);
+
+	/**
+	 * Changes the Email template file
+	 * 
+	 * @param newTemplate
+	 */
+	public void changeEmailTemplate(String newTemplate);
 }

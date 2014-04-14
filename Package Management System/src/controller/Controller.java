@@ -141,6 +141,15 @@ public class Controller{
 			public boolean deletePerson(String personID) {
 				return modelPM.deletePerson(personID);
 			}
+
+			@Override
+			public String getRawEmailTemplate() {
+				return modelPM.getRawEmailTemplate();
+			}
+			
+			public void changeEmailTemplate(String newTemplate) {
+				modelPM.changeEmailTemplate(newTemplate);
+			}
 			
 		});
 		
