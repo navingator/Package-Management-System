@@ -22,7 +22,7 @@ public class TemplateReader {
 	public static void setViewAdaptor (IModelToViewAdaptor _viewAdaptor) { viewAdaptor = _viewAdaptor; }
 	
 	public static HashMap<String,String> getTemplates(String RootDir) {
-		String filePath = RootDir + "/template.txt";
+		String filePath = RootDir + "/email-template.txt";
 		HashMap<String,String> result = new HashMap<String,String>();
 			
 		try {

@@ -1,0 +1,87 @@
+/* --General Information 
+ * 
+ *
+ *
+ *
+ *
+ * --Varibles
+ * The following variables may be used in the email subject or body.  Note that
+ * all variables begin with the dollar symbol ($), which is known as the variable delimiter.
+ * When the email is sent, these variables will be replaced with the relevant information.
+ *
+ * $COMMENT  - The comment entered when the package was checked in
+ * $PKGTIME  - Time at which the package was checked in
+ * $PKGID    - Package's package ID
+ * $FNAME    - Recipient's first name
+ * $LNAME    - Recipient's last name
+ * $NETID    - Recipient's net id
+ * $NUMPKGS  - Number of packages currently checked in
+ * $ALIAS    - The alias (name) of the sender.
+ *
+ * In order to use the dollar symbol in the e-mail without having it act as a variable delimiter,
+ * enter a backslash (\) immediately before the dollar symbol.  This is called 'escaping' the character.
+ * For example, consider you want the following to appear as-is in the email:
+ *		Makin' Ca$h Money!
+ * If we write this in the template, the program will think we want to reference a 
+ * variable named "$h" (and will likely complain that it can't find it).  Therefore,
+ * we must escape the dollar symbol with a backslash, as below:
+ *		Makin' Ca\$h Money!
+ * Note that you only need to escape the dollar symbol in the templates below; You do not need
+ * to escape them when writing comments when the package is checked in.
+ *
+ *
+ * --HTML
+ * Emails support a limited form of HTML, which will be rendered by the E-mail client (Outlook, Thunderbird, Gmail, etc.)
+ * when the email is recieved.  HTML is a language used to construct web pages, and therefore you can make
+ * your email look a lot like a web page if you want to do so.  HTML is a large and somewhat complicated language, so we'll 
+ * only talk about the most basic parts here.  You do not need to use it at all if you don't want to; simply writing plain text 
+ * below will work fine. 
+ *
+ * You can make a portion of the text bold, emphasized, or underlined by surrounding it with the <b></b>, <em></em>, or <u></u> 
+ * tags, respectively.  For example, if we want to have the "as soon as possible" portion bolded in the text below:
+ * 		Please pick up your packages as soon as possible!
+ * We would write:
+ * 		Please pick up your packages <b>as soon as possible</b>!
+ *
+ * We can combine and nest these tags however we like, for example:
+ * 		<em>Please</em> <b><u>pick up</u></b> your packages <b>as soon as possible</b>!
+ * Which would have "Please" emphasized, "pick up" in bold and underlined, and "as soon as possible" in bold.
+ *
+ * HTML can do a lot of other cool stuff, but there is way too much to cover here.  If you're interested in learning more,
+ * a good place to start is http://www.w3schools.com/html/html_intro.asp
+ *
+ * Note that, unlike standard HTML, line breaks below will appear in the email (this is done by replacing all newlines with
+ * <br> tags).  This is to make what you see below closer to what the Email will look like.  To turn this feature off, 
+ * replace the 'TRUE' under "AUTO-LINEBREAK:" with 'FALSE'.  Unless you understand the consequences of doing so, you probably
+ * do not want to change this option.
+ */
+
+AUTO-LINEBREAK:
+TRUE
+
+SENDER-ALIAS:
+Jones College Mail Room
+
+NOTIFICATION-SUBJECT:
+[JONES-MAIL] Package Notification - "$COMMENT"
+
+NOTIFICATION-BODY:
+Hello <b>$FNAME</b>,
+
+A package ($PKGID) has been checked into the mailroom for you today at $PKGTIME.
+Please pick it up at your earliest convenience.
+
+Thanks,
+<em>$ALIAS</em>
+
+REMINDER-SUBJECT:
+[JONES-MAIL] Package Reminder - You have $NUMPKGS package(s) in the mail room.
+
+REMINDER-BODY:
+Hello <b>$FNAME</b>,
+
+This is a reminder to let you know that you <em>still</em> haven't picked up your <b>$NUMPKGS</b> package(s) that are clogging up our mail room.
+Please, please, <u>please</u> pick them up as soon as you are able.
+
+Thanks,
+<em>$ALIAS</em>
