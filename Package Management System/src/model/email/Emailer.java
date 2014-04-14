@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -44,10 +45,7 @@ public class Emailer {
 	private Session session;
 	private Transport transport;
 	
-	private String reminderSubject;
-	private String reminderBody;
-	private String notificationSubject;
-	private String notificationBody;
+	private HashMap<String,String> templates;
 	
 	private Logger logger;
 	private IModelToViewAdaptor viewAdaptor;
@@ -82,7 +80,7 @@ public class Emailer {
 		}
 		
 		// Load email templates from template file
-		TemplateReader.getTemplates(FileIO.getRootDir());
+		templates = TemplateReader.getTemplates(FileIO.getRootDir());
 		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();
@@ -193,6 +191,8 @@ public class Emailer {
 		String subject = "[Package Notification] " + comment;
 		String body = new String();
 		
+		//body = templates.get("NOTIFICATION-BODY") + "\n";
+		
 		body += recipient.getFullName() + ", You have a new package in the mail room.\n\n";
 		
 		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
@@ -248,12 +248,18 @@ public class Emailer {
 		
         MimeMessage message = new MimeMessage(session);
         
+        message.addHeader("Content-Type", "text/html; charset=utf-8");
+        
         message.setFrom(new InternetAddress(senderAddress, senderAlias));
         message.addRecipient(Message.RecipientType.TO, 
         		new InternetAddress(recipientEmail, recipientAlias));
         
         message.setSubject(subject);
-        message.setText(body);
+        //message.setText(body);
+        
+        message.setContent(body, "text/html");
+        
+        message.saveChanges();
         transport.sendMessage(message, message.getAllRecipients());
 	}
 

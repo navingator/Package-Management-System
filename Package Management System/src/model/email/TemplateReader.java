@@ -17,7 +17,7 @@ public class TemplateReader {
 
 	static IModelToViewAdaptor viewAdaptor;
 	static String headers = 
-			"NOTIFICATION-SUBJECT|NOTIFICATION-BODY|REMINDER-SUBJECT|REMINDER-BODY|SENDER-ALIAS";
+			"NOTIFICATION-SUBJECT|NOTIFICATION-BODY|REMINDER-SUBJECT|REMINDER-BODY|SENDER-ALIAS|AUTO-LINEBREAK";
 	
 	public static void setViewAdaptor (IModelToViewAdaptor _viewAdaptor) { viewAdaptor = _viewAdaptor; }
 	
@@ -44,11 +44,22 @@ public class TemplateReader {
 				start = m.start(3);
 			}
 			
-		} catch (FileNotFoundException e) {
-			viewAdaptor.displayError("Could not find Email template file", "Could not find template");
-			// TODO - create a new template file in the directory
+			// TODO - Ensure that templates where found for all headers.  Print Error otherwise.
+			
+			// Transform newlines into HTML <br> tags
+			if (result.get("AUTO-LINEBREAK").equals("TRUE")) {
+				for (String key : result.keySet()) {
+					result.put(key, result.get(key).replace(System.lineSeparator(), "<br>"));
+				}
+			}
+			
+//			for (String key : result.keySet()) {
+//				System.out.format("%s:\n%s\n", key, result.get(key));
+//			}
+			
 		} catch (IOException e) {
-			viewAdaptor.displayError("Could not read Email template file", "Could not read template");
+			viewAdaptor.displayError("Could not read Email template file.  Ensure that a template file exists in "+RootDir, "Could not read templates");
+			return null;
 		}
 		
 		return result;
