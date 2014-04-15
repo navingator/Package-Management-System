@@ -1,6 +1,9 @@
 package util;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileIO {
@@ -14,6 +17,13 @@ public class FileIO {
 	}
 	
 	public static String getRootDir() { return progRootDir; }
+	
+	public static String loadFileAsString(String filePath) throws IOException {
+		// Read entire file into string
+		byte[] encoded;
+		encoded = Files.readAllBytes(Paths.get(filePath));
+		return new String(encoded);
+	}
 	
 	/*
 	 * Wrappers for the java.io package functions

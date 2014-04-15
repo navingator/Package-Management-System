@@ -65,16 +65,16 @@ public class TemplateHandler {
 		String RootDir = FileIO.getRootDir();
 		String filePath = RootDir + "/email-template.txt";
 		
+		String result = null;
+		
 		// Read entire file into string
-		byte[] encoded;
 		try {
-			encoded = Files.readAllBytes(Paths.get(filePath));
+			result = FileIO.loadFileAsString(filePath);
 		} catch (IOException e) {
 			viewAdaptor.displayError("Could not read Email template file.  Ensure that a template file exists in "+RootDir, "Could not read templates");
-			return null;
 		}
 		
-		return new String(encoded);
+		return result;
 	}
 	
 	public static void writeRawFile(String newTemplate) {

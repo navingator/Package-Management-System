@@ -1,6 +1,7 @@
 package view.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
@@ -37,10 +38,20 @@ import javax.swing.text.PlainDocument;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.nio.file.Paths;
+
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+
+import util.FileIO;
+
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.HyperlinkEvent;
 
 /**
  * Dialog that allows the user to change the email template.
@@ -55,6 +66,9 @@ public class EditTemplate extends JDialog {
 	private String newTemplate = null;
 
 	private JSplitPane splitPane;
+	
+
+	private String sidebarHTML;
 
 	/**
 	 * Create the dialog with specified previous Alias and email parameters
@@ -76,7 +90,6 @@ public class EditTemplate extends JDialog {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,}));
-
 		
 		// Warning label
 		JLabel lblNote = new JLabel("Edit the Email templates below.  Reminders for the format are in the box to the right.");
@@ -105,9 +118,45 @@ public class EditTemplate extends JDialog {
 		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		panel.add(scrollPane_1);
 		
+		// Load sidebar HTML help
+		String RootDir = FileIO.getRootDir();
+		String filePath = RootDir + "/template-help.html";
+		
+		
+		try {
+			// Read entire file into string
+			sidebarHTML = FileIO.loadFileAsString(filePath);
+			
+			// Add link to the document itself that can be loaded in a web browser.
+			String fileURL = filePath.replace("\\", "/").replace(" ", "%20");
+			String browserLink = String.format("<i>To view this information in your browser, <a href=\"file:/%s\">click here.</a></i>", fileURL);
+
+			sidebarHTML = sidebarHTML.replace("<body>", "<body>" + browserLink);
+		} catch (IOException e) {
+			sidebarHTML = "Could not load file \"template-help.html\".";
+		}
+		
 		JEditorPane lblNewLabel = new JEditorPane();
+		
+		// Allow links in the HTML help file to open in the default web browser
+		lblNewLabel.addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent event) {
+		        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+		        	String url = null;
+		        	
+		        	url = event.getURL().toString();
+
+		        	try { 
+						Desktop.getDesktop().browse(URI.create(url));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+		        }
+		    }
+		});
 		lblNewLabel.setContentType("text/html");
-		lblNewLabel.setText("<html> \r\n<h3>HTML</h3>\r\n<p>\r\nSome basic HTML tags are:<br>\r\n&lt;b&gt;bold&lt;/b&gt; for <b>bold</b> <br>\r\n&lt;u&gt;underline&lt;/u&gt; for <u>underline</u> <br>\r\n&lt;em&gt;emphasis&lt;/em&gt; for <em>emphasis</em>\r\n</p>\r\n<br>\r\n<h3>Comments</h3>\r\n<p>\r\nComments can be used to write\r\ncomments about the templates.\r\nThese are not included in the email.<br>\r\nComments begin with <b>/*</b><br>\r\nComments end with <b>*/</b><br>\r\n</p>\r\n\r\n</html>");
+		lblNewLabel.setText(sidebarHTML);
 		lblNewLabel.setEditable(false);
 		scrollPane_1.setViewportView(lblNewLabel);
 	
