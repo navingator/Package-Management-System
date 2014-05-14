@@ -187,11 +187,7 @@ public class Emailer {
 	 * have a new package 
 	 */
 	public boolean sendPackageNotification(Person recipient, Package pkg) {
-		
-		String comment = pkg.getComment();
-		String subject = "[Package Notification] " + comment;
-		String body = new String();
-		
+	
 		// Find variable values
 		Map<String,String> variables = new HashMap<String,String>();
 		variables.put("COMMENT", pkg.getComment());
@@ -205,19 +201,9 @@ public class Emailer {
 
 		// Load email templates from template file
 		Map<String,String> templates = TemplateHandler.getResolvedTemplates(variables);
-		
-//		body += recipient.getFullName() + ", You have a new package in the mail room.\n\n";
-//		
-//		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
-//		if(comment != null && !comment.isEmpty()) {
-//			body += "Comment: " + comment + "\n";
-//		}
-//		body += "Package ID: " + pkg.getPackageID() + "\n\n";
-//		
-//		body += senderAlias;
-		
-		body = templates.get("NOTIFICATION-BODY");
-		subject = templates.get("NOTIFICATION-SUBJECT");
+
+		String body = templates.get("NOTIFICATION-BODY");
+		String subject = templates.get("NOTIFICATION-SUBJECT");
 		try {
 			connect();
 			sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
@@ -324,24 +310,32 @@ public class Emailer {
 	private void sendPackageReminder(Person recipient, ArrayList<Package> packages) 
 			throws UnsupportedEncodingException, MessagingException {
 		
-		String subject = "[Package Reminder] You have " + packages.size() + " package";
-		if (packages.size() != 1) {
-			subject += 's';
-		}
-		subject += " in the mail room";
+		// Find variable values
+		Map<String,String> variables = new HashMap<String,String>();
+		variables.put("COMMENT", "");
+		variables.put("PKGTIME", "");
+		variables.put("PKGID",   "");  
+		variables.put("FNAME",   recipient.getFirstName());  
+		variables.put("LNAME",   recipient.getLastName());  
+		variables.put("NETID",   recipient.getPersonID());  
+		variables.put("NUMPKGS", String.valueOf(packages.size()));
+
+		// Load email templates from template file
+		Map<String,String> templates = TemplateHandler.getResolvedTemplates(variables);
+
+		String body = templates.get("REMINDER-BODY");
+		String subject = templates.get("REMINDER-SUBJECT");
 		
-		String body = "Please retrieve your packages as soon as possible.\n\n";
-		
-		for (int i=0; i<packages.size(); i++) {
-			Package pkg = packages.get(i);
-			body += "Package " + (i+1) + " (ID: " + pkg.getPackageID() + ")" + ":\n";
-			body += "\tChecked in on " + pkg.getCheckInDate().toString() + "\n";
-			if(!pkg.getComment().isEmpty()) {
-				body += "\tComment: " + pkg.getComment() + "\n";
-			}
-			body += "\n";
-		}
-		body += "Jones Mail Room";
+//		for (int i=0; i<packages.size(); i++) {
+//			Package pkg = packages.get(i);
+//			body += "Package " + (i+1) + " (ID: " + pkg.getPackageID() + ")" + ":\n";
+//			body += "\tChecked in on " + pkg.getCheckInDate().toString() + "\n";
+//			if(!pkg.getComment().isEmpty()) {
+//				body += "\tComment: " + pkg.getComment() + "\n";
+//			}
+//			body += "\n";
+//		}
+//		body += "Jones Mail Room";
 		sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
 	}
 	
