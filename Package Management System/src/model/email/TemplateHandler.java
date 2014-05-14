@@ -24,7 +24,7 @@ public class TemplateHandler {
 	
 	public static void setViewAdaptor (IModelToViewAdaptor _viewAdaptor) { viewAdaptor = _viewAdaptor; }
 	
-	public static HashMap<String,String> getTemplates() {
+	public static HashMap<String,String> getTemplates(boolean convert) {
 		String RootDir = FileIO.getRootDir();
 		HashMap<String,String> result = new HashMap<String,String>();
 		
@@ -48,7 +48,7 @@ public class TemplateHandler {
 		// TODO - Ensure that templates where found for all headers.  Print Error otherwise.
 		
 		// Transform newlines into HTML <br> tags
-		if (result.get("AUTO-LINEBREAK").equals("TRUE")) {
+		if (result.get("AUTO-LINEBREAK").equals("TRUE") && convert) {
 			for (String key : result.keySet()) {
 				result.put(key, result.get(key).replace(System.lineSeparator(), "<br>"));
 			}

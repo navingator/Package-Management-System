@@ -80,7 +80,7 @@ public class Emailer {
 		}
 		
 		// Load email templates from template file
-		templates = TemplateHandler.getTemplates();
+		templates = TemplateHandler.getTemplates(true);
 		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();

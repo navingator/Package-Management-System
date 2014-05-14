@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import model.IModelToViewAdaptor;
@@ -142,13 +143,16 @@ public class Controller{
 				return modelPM.deletePerson(personID);
 			}
 
-			@Override
 			public String getRawEmailTemplate() {
 				return modelPM.getRawEmailTemplate();
 			}
 			
 			public void changeEmailTemplate(String newTemplate) {
 				modelPM.changeEmailTemplate(newTemplate);
+			}
+
+			public Map<String,String> getEmailTemplates(boolean convert) {
+				return modelPM.getEmailTemplates(convert);
 			}
 			
 		});

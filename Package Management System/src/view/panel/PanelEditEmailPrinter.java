@@ -2,6 +2,7 @@ package view.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -10,6 +11,7 @@ import view.IViewToModelAdaptor;
 import view.MainFrame;
 import view.dialog.ChangeEmail;
 import view.dialog.EditTemplate;
+import view.dialog.EditTemplateEasy;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -66,15 +68,15 @@ public class PanelEditEmailPrinter extends JPanel{
 		btnChangeEmailTemplate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		
-				// open the change email dialog
-				String oldTemplate = modelAdaptor.getRawEmailTemplate();
+				// open the change email dialog				
+				Map<String,String> templateMap = modelAdaptor.getEmailTemplates(false);
 				
-				EditTemplate emailDlg = new EditTemplate(frame, oldTemplate);
-				String newTemplate = emailDlg.showDialog();
+				EditTemplateEasy emailDlg = new EditTemplateEasy(frame, templateMap);
+				Map<String, String> newTemplate = emailDlg.showDialog();
 				
 				// make the changes in the model
 				if (newTemplate != null) {
-					modelAdaptor.changeEmailTemplate(newTemplate);
+					//modelAdaptor.changeEmailTemplate(newTemplate);
 				}
 				
 			}

@@ -1,6 +1,7 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import util.Package;
 import util.Pair;
@@ -139,10 +140,17 @@ public interface IViewToModelAdaptor {
 	public String getEmailAlias();
 	
 	/**
-	 * Returns email template
+	 * Returns raw email template
 	 * @return                  String containing email template
 	 */
 	public String getRawEmailTemplate();
+	
+	/**
+	 * Returns email template as a Map of Strings to Strings.  If TRUE is given, will replace linebreaks with <br> HTML tags
+	 * if the AUTO-LINEBREAK option is TRUE in the template file.  If FALSE is given, will not replace linebreaks.
+	 * @return                  String containing email template
+	 */
+	public Map<String,String> getEmailTemplates(boolean convert);
 	
 	/**
 	 * Returns all of the packages with the appropriate filters applied

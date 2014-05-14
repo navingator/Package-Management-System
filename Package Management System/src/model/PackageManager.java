@@ -3,6 +3,7 @@ package model;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import model.database.Database;
 import model.email.Emailer;
@@ -85,6 +86,10 @@ public class PackageManager {
 	
 	public String getRawEmailTemplate() {
 		return TemplateHandler.getRawFile();
+	}
+	
+	public Map<String,String> getEmailTemplates(boolean convert) {
+		return TemplateHandler.getTemplates(convert);
 	}
 	
 	public void changeEmailTemplate(String newTemplate) {
