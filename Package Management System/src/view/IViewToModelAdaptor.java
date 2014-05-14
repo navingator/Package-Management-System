@@ -146,11 +146,15 @@ public interface IViewToModelAdaptor {
 	public String getRawEmailTemplate();
 	
 	/**
-	 * Returns email template as a Map of Strings to Strings.  If TRUE is given, will replace linebreaks with <br> HTML tags
-	 * if the AUTO-LINEBREAK option is TRUE in the template file.  If FALSE is given, will not replace linebreaks.
+	 * Returns email template as a Map of Strings to Strings.  
+	 * 
+	 * @param convert           If TRUE is given for convert, will replace linebreaks with <br> HTML tags if the AUTO-LINEBREAK option is TRUE in the template file.
+	 * 							If FALSE is given, will not replace linebreaks.
+	 * @param comments          If TRUE, returns with comments intact.  Otherwise removes comments.
+	 * 
 	 * @return                  String containing email template
 	 */
-	public Map<String,String> getEmailTemplates(boolean convert);
+	public Map<String,String> getEmailTemplates(boolean convert, boolean comments);
 	
 	/**
 	 * Returns all of the packages with the appropriate filters applied

@@ -147,8 +147,8 @@ public class Controller{
 				return modelPM.getRawEmailTemplate();
 			}
 
-			public Map<String,String> getEmailTemplates(boolean convert) {
-				return modelPM.getEmailTemplates(convert);
+			public Map<String,String> getEmailTemplates(boolean convert, boolean comments) {
+				return modelPM.getEmailTemplates(convert, comments);
 			}
 
 			public void changeEmailTemplate(Map<String, String> newTemplate) {

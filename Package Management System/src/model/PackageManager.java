@@ -88,8 +88,8 @@ public class PackageManager {
 		return TemplateHandler.getRawFile();
 	}
 	
-	public Map<String,String> getEmailTemplates(boolean convert) {
-		return TemplateHandler.getTemplates(convert);
+	public Map<String,String> getEmailTemplates(boolean convert, boolean comments) {
+		return TemplateHandler.getTemplates(convert, comments);
 	}
 	
 	public void changeEmailTemplate(Map<String,String> newTemplate) {

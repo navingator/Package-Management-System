@@ -26,9 +26,12 @@ public class TemplateHandler {
 	static String headers = 
 			"NOTIFICATION-SUBJECT|NOTIFICATION-BODY|REMINDER-SUBJECT|REMINDER-BODY|SENDER-ALIAS|AUTO-LINEBREAK";
 	
+	static Pattern varResolutionPat = Pattern.compile("(?<!\\\\)\\$([A-Z\\-]*)");
+	static Map<String, Matcher> varResolutionMats= new HashMap<String, Matcher>();
+	
 	public static void setViewAdaptor (IModelToViewAdaptor _viewAdaptor) { viewAdaptor = _viewAdaptor; }
 	
-	public static HashMap<String,String> getTemplates(boolean convert) {
+	public static HashMap<String,String> getTemplates(boolean convert, boolean comments) {
 		String RootDir = FileIO.getRootDir();
 		HashMap<String,String> result = new HashMap<String,String>();
 		
@@ -36,7 +39,9 @@ public class TemplateHandler {
 		String fileStr = getRawFile();
 		
 		// Remove all C-style block comments
-		fileStr = fileStr.replaceAll("(?s)/\\*.*?\\*/", "");
+		if (!comments) {
+			fileStr = fileStr.replaceAll("(?s)/\\*.*?\\*/", "");
+		}
 		
 		// Create matcher for the text surrounded by headers
 		Matcher m = Pattern.compile("("+headers+"):"+ "(.*?)" + "("+headers+"|\\z)", Pattern.DOTALL).matcher(fileStr);
@@ -102,6 +107,8 @@ public class TemplateHandler {
 	public static void writeNewTemplates(Map<String, String> newTemplate) {
 		String RootDir = FileIO.getRootDir();
 		String filePath = RootDir + "/email-template.txt";
+		
+		varResolutionMats.clear();
 
 		try {
 			BufferedWriter wr = new BufferedWriter(new FileWriter(filePath, false));
@@ -122,5 +129,38 @@ public class TemplateHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static Map<String, String> getResolvedTemplates(Map<String, String> variables) {
+		Map<String,String> rawTemplates = getTemplates(true, false);
+		Map<String,String> resolvedTemplates = new HashMap<String,String>();
+		variables.put("ALIAS", rawTemplates.get("SENDER-ALIAS"));
+		
+		for (String header : rawTemplates.keySet()) {
+			String resolved = rawTemplates.get(header);
+			
+			if (header.matches("(NOTIFICATION|REMINDER)-(SUBJECT|BODY)")) {
+				System.out.format("looking in %s\n", header);
+				
+				if (!varResolutionMats.containsKey(header)) {
+					varResolutionMats.put(header, varResolutionPat.matcher(rawTemplates.get(header)));
+				}
+				Matcher matcher = varResolutionMats.get(header);
+				matcher.reset();
+				
+				resolved = rawTemplates.get(header);
+				
+				while(matcher.find()) {
+					System.out.format("found: %s\n", matcher.group(1));
+					resolved = resolved.replace("$"+matcher.group(1), variables.get(matcher.group(1)));
+				}
+				
+				System.out.format("resolved: \n%s\n", resolved);
+			}
+			
+			resolvedTemplates.put(header, resolved);
+		}
+		
+		return resolvedTemplates;
 	}
 }

@@ -69,7 +69,7 @@ public class PanelEditEmailPrinter extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 		
 				// open the change email dialog				
-				Map<String,String> templateMap = modelAdaptor.getEmailTemplates(false);
+				Map<String,String> templateMap = modelAdaptor.getEmailTemplates(false, true);
 				
 				EditTemplateEasy emailDlg = new EditTemplateEasy(frame, templateMap);
 				Map<String, String> newTemplate = emailDlg.showDialog();

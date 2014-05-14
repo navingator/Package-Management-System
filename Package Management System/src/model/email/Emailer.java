@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -45,7 +46,7 @@ public class Emailer {
 	private Session session;
 	private Transport transport;
 	
-	private HashMap<String,String> templates;
+	//private HashMap<String,String> templates;
 	
 	private Logger logger;
 	private IModelToViewAdaptor viewAdaptor;
@@ -79,9 +80,6 @@ public class Emailer {
 			changeEmail();
 		}
 		
-		// Load email templates from template file
-		templates = TemplateHandler.getTemplates(true);
-		
 		// attempt to connect to the mail server and alert user if it fails
 		attemptConnection();
 		
@@ -110,10 +108,6 @@ public class Emailer {
 		
 	}
 	
-	public void setTemplates() {
-		//propHandler.
-	}
-	
 	/**
 	 * Attempts to connect to the Gmail server with stored credentials
 	 * Sends error messages to the view if an authentication error or a 
@@ -127,12 +121,19 @@ public class Emailer {
 				closeConnection();
 				retry = false;
 			} catch (AuthenticationFailedException e){ 
+					System.err.format(e.toString());
+					e.printStackTrace();
+					
 					viewAdaptor.displayMessage("Incorrect username or password.\n","");
+					
+					
 					if (!changeEmail()) {
 						retry = false;
 						viewAdaptor.displayMessage("Emails will not be sent until a connection is established.",
 								"");
 					}
+					
+					
 			} catch (MessagingException e) {
 				logger.warning("Failed to connect to the mail server.");
 				String[] options = {"Retry", "Cancel"};
@@ -191,17 +192,32 @@ public class Emailer {
 		String subject = "[Package Notification] " + comment;
 		String body = new String();
 		
-		//body = templates.get("NOTIFICATION-BODY") + "\n";
+		// Find variable values
+		Map<String,String> variables = new HashMap<String,String>();
+		variables.put("COMMENT", pkg.getComment());
+		variables.put("PKGTIME", pkg.getCheckInDate().toString());
+		variables.put("PKGID",   String.valueOf(pkg.getPackageID()));  
+		variables.put("FNAME",   recipient.getFirstName());  
+		variables.put("LNAME",   recipient.getLastName());  
+		variables.put("NETID",   recipient.getPersonID());  
+		variables.put("NUMPKGS", "--");
+		//variables.put("ALIAS",   "");  
+
+		// Load email templates from template file
+		Map<String,String> templates = TemplateHandler.getResolvedTemplates(variables);
 		
-		body += recipient.getFullName() + ", You have a new package in the mail room.\n\n";
+//		body += recipient.getFullName() + ", You have a new package in the mail room.\n\n";
+//		
+//		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
+//		if(comment != null && !comment.isEmpty()) {
+//			body += "Comment: " + comment + "\n";
+//		}
+//		body += "Package ID: " + pkg.getPackageID() + "\n\n";
+//		
+//		body += senderAlias;
 		
-		body += "Checked in on " + pkg.getCheckInDate().toString() + "\n";
-		if(comment != null && !comment.isEmpty()) {
-			body += "Comment: " + comment + "\n";
-		}
-		body += "Package ID: " + pkg.getPackageID() + "\n\n";
-		
-		body += senderAlias;
+		body = templates.get("NOTIFICATION-BODY");
+		subject = templates.get("NOTIFICATION-SUBJECT");
 		try {
 			connect();
 			sendEmail(recipient.getEmailAddress(), recipient.getFullName(), subject, body);
