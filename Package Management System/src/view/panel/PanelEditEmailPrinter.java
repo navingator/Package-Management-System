@@ -76,8 +76,8 @@ public class PanelEditEmailPrinter extends JPanel{
 				
 				// make the changes in the model
 				if (newTemplate != null) {
-					//modelAdaptor.changeEmailTemplate(newTemplate);
-				}
+					modelAdaptor.changeEmailTemplate(newTemplate);
+				} 
 				
 			}
 		});

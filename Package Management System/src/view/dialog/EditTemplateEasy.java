@@ -44,6 +44,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JTextArea;
@@ -57,6 +58,10 @@ import javax.swing.JCheckBox;
 
 import java.awt.GridLayout;
 import java.awt.Color;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 /**
  * Dialog that allows the user to change the email template.
@@ -84,11 +89,7 @@ public class EditTemplateEasy extends JDialog {
 		setTitle("Edit Email Template");
 		setSize(850, 450);
 		setLocationRelativeTo(frame);
-		
-		for(String header : templateMap.keySet()) {
-			System.out.format("%s:\n%s\n\n", header, templateMap.get(header));
-		}
-		
+
 		panelEditEmail.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(90dlu;default):grow"),
@@ -102,7 +103,7 @@ public class EditTemplateEasy extends JDialog {
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,}));
 		
-		// Warning label
+		// Reminder label
 		JLabel lblNote = new JLabel("Edit the Email templates below.  Reminders for the format are in the box to the right.");
 		panelEditEmail.add(lblNote, "2, 2, center, default");
 		
@@ -126,17 +127,7 @@ public class EditTemplateEasy extends JDialog {
 	
 		
 		
-		// Submit changes
-		JButton btnSaveChanges = new JButton("Save");
-		btnSaveChanges.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// return new edited template file text
-				//newTemplate = textArea.getText();
-				
-				setVisible(false);
-				dispose();
-			}
-		});
+		
 		
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -185,10 +176,13 @@ public class EditTemplateEasy extends JDialog {
 			new RowSpec[] {
 				RowSpec.decode("22px"),}));
 		
-		JCheckBox chckbxAutoLinebreak = new JCheckBox("Auto-Linebreak");
+		final JCheckBox chckbxAutoLinebreak = new JCheckBox("Auto-Linebreak");
+		
 		panel.add(chckbxAutoLinebreak, "1, 1, right, default");
 		chckbxAutoLinebreak.setToolTipText("Automatically converts linebreaks into <br> HTML tags.  Unless you know what you're doing, you probably want this checked.");
 		chckbxAutoLinebreak.setSelected(templateMap.get("AUTO-LINEBREAK").equals("TRUE"));
+		
+		System.out.format("AutoLinebreak: %s\n", chckbxAutoLinebreak.getSelectedObjects());
 		
 		JLabel lblSenderAlias = new JLabel("Sender Alias");
 		pnlTemplates.add(lblSenderAlias, "2, 4, right, default");
@@ -209,7 +203,7 @@ public class EditTemplateEasy extends JDialog {
 		JLabel lblNotificationEmail = new JLabel("Notification Body");
 		pnlTemplates.add(lblNotificationEmail, "2, 8, right, top");
 		
-		JTextPane txtNotificationBody = new JTextPane();
+		final JTextPane txtNotificationBody = new JTextPane();
 		pnlTemplates.add(txtNotificationBody, "4, 8, 3, 1, fill, fill");
 		txtNotificationBody.setText(templateMap.get("NOTIFICATION-BODY"));
 
@@ -227,7 +221,7 @@ public class EditTemplateEasy extends JDialog {
 		pnlTemplates.add(lblReminderBody, "2, 12, right, top");
 
 		
-		JTextPane txtReminderBody = new JTextPane();
+		final JTextPane txtReminderBody = new JTextPane();
 		pnlTemplates.add(txtReminderBody, "4, 12, 3, 1, fill, fill");
 		txtReminderBody.setText(templateMap.get("REMINDER-BODY"));
 
@@ -258,6 +252,24 @@ public class EditTemplateEasy extends JDialog {
 		pnltxtHelp.setText(sidebarHTML);
 		pnltxtHelp.setEditable(false);
 		scrollPane_1.setViewportView(pnltxtHelp);
+		
+		// Submit changes
+		JButton btnSaveChanges = new JButton("Save");
+		btnSaveChanges.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// return new edited template text
+				newTemplates = new HashMap<String,String>();
+				newTemplates.put("AUTO-LINEBREAK", chckbxAutoLinebreak.getSelectedObjects() != null ? "TRUE" : "FALSE");
+				newTemplates.put("SENDER-ALIAS", txtSenderAlias.getText());
+				newTemplates.put("NOTIFICATION-SUBJECT", txtNotificationSubject.getText());
+				newTemplates.put("NOTIFICATION-BODY", txtNotificationBody.getText());
+				newTemplates.put("REMINDER-SUBJECT", txtReminderSubject.getText());
+				newTemplates.put("REMINDER-BODY", txtReminderBody.getText());
+				
+				setVisible(false);
+				dispose();
+			}
+		});
 		
 		panelEditEmail.add(btnSaveChanges, "2, 6, center, default");
 		getContentPane().add(panelEditEmail);

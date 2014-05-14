@@ -146,13 +146,13 @@ public class Controller{
 			public String getRawEmailTemplate() {
 				return modelPM.getRawEmailTemplate();
 			}
-			
-			public void changeEmailTemplate(String newTemplate) {
-				modelPM.changeEmailTemplate(newTemplate);
-			}
 
 			public Map<String,String> getEmailTemplates(boolean convert) {
 				return modelPM.getEmailTemplates(convert);
+			}
+
+			public void changeEmailTemplate(Map<String, String> newTemplate) {
+				modelPM.changeEmailTemplate(newTemplate);
 			}
 			
 		});

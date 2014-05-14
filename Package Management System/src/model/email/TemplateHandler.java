@@ -1,15 +1,19 @@
 package model.email;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +90,31 @@ public class TemplateHandler {
 			os = new FileOutputStream(filePath, false);
 			os.write(newTemplate.getBytes());
 			os.close();
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeNewTemplates(Map<String, String> newTemplate) {
+		String RootDir = FileIO.getRootDir();
+		String filePath = RootDir + "/email-template.txt";
+
+		try {
+			BufferedWriter wr = new BufferedWriter(new FileWriter(filePath, false));
+			
+			for (String header : newTemplate.keySet()) {
+				wr.write(header+":");
+				wr.newLine();
+				wr.write(newTemplate.get(header));
+				wr.newLine();
+				wr.newLine();
+			}
+			
+			wr.close();
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

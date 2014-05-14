@@ -92,8 +92,8 @@ public class PackageManager {
 		return TemplateHandler.getTemplates(convert);
 	}
 	
-	public void changeEmailTemplate(String newTemplate) {
-		TemplateHandler.writeRawFile(newTemplate);
+	public void changeEmailTemplate(Map<String,String> newTemplate) {
+		TemplateHandler.writeNewTemplates(newTemplate);
 	}
 	
 	/*

@@ -205,5 +205,5 @@ public interface IViewToModelAdaptor {
 	 * 
 	 * @param newTemplate
 	 */
-	public void changeEmailTemplate(String newTemplate);
+	public void changeEmailTemplate(Map<String,String> newTemplate);
 }
